@@ -12,7 +12,7 @@
     "url": "git+https://github.com/recyclejs/recycle.git"
   },
   "author": "Domagoj Kriskovic",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/recyclejs/recycle/issues"
   },
