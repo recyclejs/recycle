@@ -123,6 +123,9 @@ function ReCycle(adapter, additionalSources) {
 }
 
 export default (adapter, sources) => {
+  if (!adapter)
+    throw new Error('No adapter provided')
+
   return {
     render: ReCycle(adapter, sources)
   }
