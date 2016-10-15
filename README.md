@@ -15,14 +15,14 @@ A functional and reactive JavaScript framework for creating components where Vie
   1. [Functional](#functional)
   1. [Reactive](#reactive)
 1. [Comparison with Cycle.js](#comparison-with-cyclejs)
-1. [View-Actions-Reducer](#view-actions-reducer)
+1. [Reducer-View-Actions](#reducer-view-actions)
 1. [Examples](#examples)
   1. [Simple Component](#simple-component)
   1. [Stateful Component](#stateful-component)
   1. [Application](#application)
   1. [Component with actions](#component-with-actions)
   1. [TodoMVC](#todomvc)
-1. [Why CSS selectors for querying DOM events?](#why_css_selectors_for_querying_dom_events)
+1. [Why CSS selectors for querying DOM events?](#why-css-selectors-for-querying-dom-events)
 
 
 ## Installation
