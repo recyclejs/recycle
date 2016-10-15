@@ -281,7 +281,7 @@ export default ({editing}, {completed, title}) => (
 ### TodoMVC
 To see how are these actions are used in parent component, check the whole implementation:
 
-  - [TodoMVC using RxJS](https://github.com/recyclejs/todomvc-xstream)
+  - [TodoMVC using RxJS](https://github.com/recyclejs/todomvc-rxjs)
   - [TodoMVC using xstream](https://github.com/recyclejs/todomvc-xstream)
 
 ## Why CSS selectors for querying DOM events?
