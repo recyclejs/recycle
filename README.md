@@ -1,4 +1,7 @@
 # ReCycle
+
+A functional and reactive JavaScript framework for creating components where View is a visual representation of the state which can be changed by reducers reacting to actions.
+
 ```javascript
 const ReCycle = leverage('Cycle.js')
   .forCreatingComponents()
@@ -6,8 +9,6 @@ const ReCycle = leverage('Cycle.js')
   .and('Redux') 
   .using('RxJS') //or xstream   
 ```
-
-A functional and reactive JavaScript framework for creating components where View is a visual representation of the state which can be changed by reducers reacting to actions.
 
 ## Table of Contents
 1. [Installation](#installation)
