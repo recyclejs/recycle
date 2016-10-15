@@ -11,6 +11,7 @@ A functional and reactive JavaScript framework for creating components where Vie
 
 ## Table of Contents
 1. [Installation](#installation)
+1. [JSX and hyperscript](#jsx-and-hyperscript)
 1. [Comparison with React/Redux](#comparison-with-reactredux)
   1. [Functional](#functional)
   1. [Reactive](#reactive)
@@ -40,6 +41,9 @@ If you are working with xstream
 ```
 npm install --save recycle-xstream
 ```
+
+## JSX and hyperscript
+For views, ReCycle uses [snabbdom](https://github.com/snabbdom/snabbdom). That means you can use [hyperscript](https://github.com/ohanhi/hyperscript-helpers) or [JSX](https://github.com/yelouafi/snabbdom-jsx)
 
 ## Comparison with React/Redux
 
