@@ -1,10 +1,11 @@
 let DOMscope = 0
 
-export const ReCycleComponent = ({parent, DOM, adapter, additionalSources}) => {
+export const ReCycleComponent = ({parent, DOM, adapter, additionalSources, name}) => {
 
   let childrenComponents = []
   let actions$
   let childActions = adapter.makeSubject()
+  let componentState
 
   DOM = DOM.isolateSource(DOM, ++DOMscope)
   let componentSources = Object.assign(additionalSources || {}, {
@@ -16,17 +17,24 @@ export const ReCycleComponent = ({parent, DOM, adapter, additionalSources}) => {
       return
 
     childActions.observer.next(adapter.mergeArray(
-      childrenComponents.map(component => component.getActionsStream())
+      childrenComponents
+        .filter(component => component.getActionsStream())
+        .map(component => component.getActionsStream())
     ))
   }
 
   const render = ({view, actions, reducer, children, initialState, onStateUpdate}) => {
     
-    let componentActions = actions(componentSources, adapter.flatten(childActions.stream))
-    if (!Array.isArray(componentActions))
-      componentActions = [componentActions]
+    componentState = initialState
 
-    actions$ = adapter.mergeArray(componentActions)
+    if (actions) {
+      let componentActions = actions(componentSources, adapter.flatten(childActions.stream), componentState)
+      if (!Array.isArray(componentActions))
+        componentActions = [componentActions]
+
+      actions$ = adapter.mergeArray(componentActions)
+    }
+
 
     let state$ = adapter.of(initialState)
     if (reducer) {
@@ -45,10 +53,29 @@ export const ReCycleComponent = ({parent, DOM, adapter, additionalSources}) => {
       .map(state => {
         clearChildren()
 
+        componentState = state
+
         if (onStateUpdate)
           onStateUpdate(state)
 
-        return view(state, wrapChildComponents(children))
+        let returned
+        let errNotified
+        try {
+          returned = view(state, wrapChildComponents(children))
+        } catch(e) {
+          errNotified = true
+          console.error(e)
+        }
+        if (!errNotified && (!returned || !returned.sel)) {
+          let message = 'Unsupported View'
+          if (name)
+            message += ' in component "'+name+'"'
+
+          console.error(message)
+        }
+          
+
+        return returned;
       })
     
     if (parent) 
@@ -78,6 +105,7 @@ export const ReCycleComponent = ({parent, DOM, adapter, additionalSources}) => {
             parent: thisComponent, 
             DOM, 
             adapter, 
+            name: child,
             additionalSources
           }).render(children[child](...arguments))
         }

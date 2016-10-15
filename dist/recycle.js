@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -10,11 +10,13 @@ var ReCycleComponent = exports.ReCycleComponent = function ReCycleComponent(_ref
   var DOM = _ref.DOM;
   var adapter = _ref.adapter;
   var additionalSources = _ref.additionalSources;
+  var name = _ref.name;
 
 
   var childrenComponents = [];
   var actions$ = void 0;
   var childActions = adapter.makeSubject();
+  var componentState = void 0;
 
   DOM = DOM.isolateSource(DOM, ++DOMscope);
   var componentSources = Object.assign(additionalSources || {}, {
@@ -26,7 +28,9 @@ var ReCycleComponent = exports.ReCycleComponent = function ReCycleComponent(_ref
   var updateChildActions = function updateChildActions() {
     if (!childrenComponents.length) return;
 
-    childActions.observer.next(adapter.mergeArray(childrenComponents.map(function (component) {
+    childActions.observer.next(adapter.mergeArray(childrenComponents.filter(function (component) {
+      return component.getActionsStream();
+    }).map(function (component) {
       return component.getActionsStream();
     })));
   };
@@ -40,14 +44,18 @@ var ReCycleComponent = exports.ReCycleComponent = function ReCycleComponent(_ref
     var onStateUpdate = _ref2.onStateUpdate;
 
 
-    var componentActions = actions(componentSources, adapter.flatten(childActions.stream));
-    if (!Array.isArray(componentActions)) componentActions = [componentActions];
+    componentState = initialState;
 
-    actions$ = adapter.mergeArray(componentActions);
+    if (actions) {
+      var componentActions = actions(componentSources, adapter.flatten(childActions.stream), componentState);
+      if (!Array.isArray(componentActions)) componentActions = [componentActions];
+
+      actions$ = adapter.mergeArray(componentActions);
+    }
 
     var state$ = adapter.of(initialState);
     if (reducer) {
-      var componentReducers = reducer(actions$, componentSources);
+      var componentReducers = reducer(actions$, componentSources, componentState);
       if (!Array.isArray(componentReducers)) componentReducers = [componentReducers];
 
       state$ = adapter.fold(adapter.mergeArray(componentReducers), function (state, reducer) {
@@ -58,9 +66,26 @@ var ReCycleComponent = exports.ReCycleComponent = function ReCycleComponent(_ref
     var view$ = state$.map(function (state) {
       clearChildren();
 
+      componentState = state;
+
       if (onStateUpdate) onStateUpdate(state);
 
-      return view(state, wrapChildComponents(children));
+      var returned = void 0;
+      var errNotified = void 0;
+      try {
+        returned = view(state, wrapChildComponents(children));
+      } catch (e) {
+        errNotified = true;
+        console.error(e);
+      }
+      if (!errNotified && (!returned || !returned.sel)) {
+        var message = 'Unsupported View';
+        if (name) message += ' in component "' + name + '"';
+
+        console.error(message);
+      }
+
+      return returned;
     });
 
     if (parent) parent.updateChildActions();
@@ -90,6 +115,7 @@ var ReCycleComponent = exports.ReCycleComponent = function ReCycleComponent(_ref
             parent: thisComponent,
             DOM: DOM,
             adapter: adapter,
+            name: child,
             additionalSources: additionalSources
           }).render(children[child].apply(children, arguments));
         };
@@ -139,6 +165,8 @@ function ReCycle(adapter, additionalSources) {
 }
 
 exports.default = function (adapter, sources) {
+  if (!adapter) throw new Error('No adapter provided');
+
   return {
     render: ReCycle(adapter, sources)
   };
