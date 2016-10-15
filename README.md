@@ -287,7 +287,7 @@ To see how are these actions are used in parent component, check the whole imple
 ## Why CSS selectors for querying DOM events?
 Besides from using Observables, probably the biggest difference from React is the fact that CSS selectors are used for defining actions. In [Cycle.js documentation](https://cycle.js.org/model-view-intent.html) there is a good explanation on this issue:
 
-Some programmers get concerned about `$(selector).events(eventType)` being a bad practice because it resembles spaghetti code in jQuery-based programs. They would rather prefer the virtual DOM elements to specify handler callbacks for events, such as `onClick={this.handleClick()}`.
+Some programmers get concerned about `sources.$(selector).events(eventType)` being a bad practice because it resembles spaghetti code in jQuery-based programs. They would rather prefer the virtual DOM elements to specify handler callbacks for events, such as `onClick={this.handleClick()}`.
 
 The choice for selector-based event querying in Cycle DOM is an informed and rational decision. This strategy enables MVI to be reactive and is inspired by the [open-closed principle](https://en.wikipedia.org/wiki/Open/closed_principle).
 
