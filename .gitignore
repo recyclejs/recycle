@@ -3,6 +3,7 @@ index.js
 component.js
 view.js
 view/
+sources/
 rxjs/
 
 node_modules
