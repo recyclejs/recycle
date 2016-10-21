@@ -2,10 +2,10 @@
   "name": "recyclejs",
   "version": "0.1.2",
   "description": "",
-  "main": "dist/recycle.js",
+  "main": "index.js",
   "scripts": {
     "test": "mocha --compilers js:babel-register",
-    "build": "babel src -d dist"
+    "build": "babel src -d ./"
   },
   "repository": {
     "type": "git",
@@ -24,5 +24,15 @@
     "babel-register": "^6.11.6",
     "chai": "^3.5.0",
     "recycle-xstream": "0.0.1"
+  },
+  "dependencies": {
+    "@cycle/dom": "^12.2.5",
+    "@cycle/history": "^4.0.1",
+    "@cycle/rxjs-adapter": "^3.0.3",
+    "@cycle/rxjs-run": "^3.0.3",
+    "history": "^4.3.0",
+    "rxjs": "^5.0.0-rc.1",
+    "snabbdom-jsx": "^0.3.1",
+    "xstream": "^6.4.1"
   }
 }
