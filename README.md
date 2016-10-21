@@ -13,7 +13,7 @@ const Recycle = leverage('Cycle.js')
 
 ## Table of Contents
 1. [Installation](#installation)
-1. [Comparison with React](#comparison-with-react)
+1. [Comparison with React](#comparison-with-reactjs)
   1. [Functional](#functional)
   1. [Reactive](#reactive)
 1. [Comparison with Redux](#comparison-with-redux)
