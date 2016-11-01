@@ -15,38 +15,6 @@ export default function recycleComponent(constructor, componentKey, parent) {
   let domSelectors = {}
   let inErrorState = false
 
-  function jsxHandler() {
-    if (typeof arguments['0'] == 'function') {
-
-      let constructor = arguments['0']
-      let props = arguments['1'] || {}
-      let key = props.key
-
-      if (isReactClass(constructor))
-        return getReactElement(arguments, jsxHandler)
-
-      let child = getChild(constructor, key, savedChildren)
-      if (child) {
-        if (!inErrorState && timesRendered === 1) {
-          inErrorState = true
-          
-          if (!child.getKey())
-            throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
-          else
-            throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
-        }
-
-        return React.createElement(child.getReactComponent(), props)
-      }
-
-      let newComponent = recycleComponent(constructor, key, thisComponent)
-      registerComponent(newComponent, savedChildren)
-      return React.createElement(newComponent.getReactComponent(), props)
-
-    }
-    return React.createElement.apply(React, arguments)
-  }
-
   function createReactComponent() {
     let {
       view, 
@@ -115,6 +83,38 @@ export default function recycleComponent(constructor, componentKey, parent) {
         return true
       }
     })
+  }
+
+  function jsxHandler() {
+    if (typeof arguments['0'] == 'function') {
+
+      let constructor = arguments['0']
+      let props = arguments['1'] || {}
+      let key = props.key
+
+      if (isReactClass(constructor))
+        return getReactElement(arguments, jsxHandler)
+
+      let child = getChild(constructor, key, savedChildren)
+      if (child) {
+        if (!inErrorState && timesRendered === 1) {
+          inErrorState = true
+          
+          if (!child.getKey())
+            throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
+          else
+            throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
+        }
+
+        return React.createElement(child.getReactComponent(), props)
+      }
+
+      let newComponent = recycleComponent(constructor, key, thisComponent)
+      registerComponent(newComponent, savedChildren)
+      return React.createElement(newComponent.getReactComponent(), props)
+
+    }
+    return React.createElement.apply(React, arguments)
   }
 
   function addChild(c) {
