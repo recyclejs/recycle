@@ -9,7 +9,7 @@ function isReactClass(component) {
 
 function recycleComponent(constructor, parent) {
 
-  let reactComponent
+  let ReactComponent
   let actions$
   let childActions = makeSubject()
   let componentLifecycle = makeSubject()
@@ -79,7 +79,7 @@ function recycleComponent(constructor, parent) {
 
   const render = ({view, actions, reducers, initialState, shouldComponentUpdate, propTypes, defaultProps, displayName}) => {
 
-    class ReactComponent extends React.Component {
+    ReactComponent = class extends React.Component {
       constructor(props) {
         super(props);
         this.state = initialState
@@ -150,12 +150,6 @@ function recycleComponent(constructor, parent) {
       ReactComponent.defaultProps = defaultProps
 
     ReactComponent.displayName = displayName || constructor.name
-
-    reactComponent = ReactComponent
-  }
-
-  const renderContainer = () => {
-
   }
 
   const addChild = (c) => {
@@ -186,7 +180,7 @@ function recycleComponent(constructor, parent) {
   }
 
   const getReactComponent = () => {
-    return reactComponent;
+    return ReactComponent;
   }
 
   render(constructor())
