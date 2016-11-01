@@ -117,8 +117,8 @@ export default function recycleComponent(constructor, componentKey, parent) {
     return React.createElement.apply(React, arguments)
   }
 
-  function addChild(c) {
-    childrenComponents.push(c);
+  function addChild(component) {
+    childrenComponents.push(component);
   }
 
   function updateChildActions() {
