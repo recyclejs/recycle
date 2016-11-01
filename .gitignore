@@ -1,10 +1,7 @@
 # Generated code
-index.js
-component.js
-view.js
-view/
-sources/
-rxjs/
+/component.js
+/index.js
+/rxjs.js
 
 node_modules
 .DS_Store
