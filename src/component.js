@@ -3,9 +3,6 @@ import ReactDOM from 'react-dom'
 import { Observable, makeSubject, mergeArray } from './rxjs'
 
 // todo export react propTypes
-function isReactClass(component) {
-  return (component.prototype.render)
-}
 
 function recycleComponent(constructor, parent) {
 
@@ -106,16 +103,7 @@ function recycleComponent(constructor, parent) {
 
         if (reducers) {
           let componentReducers = reducers(componentSources, this.props)
-          if (!Array.isArray(componentReducers))
-            componentReducers = [componentReducers]
-
-          let state$ = mergeArray(componentReducers)
-            .startWith(initialState)
-            .scan((state, {reducer, action}) => {
-              componentLifecycle.observer.next({ type: 'willCallReducer', action, reducer})
-              return reducer(state, action)
-            })
-            .share()
+          let state$ = getStateStream(componentReducers, initialState, componentLifecycle)
 
           state$.subscribe((state) => {
             this.setState(state)
@@ -200,6 +188,10 @@ function recycleComponent(constructor, parent) {
   return thisComponent;
 }
 
+function isReactClass(component) {
+  return (component.prototype.render)
+}
+
 function getDomObservable(domSelectors, selector, event) {
   if (domSelectors[selector] && domSelectors[selector][event])
     return domSelectors[selector][event].stream.switch().share()
@@ -210,6 +202,19 @@ function getDomObservable(domSelectors, selector, event) {
   domSelectors[selector][event] = makeSubject()
 
   return domSelectors[selector][event].stream.switch().share()
+}
+
+function getStateStream(componentReducers, initialState, componentLifecycle) {
+  if (!Array.isArray(componentReducers))
+      componentReducers = [componentReducers]
+
+  return mergeArray(componentReducers)
+    .startWith(initialState)
+    .scan((state, {reducer, action}) => {
+      componentLifecycle.observer.next({ type: 'willCallReducer', action, reducer})
+      return reducer(state, action)
+    })
+    .share()
 }
 
 function updateDomObservables(domSelectors, el) {
