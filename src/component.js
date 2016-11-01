@@ -183,11 +183,8 @@ function recycleComponent(constructor, parent) {
     return ReactComponent;
   }
 
-  render(constructor())
-
   const thisComponent =  {
     render,
-    renderContainer,
     updateChildActions,
     addChild,
     getActionsStream,
@@ -197,6 +194,8 @@ function recycleComponent(constructor, parent) {
   if (parent) {
     parent.addChild(thisComponent)
   }
+
+  render(constructor())
 
   return thisComponent;
 }
