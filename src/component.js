@@ -67,6 +67,14 @@ function recycleComponent(constructor, parent) {
 
   const render = ({view, actions, reducers, initialState, shouldComponentUpdate, propTypes, defaultProps, displayName}) => {
 
+    let componentSources = {
+          DOM: (selector) => ({
+            events: (event) => getDomObservable(this.domSelectors, selector, event)
+          }),
+          componentLifecycle: componentLifecycle.stream,
+          childrenActions: childActions.stream.switch().share(),
+          actions: makeSubject().stream
+        }
     class ReactComponent extends React.Component {
       constructor(props) {
         super(props);
@@ -83,14 +91,7 @@ function recycleComponent(constructor, parent) {
 
       componentDidMount() {
         
-        let componentSources = {
-          DOM: (selector) => ({
-            events: (event) => getDomObservable(this.domSelectors, selector, event)
-          }),
-          componentLifecycle: componentLifecycle.stream,
-          childrenActions: childActions.stream.switch().share(),
-          actions: makeSubject().stream
-        }
+        
 
         if (actions) {
           let componentActions = actions(componentSources, this.props)
@@ -129,7 +130,6 @@ function recycleComponent(constructor, parent) {
 
       render() {
         timesRendered++
-
         return view(this.state, this.props, jsx)
       }
 
