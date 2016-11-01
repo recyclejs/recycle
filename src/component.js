@@ -29,6 +29,42 @@ function recycleComponent(constructor, parent) {
     ))
   }
 
+  const jsx = function(tag, props) {
+    if (typeof tag == 'function') {
+
+      if (isReactClass(tag)) {
+        let originalRender = tag.prototype.render
+        tag.prototype.render = function() {
+          return originalRender.call(this, this.props._renderHandler)
+        }
+        
+        if (!props)
+          props = {}
+
+        props._renderHandler = jsx
+        return React.createElement.apply(React, arguments)
+      }
+
+      let key = (props) ? props.key : null
+
+      if (!inErrorState && getSaved(tag, key) && timesRendered == 1) {
+        inErrorState = true
+        if (!key)
+          throw new Error(`Recycle component '${tag.name}' called multiple times without the key property`)
+        else
+          throw new Error(`Recycle component '${tag.name}' called multiple times with the same key property '${key}'`)
+      }
+
+      if (getSaved(tag, key))
+        return React.createElement(getSaved(tag, key).getReactComponent(), props)
+
+      setSaved(tag, key, recycleComponent(tag, thisComponent))
+      
+      return React.createElement(getSaved(tag, key).getReactComponent(), props)
+    }
+    return React.createElement.apply(React, arguments)
+  }
+
   const render = ({view, actions, reducers, initialState, shouldComponentUpdate, propTypes, defaultProps, displayName}) => {
 
     class ReactComponent extends React.Component {
@@ -94,42 +130,6 @@ function recycleComponent(constructor, parent) {
       render() {
         timesRendered++
 
-        var jsx = function(tag, props) {
-          if (typeof tag == 'function') {
-
-            if (isReactClass(tag)) {
-              let originalRender = tag.prototype.render
-              tag.prototype.render = function() {
-                return originalRender.call(this, this.props._renderHandler)
-              }
-              
-              if (!props)
-                props = {}
-
-              props._renderHandler = jsx
-              return React.createElement.apply(React, arguments)
-            }
-
-            let key = (props) ? props.key : null
-
-            if (!inErrorState && getSaved(tag, key) && timesRendered == 1) {
-              inErrorState = true
-              if (!key)
-                throw new Error(`Recycle component '${tag.name}' called multiple times without the key property`)
-              else
-                throw new Error(`Recycle component '${tag.name}' called multiple times with the same key property '${key}'`)
-            }
-
-            if (getSaved(tag, key))
-              return React.createElement(getSaved(tag, key).getReactComponent(), props)
-
-            setSaved(tag, key, recycleComponent(tag, thisComponent))
-            
-            return React.createElement(getSaved(tag, key).getReactComponent(), props)
-          }
-          return React.createElement.apply(React, arguments)
-        }
-
         return view(this.state, this.props, jsx)
       }
 
@@ -150,6 +150,10 @@ function recycleComponent(constructor, parent) {
     ReactComponent.displayName = displayName || constructor.name
 
     reactComponent = ReactComponent
+  }
+
+  const renderContainer = () => {
+
   }
 
   const addChild = (c) => {
@@ -187,6 +191,7 @@ function recycleComponent(constructor, parent) {
 
   const thisComponent =  {
     render,
+    renderContainer,
     updateChildActions,
     addChild,
     getActionsStream,
