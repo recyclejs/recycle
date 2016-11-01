@@ -6,13 +6,13 @@ export default function recycleComponent(constructor, componentKey, parent) {
 
   let ReactComponent
   let actions$
+  let componentName
   let childActions = makeSubject()
   let componentLifecycle = makeSubject()
   let childrenComponents = []
   let savedChildren = new Map()
   let timesRendered = 0
   let domSelectors = {}
-  let componentName
   let inErrorState = false
 
   const addChild = (c) => {
@@ -70,16 +70,13 @@ export default function recycleComponent(constructor, componentKey, parent) {
 
         if (actions) {
           let componentActions = actions(componentSources, this.props)
-          if (!Array.isArray(componentActions))
-            componentActions = [componentActions]
-
-          actions$ = mergeArray(componentActions).filter(action => action)
+          actions$ = createActionsStream(componentActions)
           actions$.subscribe(componentSources.actions)
         }
 
         if (reducers) {
           let componentReducers = reducers(componentSources, this.props)
-          let state$ = getStateStream(componentReducers, initialState, componentLifecycle)
+          let state$ = createStateStream(componentReducers, initialState, componentLifecycle)
 
           state$.subscribe((state) => {
             this.setState(state)
@@ -183,7 +180,7 @@ function updateDomObservables(domSelectors, el) {
   }
 }
 
-function getStateStream(componentReducers, initialState, componentLifecycle) {
+function createStateStream(componentReducers, initialState, componentLifecycle) {
   if (!Array.isArray(componentReducers))
       componentReducers = [componentReducers]
 
@@ -194,6 +191,13 @@ function getStateStream(componentReducers, initialState, componentLifecycle) {
       return reducer(state, action)
     })
     .share()
+}
+
+function createActionsStream(componentActions) {
+  if (!Array.isArray(componentActions))
+    componentActions = [componentActions]
+
+  return mergeArray(componentActions).filter(action => action)
 }
 
 function getChild(fn, key, savedChildren) {
