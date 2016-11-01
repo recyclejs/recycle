@@ -25,14 +25,22 @@ export default function recycleComponent(constructor, componentKey, parent) {
       if (isReactClass(constructor))
         return getReactElement(arguments, jsxHandler)
 
-      let child = getChild(constructor, key, getSavedChildren())
+      let child = getChild(constructor, key, savedChildren)
       if (child) {
-        validateChild(child, getTimesRendered())
+        if (!inErrorState && timesRendered === 1) {
+          inErrorState = true
+          
+          if (!child.getKey())
+            throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
+          else
+            throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
+        }
+
         return React.createElement(child.getReactComponent(), props)
       }
 
       let newComponent = recycleComponent(constructor, key, thisComponent)
-      registerComponent(newComponent, getSavedChildren())
+      registerComponent(newComponent, savedChildren)
       return React.createElement(newComponent.getReactComponent(), props)
 
     }
@@ -77,8 +85,8 @@ export default function recycleComponent(constructor, componentKey, parent) {
 
         if (actions) {
           let componentActions = actions(componentSources, this.props)
-          setActions(createActionsStream(componentActions))
-          getActions().subscribe(componentSources.actions)
+          actions$ = createActionsStream(componentActions)
+          actions$.subscribe(componentSources.actions)
         }
 
         if (reducers) {
@@ -123,9 +131,6 @@ export default function recycleComponent(constructor, componentKey, parent) {
   const getActions = () => {
     return actions$;
   }
-  const setActions = (newActions) => {
-    actions$ = newActions
-  }
 
   const getReactComponent = () => {
     return ReactComponent;
@@ -142,35 +147,15 @@ export default function recycleComponent(constructor, componentKey, parent) {
   const getConstructor = () => {
     return constructor;
   }
-  
-  const getSavedChildren = () => {
-    return savedChildren;
-  }
-
-  const getTimesRendered = () => {
-    return timesRendered;
-  }
-
-  const getErrorState = () => {
-    return inErrorState;
-  }
-  const setErrorState = (newState) => {
-    return inErrorState = newState;
-  }
 
   const thisComponent =  {
     updateChildActions,
     addChild,
     getActions,
-    setActions,
     getReactComponent,
     getName,
     getKey,
     getConstructor,
-    getSavedChildren,
-    getTimesRendered,
-    getErrorState,
-    setErrorState
   }
 
   if (parent) {
@@ -270,17 +255,6 @@ export function generateNewActions(childrenComponents, next) {
       .filter(component => component.getActions())
       .map(component => component.getActions())
   ))
-}
-
-export function validateChild(child, timesRendered) {
-  if (!child.getErrorState() && timesRendered === 1) {
-    child.setErrorState(true)
-    
-    if (!child.getKey())
-      throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
-    else
-      throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
-  }
 }
 
 export function generateSources(domSelectors, childActions, componentLifecycle) {
