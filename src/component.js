@@ -7,7 +7,6 @@ export default function recycleComponent(constructor, componentKey, parent) {
   let ReactComponent
   let actions$
   let componentName
-  let jsxHandler
   let childActions = makeSubject()
   let componentLifecycle = makeSubject()
   let childrenComponents = []
@@ -16,7 +15,31 @@ export default function recycleComponent(constructor, componentKey, parent) {
   let domSelectors = {}
   let inErrorState = false
 
-  const createReactComponent = () => {
+  function jsxHandler() {
+    if (typeof arguments['0'] == 'function') {
+
+      let constructor = arguments['0']
+      let props = arguments['1'] || {}
+      let key = props.key
+
+      if (isReactClass(constructor))
+        return getReactElement(arguments, jsxHandler)
+
+      let child = getChild(constructor, key, getSavedChildren())
+      if (child) {
+        validateChild(child, getTimesRendered())
+        return React.createElement(child.getReactComponent(), props)
+      }
+
+      let newComponent = recycleComponent(constructor, key, thisComponent)
+      registerComponent(newComponent, getSavedChildren())
+      return React.createElement(newComponent.getReactComponent(), props)
+
+    }
+    return React.createElement.apply(React, arguments)
+  }
+
+  function createReactComponent() {
     let {
       view, 
       actions, 
@@ -74,7 +97,7 @@ export default function recycleComponent(constructor, componentKey, parent) {
 
       render() {
         timesRendered++
-        return view(this.state, this.props, getJSXHandler())
+        return view(this.state, this.props, jsxHandler)
       },
 
       shouldComponentUpdate(nextProps, nextState) {
@@ -86,11 +109,11 @@ export default function recycleComponent(constructor, componentKey, parent) {
     })
   }
 
-  const addChild = (c) => {
+  function addChild(c) {
     childrenComponents.push(c);
   }
 
-  const updateChildActions = () => {
+  function updateChildActions() {
     if (parent)
       parent.updateChildActions()
     
@@ -128,14 +151,6 @@ export default function recycleComponent(constructor, componentKey, parent) {
     return timesRendered;
   }
 
-  const getJSXHandler = () => {
-    if (jsxHandler)
-      return jsxHandler
-    
-    jsxHandler = jsxFactory(thisComponent)
-    return jsxHandler;
-  }
-
   const getErrorState = () => {
     return inErrorState;
   }
@@ -154,7 +169,6 @@ export default function recycleComponent(constructor, componentKey, parent) {
     getConstructor,
     getSavedChildren,
     getTimesRendered,
-    getJSXHandler,
     getErrorState,
     setErrorState
   }
@@ -230,8 +244,8 @@ export function registerComponent(newComponent, savedChildren) {
   savedChildren.set(constructor, obj)
 }
 
-export function isReactClass(component) {
-  return (component.prototype.render)
+export function isReactClass(constructor) {
+  return (constructor.prototype.render)
 }
 
 export function getReactElement(args, jsx) {
@@ -277,31 +291,5 @@ export function generateSources(domSelectors, childActions, componentLifecycle) 
     componentLifecycle: componentLifecycle.stream,
     childrenActions: childActions.stream.switch().share(),
     actions: makeSubject().stream
-  }
-}
-
-export function jsxFactory(component) {
-  return function() {
-    if (typeof arguments['0'] == 'function') {
-
-      let constructor = arguments['0']
-      let props = arguments['1'] || {}
-      let key = props.key
-
-      if (isReactClass(constructor))
-        return getReactElement(arguments, component.getJSXHandler())
-
-      let child = getChild(constructor, key, component.getSavedChildren())
-      if (child) {
-        validateChild(child, component.getTimesRendered())
-        return React.createElement(child.getReactComponent(), props)
-      }
-
-      let newComponent = recycleComponent(constructor, key, component)
-      registerComponent(newComponent, component.getSavedChildren())
-      return React.createElement(newComponent.getReactComponent(), props)
-
-    }
-    return React.createElement.apply(React, arguments)
   }
 }
