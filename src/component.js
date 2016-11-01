@@ -17,6 +17,7 @@ function recycleComponent(constructor, parent) {
   let savedChildren = new Map()
   let timesRendered = 0
   let inErrorState = false
+  let domSelectors = {}
 
   const updateChildActions = () => {
     if (!childrenComponents.length)
@@ -27,6 +28,17 @@ function recycleComponent(constructor, parent) {
         .filter(component => component.getActionsStream())
         .map(component => component.getActionsStream())
     ))
+  }
+
+  const generateSources = (domSelectors) => {
+    return {
+      DOM: (selector) => ({
+        events: (event) => getDomObservable(domSelectors, selector, event)
+      }),
+      componentLifecycle: componentLifecycle.stream,
+      childrenActions: childActions.stream.switch().share(),
+      actions: makeSubject().stream
+    }
   }
 
   const jsx = function(tag, props) {
@@ -70,27 +82,18 @@ function recycleComponent(constructor, parent) {
     class ReactComponent extends React.Component {
       constructor(props) {
         super(props);
-        
-        this.domSelectors = {}
         this.state = initialState
       }
 
       componentDidUpdate() {
         let el = ReactDOM.findDOMNode(this)
-        updateDomObservables(this.domSelectors, el)
+        updateDomObservables(domSelectors, el)
         componentLifecycle.observer.next({ type: 'componentUpdated', state: this.state })
       }
 
       componentDidMount() {
         
-        let componentSources = {
-          DOM: (selector) => ({
-            events: (event) => getDomObservable(this.domSelectors, selector, event)
-          }),
-          componentLifecycle: componentLifecycle.stream,
-          childrenActions: childActions.stream.switch().share(),
-          actions: makeSubject().stream
-        }
+        let componentSources = generateSources(domSelectors)
 
         if (actions) {
           let componentActions = actions(componentSources, this.props)
