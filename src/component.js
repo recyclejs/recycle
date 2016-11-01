@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Observable, makeSubject, mergeArray } from './rxjs'
 
-export default function recycleComponent(constructor, parent) {
+export default function recycleComponent(constructor, componentKey, parent) {
 
   let ReactComponent
   let actions$
@@ -12,6 +12,7 @@ export default function recycleComponent(constructor, parent) {
   let savedChildren = new Map()
   let timesRendered = 0
   let domSelectors = {}
+  let componentName
 
   const updateChildActions = () => {
     if (parent)
@@ -41,14 +42,16 @@ export default function recycleComponent(constructor, parent) {
       if (isReactClass(constructor))
         return getReactElement(arguments, jsx)
 
-      validateChild(constructor, key, savedChildren, timesRendered)
+      let child = getChild(constructor, key, savedChildren)
+      if (child) {
+        validateChild(child, timesRendered)
+        return React.createElement(child.getReactComponent(), props)
+      }
 
-      if (getChild(constructor, key, savedChildren))
-        return React.createElement(getChild(constructor, key, savedChildren).getReactComponent(), props)
+      let newComponent = recycleComponent(constructor, key, thisComponent)
+      registerComponent(newComponent, savedChildren)
+      return React.createElement(newComponent.getReactComponent(), props)
 
-      updateChild(constructor, key, recycleComponent(constructor, thisComponent), savedChildren)
-      
-      return React.createElement(getChild(constructor, key, savedChildren).getReactComponent(), props)
     }
     return React.createElement.apply(React, arguments)
   }
@@ -113,7 +116,7 @@ export default function recycleComponent(constructor, parent) {
     if (defaultProps)
       ReactComponent.defaultProps = defaultProps
 
-    ReactComponent.displayName = displayName || constructor.name
+    ReactComponent.displayName = componentName = displayName || constructor.name
   }
 
   const addChild = (c) => {
@@ -127,6 +130,18 @@ export default function recycleComponent(constructor, parent) {
   const getReactComponent = () => {
     return ReactComponent;
   }
+  
+  const getName = () => {
+    return componentName;
+  }
+  
+  const getKey = () => {
+    return componentKey;
+  }
+  
+  const getConstructor = () => {
+    return constructor;
+  }
 
   const thisComponent =  {
     render,
@@ -134,6 +149,9 @@ export default function recycleComponent(constructor, parent) {
     addChild,
     getActionsStream,
     getReactComponent,
+    getName,
+    getKey,
+    getConstructor,
   }
 
   if (parent) {
@@ -186,15 +204,18 @@ function getChild(fn, key, savedChildren) {
   return savedChildren.get(fn)[key]
 }
   
-function updateChild(fn, key, val, savedChildren) {
-  let obj = savedChildren.get(fn) || {}
-  
-  if (obj[key])
-    throw Error(`Could not register recycle component '${fn.name}'. Key '${key}' is already in use.`)
-  
-  obj[key] = val
+function registerComponent(newComponent, savedChildren) {
+  let constructor = newComponent.getConstructor()
+  let key = newComponent.getKey()
+  let name = newComponent.getName()
 
-  savedChildren.set(fn, obj)
+  let obj = savedChildren.get(constructor) || {}
+
+  if (obj[key])
+    throw Error(`Could not register recycle component '${name}'. Key '${key}' is already in use.`)
+  
+  obj[key] = newComponent
+  savedChildren.set(constructor, obj)
 }
 
 function isReactClass(component) {
@@ -226,12 +247,12 @@ function generateNewActions(childrenComponents, next) {
 }
 
 let inErrorState = false
-function validateChild(constructor, key, savedChildren, timesRendered) {
-  if (!inErrorState && getChild(constructor, key, savedChildren) && timesRendered === 1) {
+function validateChild(child, timesRendered) {
+  if (!inErrorState && timesRendered === 1) {
     inErrorState = true
-    if (!key)
-      throw new Error(`Recycle component '${constructor.name}' called multiple times without the key property`)
+    if (!child.getKey())
+      throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
     else
-      throw new Error(`Recycle component '${constructor.name}' called multiple times with the same key property '${key}'`)
+      throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
   }
 }
