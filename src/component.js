@@ -13,6 +13,11 @@ export default function recycleComponent(constructor, componentKey, parent) {
   let timesRendered = 0
   let domSelectors = {}
   let componentName
+  let inErrorState = false
+
+  const addChild = (c) => {
+    childrenComponents.push(c);
+  }
 
   const updateChildActions = () => {
     if (parent)
@@ -119,10 +124,6 @@ export default function recycleComponent(constructor, componentKey, parent) {
     ReactComponent.displayName = componentName = displayName || constructor.name
   }
 
-  const addChild = (c) => {
-    childrenComponents.push(c);
-  }
-
   const getActionsStream = () => {
     return actions$;
   }
@@ -143,6 +144,13 @@ export default function recycleComponent(constructor, componentKey, parent) {
     return constructor;
   }
 
+  const getErrorState = () => {
+    return inErrorState;
+  }
+  const setErrorState = (newState) => {
+    return inErrorState = newState;
+  }
+
   const thisComponent =  {
     render,
     updateChildActions,
@@ -152,6 +160,8 @@ export default function recycleComponent(constructor, componentKey, parent) {
     getName,
     getKey,
     getConstructor,
+    getErrorState,
+    setErrorState
   }
 
   if (parent) {
@@ -246,10 +256,10 @@ function generateNewActions(childrenComponents, next) {
   ))
 }
 
-let inErrorState = false
 function validateChild(child, timesRendered) {
-  if (!inErrorState && timesRendered === 1) {
-    inErrorState = true
+  if (!child.getErrorState() && timesRendered === 1) {
+    child.setErrorState(true)
+    
     if (!child.getKey())
       throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
     else
