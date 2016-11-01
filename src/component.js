@@ -44,22 +44,22 @@ function recycleComponent(constructor, parent) {
   const jsx = function(tag, props) {
     if (typeof tag == 'function') {
 
+      if (!props)
+          props = {}
+
       if (isReactClass(tag)) {
         let originalRender = tag.prototype.render
         tag.prototype.render = function() {
           return originalRender.call(this, this.props._renderHandler)
         }
         
-        if (!props)
-          props = {}
-
         props._renderHandler = jsx
         return React.createElement.apply(React, arguments)
       }
 
-      let key = (props) ? props.key : null
+      let key = props.key
 
-      if (!inErrorState && getSaved(tag, key) && timesRendered == 1) {
+      if (!inErrorState && getChild(tag, key, savedChildren) && timesRendered == 1) {
         inErrorState = true
         if (!key)
           throw new Error(`Recycle component '${tag.name}' called multiple times without the key property`)
@@ -67,12 +67,12 @@ function recycleComponent(constructor, parent) {
           throw new Error(`Recycle component '${tag.name}' called multiple times with the same key property '${key}'`)
       }
 
-      if (getSaved(tag, key))
-        return React.createElement(getSaved(tag, key).getReactComponent(), props)
+      if (getChild(tag, key, savedChildren))
+        return React.createElement(getChild(tag, key, savedChildren).getReactComponent(), props)
 
-      setSaved(tag, key, recycleComponent(tag, thisComponent))
+      updateChild(tag, key, recycleComponent(tag, thisComponent), savedChildren)
       
-      return React.createElement(getSaved(tag, key).getReactComponent(), props)
+      return React.createElement(getChild(tag, key, savedChildren).getReactComponent(), props)
     }
     return React.createElement.apply(React, arguments)
   }
@@ -144,25 +144,6 @@ function recycleComponent(constructor, parent) {
     childrenComponents.push(c);
   }
 
-  const getSaved = (fn, key) => {
-    if (!savedChildren.has(fn))
-      return false
-
-    return savedChildren.get(fn)[key]
-  }
-  
-  const setSaved = (fn, key, val) => {
-    
-    let obj = savedChildren.get(fn) || {}
-    
-    if (obj[key])
-      throw Error(`Could not register recycle component '${fn.name}'. Key '${key}' is already in use.`)
-    
-    obj[key] = val
-
-    savedChildren.set(fn, obj)
-  }
-
   const getActionsStream = () => {
     return actions$;
   }
@@ -204,6 +185,15 @@ function getDomObservable(domSelectors, selector, event) {
   return domSelectors[selector][event].stream.switch().share()
 }
 
+function updateDomObservables(domSelectors, el) {
+  for (let selector in domSelectors) {
+    for (let event in domSelectors[selector]) {
+      let domEl = el.querySelectorAll(selector)
+      domSelectors[selector][event].observer.next(Observable.fromEvent(domEl, event))
+    }
+  }
+}
+
 function getStateStream(componentReducers, initialState, componentLifecycle) {
   if (!Array.isArray(componentReducers))
       componentReducers = [componentReducers]
@@ -217,13 +207,24 @@ function getStateStream(componentReducers, initialState, componentLifecycle) {
     .share()
 }
 
-function updateDomObservables(domSelectors, el) {
-  for (let selector in domSelectors) {
-    for (let event in domSelectors[selector]) {
-      let domEl = el.querySelectorAll(selector)
-      domSelectors[selector][event].observer.next(Observable.fromEvent(domEl, event))
-    }
-  }
+function getChild(fn, key, savedChildren) {
+  if (!savedChildren.has(fn))
+    return false
+
+  return savedChildren.get(fn)[key]
 }
+  
+function updateChild(fn, key, val, savedChildren) {
+  let obj = savedChildren.get(fn) || {}
+  
+  if (obj[key])
+    throw Error(`Could not register recycle component '${fn.name}'. Key '${key}' is already in use.`)
+  
+  obj[key] = val
+
+  savedChildren.set(fn, obj)
+}
+
+
 
 export default recycleComponent
