@@ -2,9 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Observable, makeSubject, mergeArray } from './rxjs'
 
-// todo export react propTypes
-
-function recycleComponent(constructor, parent) {
+export default function recycleComponent(constructor, parent) {
 
   let ReactComponent
   let actions$
@@ -13,21 +11,13 @@ function recycleComponent(constructor, parent) {
   let childrenComponents = []
   let savedChildren = new Map()
   let timesRendered = 0
-  let inErrorState = false
   let domSelectors = {}
 
   const updateChildActions = () => {
     if (parent)
       parent.updateChildActions()
-
-    if (!childrenComponents.length)
-      return
-
-    childActions.observer.next(mergeArray(
-      childrenComponents
-        .filter(component => component.getActionsStream())
-        .map(component => component.getActionsStream())
-    ))
+    
+    generateNewActions(childrenComponents, childActions.observer.next)
   }
 
   const generateSources = (domSelectors) => {
@@ -47,17 +37,11 @@ function recycleComponent(constructor, parent) {
       let constructor = arguments['0']
       let props = arguments['1'] || {}
       let key = props.key
-      
+
       if (isReactClass(constructor))
         return getReactElement(arguments, jsx)
 
-      if (!inErrorState && getChild(constructor, key, savedChildren) && timesRendered == 1) {
-        inErrorState = true
-        if (!key)
-          throw new Error(`Recycle component '${constructor.name}' called multiple times without the key property`)
-        else
-          throw new Error(`Recycle component '${constructor.name}' called multiple times with the same key property '${key}'`)
-      }
+      validateChild(constructor, key, savedChildren, timesRendered)
 
       if (getChild(constructor, key, savedChildren))
         return React.createElement(getChild(constructor, key, savedChildren).getReactComponent(), props)
@@ -161,7 +145,6 @@ function recycleComponent(constructor, parent) {
   return thisComponent;
 }
 
-
 function getDomObservable(domSelectors, selector, event) {
   if (domSelectors[selector] && domSelectors[selector][event])
     return domSelectors[selector][event].stream.switch().share()
@@ -231,4 +214,24 @@ function getReactElement(args, jsx) {
   return React.createElement.apply(React, args)
 }
 
-export default recycleComponent
+function generateNewActions(childrenComponents, next) {
+  if (!childrenComponents.length)
+    return
+
+  next(mergeArray(
+    childrenComponents
+      .filter(component => component.getActionsStream())
+      .map(component => component.getActionsStream())
+  ))
+}
+
+let inErrorState = false
+function validateChild(constructor, key, savedChildren, timesRendered) {
+  if (!inErrorState && getChild(constructor, key, savedChildren) && timesRendered === 1) {
+    inErrorState = true
+    if (!key)
+      throw new Error(`Recycle component '${constructor.name}' called multiple times without the key property`)
+    else
+      throw new Error(`Recycle component '${constructor.name}' called multiple times with the same key property '${key}'`)
+  }
+}
