@@ -16,19 +16,37 @@ export default function recycleComponent(constructor, componentKey, parent) {
   let domSelectors = {}
   let inErrorState = false
 
-  const render = ({view, actions, reducers, initialState, shouldComponentUpdate, propTypes, defaultProps, displayName}) => {
+  const createReactComponent = () => {
+    let {
+      view, 
+      actions, 
+      reducers, 
+      initialState, 
+      shouldComponentUpdate, 
+      propTypes, 
+      defaultProps, 
+      displayName
+    } = constructor()
 
-    ReactComponent = class extends React.Component {
-      constructor(props) {
-        super(props);
-        this.state = initialState
-      }
+    componentName = displayName || constructor.name
+
+    return React.createClass({
+      propTypes: propTypes || null,
+      displayName: componentName,
+
+      getDefaultProps() {
+        return defaultProps || null
+      },
+
+      getInitialState() {
+        return initialState || null
+      },
 
       componentDidUpdate() {
         let el = ReactDOM.findDOMNode(this)
         updateDomObservables(domSelectors, el)
         componentLifecycle.observer.next({ type: 'componentUpdated', state: this.state })
-      }
+      },
 
       componentDidMount() {
         
@@ -36,8 +54,8 @@ export default function recycleComponent(constructor, componentKey, parent) {
 
         if (actions) {
           let componentActions = actions(componentSources, this.props)
-          actions$ = createActionsStream(componentActions)
-          actions$.subscribe(componentSources.actions)
+          setActions(createActionsStream(componentActions))
+          getActions().subscribe(componentSources.actions)
         }
 
         if (reducers) {
@@ -52,12 +70,12 @@ export default function recycleComponent(constructor, componentKey, parent) {
         }
 
         componentLifecycle.observer.next({ type: 'componentMounted', state: this.state })
-      }
+      },
 
       render() {
         timesRendered++
         return view(this.state, this.props, getJSXHandler())
-      }
+      },
 
       shouldComponentUpdate(nextProps, nextState) {
         if (shouldComponentUpdate) {
@@ -65,15 +83,7 @@ export default function recycleComponent(constructor, componentKey, parent) {
         }
         return true
       }
-    }
-
-    if (propTypes)
-      ReactComponent.propTypes = propTypes
-    
-    if (defaultProps)
-      ReactComponent.defaultProps = defaultProps
-
-    ReactComponent.displayName = componentName = displayName || constructor.name
+    })
   }
 
   const addChild = (c) => {
@@ -87,8 +97,11 @@ export default function recycleComponent(constructor, componentKey, parent) {
     generateNewActions(childrenComponents, childActions.observer.next)
   }
 
-  const getActionsStream = () => {
+  const getActions = () => {
     return actions$;
+  }
+  const setActions = (newActions) => {
+    actions$ = newActions
   }
 
   const getReactComponent = () => {
@@ -131,10 +144,10 @@ export default function recycleComponent(constructor, componentKey, parent) {
   }
 
   const thisComponent =  {
-    render,
     updateChildActions,
     addChild,
-    getActionsStream,
+    getActions,
+    setActions,
     getReactComponent,
     getName,
     getKey,
@@ -150,7 +163,7 @@ export default function recycleComponent(constructor, componentKey, parent) {
     parent.addChild(thisComponent)
   }
 
-  render(constructor())
+  ReactComponent = createReactComponent()
 
   return thisComponent;
 }
@@ -240,8 +253,8 @@ export function generateNewActions(childrenComponents, next) {
 
   next(mergeArray(
     childrenComponents
-      .filter(component => component.getActionsStream())
-      .map(component => component.getActionsStream())
+      .filter(component => component.getActions())
+      .map(component => component.getActions())
   ))
 }
 
