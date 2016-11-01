@@ -26,17 +26,6 @@ export default function recycleComponent(constructor, componentKey, parent) {
     generateNewActions(childrenComponents, childActions.observer.next)
   }
 
-  const generateSources = (domSelectors) => {
-    return {
-      DOM: (selector) => ({
-        events: (event) => getDomObservable(domSelectors, selector, event)
-      }),
-      componentLifecycle: componentLifecycle.stream,
-      childrenActions: childActions.stream.switch().share(),
-      actions: makeSubject().stream
-    }
-  }
-
   const jsx = function() {
     if (typeof arguments['0'] == 'function') {
 
@@ -77,7 +66,7 @@ export default function recycleComponent(constructor, componentKey, parent) {
 
       componentDidMount() {
         
-        let componentSources = generateSources(domSelectors)
+        let componentSources = generateSources(domSelectors, childActions, componentLifecycle)
 
         if (actions) {
           let componentActions = actions(componentSources, this.props)
@@ -264,5 +253,16 @@ function validateChild(child, timesRendered) {
       throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
     else
       throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
+  }
+}
+
+function generateSources(domSelectors, childActions, componentLifecycle) {
+  return {
+    DOM: (selector) => ({
+      events: (event) => getDomObservable(domSelectors, selector, event)
+    }),
+    componentLifecycle: componentLifecycle.stream,
+    childrenActions: childActions.stream.switch().share(),
+    actions: makeSubject().stream
   }
 }
