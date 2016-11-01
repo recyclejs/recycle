@@ -34,102 +34,6 @@ const Recycle = leverage('Cycle.js')
 npm install --save recyclejs
 ```
 
-## Comparison with React.js
-
-"*Component where View is a representation of the state*". 
-
-If you know React, that should sound familiar.
-But there are two main keywords in the description of Recycle that suggests its biggest difference: *functional* and *reactive*.
-
-### Functional
-Components (in React and Recycle) can be fully described in three parts: 
-  - view (rerenering itself on state change)
-  - defining actions (mouse clicks, keyboard, etc.)
-  - handling state (usually reacting to user actions)
-
-Because of its imperative nature, in React, these three parts are impossible to separate from each other. Since logic for handling state (using `this.setState`) or forwarding actions to parent component are defined as "helper callbacks" of a `render` method, all three parts of the component are "bundled" together in a class.
-
-In Recycle there is no need for classes because every part of the component is defined as a function that can be logically separated.
-
-### Reactive
-To achieve this kind of separation, it's necessary to deal with the asynchronous aspect of the component and not just the synchronous one. So rather than letting libraries like React handle this for you (by using something like `onClick` inside a View), Recycle uses Observables.
-
-As a result, components in Recycle have no `setState` function - the only way a component state can be changed is by defining reducer streams.
-
-## Comparison with Redux
-Wait... reducer inside of a component? Shouldn't this be separated?
-
-Well, actually, it shouldn't.
-
-Why? Because application state is nothing more than the state of a root component. It should then be handled in the same way as any other component, without the need of using multiple libraries.
-
-In Recycle, there is no such thing as *presentational* and *container* components. There are only components.
-
-## Comparison with Cycle.js
-Under the hood, Recycle uses [Cycle.js](https://github.com/cyclejs/cyclejs) but its purpose and usage is different. 
-
-Cycle.js is much more flexible then Recycle. Since Recycle is only concerned with defining components, there is no main function, no drivers for dealing with side effects and much less "stream wiring" (since Recycle does that for you).
-
-Also instead of `model-view-intent`, Recycle has a similar pattern but named differently (resemblance to React and Redux): `reducers-view-actions`.
-
-So, you can think of Recycle as an opinionated version of Cycle.js
-
-## What about side-effects?
-
-If we can use Observables for handling events like user clicks and keystrokes, we can also use them for all other async operations as well. 
-
-So, for any AJAX calls, WebSockets events or similar, there is no need any special middlewear like [thunk](https://github.com/gaearon/redux-thunk) or [redux saga](https://github.com/yelouafi/redux-saga) because those are just another async operations which can be deffined in component actions.
-
-## Reducer-View-Actions
-To recap, Recycle component consist of:
-  - View - responsible only for declaring how state is visually represented. It is not aware of any user inputs such as mouse operations and keystrokes
-  - Actions - generates actions from sources (like DOM) or from actions of child components
-  - Reducers - creates a new state based on actions or sources 
-
-## JSX and Hyperscript
-For views, Recycle uses [snabbdom](https://github.com/snabbdom/snabbdom). Which means you can use [hyperscript](https://github.com/ohanhi/hyperscript-helpers) or [JSX](https://github.com/yelouafi/snabbdom-jsx)
-
-JSX example:
-```javascript
-function view() {
-  return (
-    <div className="menu">
-      <ul>
-        <li>option #1</li>
-        <li>option #2</li>
-      </ul>
-    </div>
-  )
-}
-```
-
-Hyperscript example:
-```javascript
-import {div, ul, li} from 'recyclejs/view'
-
-function view() {
-  return div(".menu", [
-    ul([
-      li(['option #1']),
-      li(['option #2'])
-    ])
-  ])
-}
-```
-
-Note that in order for JSX to work it first needs to be transpiled by something like `transform-react-jsx` from babel (with `RecycleJSX` as *pragma* option)
-
-`.babelrc` example:
-```
-{
-  "presets": ["es2015"],
-  "plugins": [
-    "syntax-jsx",
-    ["transform-react-jsx", {"pragma": "RecycleJSX"}],
-  ]
-}
-```
-
 ## Getting Started
 
 ### Recycle Initialization
@@ -289,6 +193,101 @@ function view(state, render) {
 
 Recycle is easy to use for simple apps, but the real advatages of this framework can be seen when used in a more complex application. For that purpose check out [TodoMVC](https://github.com/recyclejs/TodoMVC) implementation with the addition of autocomplete feature (so you can see how much extra code is needed for accomplishing debouncing, fetching results or handling errors) 
 
+## JSX and Hyperscript
+For views, Recycle uses [snabbdom](https://github.com/snabbdom/snabbdom). Which means you can use [hyperscript](https://github.com/ohanhi/hyperscript-helpers) or [JSX](https://github.com/yelouafi/snabbdom-jsx)
+
+JSX example:
+```javascript
+function view() {
+  return (
+    <div className="menu">
+      <ul>
+        <li>option #1</li>
+        <li>option #2</li>
+      </ul>
+    </div>
+  )
+}
+```
+
+Hyperscript example:
+```javascript
+import {div, ul, li} from 'recyclejs/view'
+
+function view() {
+  return div(".menu", [
+    ul([
+      li(['option #1']),
+      li(['option #2'])
+    ])
+  ])
+}
+```
+
+Note that in order for JSX to work it first needs to be transpiled by something like `transform-react-jsx` from babel (with `RecycleJSX` as *pragma* option)
+
+`.babelrc` example:
+```
+{
+  "presets": ["es2015"],
+  "plugins": [
+    "syntax-jsx",
+    ["transform-react-jsx", {"pragma": "RecycleJSX"}],
+  ]
+}
+```
+
+## Comparison with React.js
+
+"*Component where View is a representation of the state*". 
+
+If you know React, that should sound familiar.
+But there are two main keywords in the description of Recycle that suggests its biggest difference: *functional* and *reactive*.
+
+### Functional
+Components (in React and Recycle) can be fully described in three parts: 
+  - view (rerenering itself on state change)
+  - defining actions (mouse clicks, keyboard, etc.)
+  - handling state (usually reacting to user actions)
+
+Because of its imperative nature, in React, these three parts are impossible to separate from each other. Since logic for handling state (using `this.setState`) or forwarding actions to parent component are defined as "helper callbacks" of a `render` method, all three parts of the component are "bundled" together in a class.
+
+In Recycle there is no need for classes because every part of the component is defined as a function that can be logically separated.
+
+### Reactive
+To achieve this kind of separation, it's necessary to deal with the asynchronous aspect of the component and not just the synchronous one. So rather than letting libraries like React handle this for you (by using something like `onClick` inside a View), Recycle uses Observables.
+
+As a result, components in Recycle have no `setState` function - the only way a component state can be changed is by defining reducer streams.
+
+## Comparison with Redux
+Wait... reducer inside of a component? Shouldn't this be separated?
+
+Well, actually, it shouldn't.
+
+Why? Because application state is nothing more than the state of a root component. It should then be handled in the same way as any other component, without the need of using multiple libraries.
+
+In Recycle, there is no such thing as *presentational* and *container* components. There are only components.
+
+## Comparison with Cycle.js
+Under the hood, Recycle uses [Cycle.js](https://github.com/cyclejs/cyclejs) but its purpose and usage is different. 
+
+Cycle.js is much more flexible then Recycle. Since Recycle is only concerned with defining components, there is no main function, no drivers for dealing with side effects and much less "stream wiring" (since Recycle does that for you).
+
+Also instead of `model-view-intent`, Recycle has a similar pattern but named differently (resemblance to React and Redux): `reducers-view-actions`.
+
+So, you can think of Recycle as an opinionated version of Cycle.js
+
+## What about side-effects?
+
+If we can use Observables for handling events like user clicks and keystrokes, we can also use them for all other async operations as well. 
+
+So, for any AJAX calls, WebSockets events or similar, there is no need any special middlewear like [thunk](https://github.com/gaearon/redux-thunk) or [redux saga](https://github.com/yelouafi/redux-saga) because those are just another async operations which can be deffined in component actions.
+
+## Reducer-View-Actions
+To recap, Recycle component consist of:
+  - View - responsible only for declaring how state is visually represented. It is not aware of any user inputs such as mouse operations and keystrokes
+  - Actions - generates actions from sources (like DOM) or from actions of child components
+  - Reducers - creates a new state based on actions or sources 
 
 ## Why CSS selectors for querying DOM events?
 Besides from using Observables, probably the biggest difference from React is the fact that CSS selectors are used for defining actions. In [Cycle.js documentation](https://cycle.js.org/model-view-intent.html) there is a good explanation on this issue:
