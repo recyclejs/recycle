@@ -41,38 +41,30 @@ function recycleComponent(constructor, parent) {
     }
   }
 
-  const jsx = function(tag, props) {
-    if (typeof tag == 'function') {
+  const jsx = function() {
+    if (typeof arguments['0'] == 'function') {
 
-      if (!props)
-          props = {}
-
-      if (isReactClass(tag)) {
-        let originalRender = tag.prototype.render
-        tag.prototype.render = function() {
-          return originalRender.call(this, this.props._renderHandler)
-        }
-        
-        props._renderHandler = jsx
-        return React.createElement.apply(React, arguments)
-      }
-
+      let constructor = arguments['0']
+      let props = arguments['1'] || {}
       let key = props.key
+      
+      if (isReactClass(constructor))
+        return getReactElement(arguments, jsx)
 
-      if (!inErrorState && getChild(tag, key, savedChildren) && timesRendered == 1) {
+      if (!inErrorState && getChild(constructor, key, savedChildren) && timesRendered == 1) {
         inErrorState = true
         if (!key)
-          throw new Error(`Recycle component '${tag.name}' called multiple times without the key property`)
+          throw new Error(`Recycle component '${constructor.name}' called multiple times without the key property`)
         else
-          throw new Error(`Recycle component '${tag.name}' called multiple times with the same key property '${key}'`)
+          throw new Error(`Recycle component '${constructor.name}' called multiple times with the same key property '${key}'`)
       }
 
-      if (getChild(tag, key, savedChildren))
-        return React.createElement(getChild(tag, key, savedChildren).getReactComponent(), props)
+      if (getChild(constructor, key, savedChildren))
+        return React.createElement(getChild(constructor, key, savedChildren).getReactComponent(), props)
 
-      updateChild(tag, key, recycleComponent(tag, thisComponent), savedChildren)
+      updateChild(constructor, key, recycleComponent(constructor, thisComponent), savedChildren)
       
-      return React.createElement(getChild(tag, key, savedChildren).getReactComponent(), props)
+      return React.createElement(getChild(constructor, key, savedChildren).getReactComponent(), props)
     }
     return React.createElement.apply(React, arguments)
   }
@@ -169,9 +161,6 @@ function recycleComponent(constructor, parent) {
   return thisComponent;
 }
 
-function isReactClass(component) {
-  return (component.prototype.render)
-}
 
 function getDomObservable(domSelectors, selector, event) {
   if (domSelectors[selector] && domSelectors[selector][event])
@@ -225,6 +214,21 @@ function updateChild(fn, key, val, savedChildren) {
   savedChildren.set(fn, obj)
 }
 
+function isReactClass(component) {
+  return (component.prototype.render)
+}
 
+function getReactElement(args, jsx) {
+  let constructor = args['0']
+  let props = args['1'] || {}
+
+  let originalRender = constructor.prototype.render
+  constructor.prototype.render = function() {
+    return originalRender.call(this, this.props._renderHandler)
+  }
+  
+  props._renderHandler = jsx
+  return React.createElement.apply(React, args)
+}
 
 export default recycleComponent
