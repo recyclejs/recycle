@@ -17,6 +17,9 @@ function recycleComponent(constructor, parent) {
   let domSelectors = {}
 
   const updateChildActions = () => {
+    if (parent)
+      parent.updateChildActions()
+
     if (!childrenComponents.length)
       return
 
@@ -108,9 +111,6 @@ function recycleComponent(constructor, parent) {
           state$.subscribe((state) => {
             this.setState(state)
           })
-
-          if (parent)
-            parent.updateChildActions()
 
           updateChildActions()
         }
