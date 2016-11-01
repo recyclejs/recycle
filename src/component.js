@@ -16,17 +16,6 @@ export default function recycleComponent(constructor, componentKey, parent) {
   let domSelectors = {}
   let inErrorState = false
 
-  const addChild = (c) => {
-    childrenComponents.push(c);
-  }
-
-  const updateChildActions = () => {
-    if (parent)
-      parent.updateChildActions()
-    
-    generateNewActions(childrenComponents, childActions.observer.next)
-  }
-
   const render = ({view, actions, reducers, initialState, shouldComponentUpdate, propTypes, defaultProps, displayName}) => {
 
     ReactComponent = class extends React.Component {
@@ -85,6 +74,17 @@ export default function recycleComponent(constructor, componentKey, parent) {
       ReactComponent.defaultProps = defaultProps
 
     ReactComponent.displayName = componentName = displayName || constructor.name
+  }
+
+  const addChild = (c) => {
+    childrenComponents.push(c);
+  }
+
+  const updateChildActions = () => {
+    if (parent)
+      parent.updateChildActions()
+    
+    generateNewActions(childrenComponents, childActions.observer.next)
   }
 
   const getActionsStream = () => {
@@ -155,7 +155,7 @@ export default function recycleComponent(constructor, componentKey, parent) {
   return thisComponent;
 }
 
-function getDomObservable(domSelectors, selector, event) {
+export function getDomObservable(domSelectors, selector, event) {
   if (domSelectors[selector] && domSelectors[selector][event])
     return domSelectors[selector][event].stream.switch().share()
 
@@ -167,7 +167,7 @@ function getDomObservable(domSelectors, selector, event) {
   return domSelectors[selector][event].stream.switch().share()
 }
 
-function updateDomObservables(domSelectors, el) {
+export function updateDomObservables(domSelectors, el) {
   for (let selector in domSelectors) {
     for (let event in domSelectors[selector]) {
       let domEl = el.querySelectorAll(selector)
@@ -176,7 +176,7 @@ function updateDomObservables(domSelectors, el) {
   }
 }
 
-function createStateStream(componentReducers, initialState, componentLifecycle) {
+export function createStateStream(componentReducers, initialState, componentLifecycle) {
   if (!Array.isArray(componentReducers))
       componentReducers = [componentReducers]
 
@@ -189,21 +189,21 @@ function createStateStream(componentReducers, initialState, componentLifecycle) 
     .share()
 }
 
-function createActionsStream(componentActions) {
+export function createActionsStream(componentActions) {
   if (!Array.isArray(componentActions))
     componentActions = [componentActions]
 
   return mergeArray(componentActions).filter(action => action)
 }
 
-function getChild(fn, key, savedChildren) {
+export function getChild(fn, key, savedChildren) {
   if (!savedChildren.has(fn))
     return false
 
   return savedChildren.get(fn)[key]
 }
   
-function registerComponent(newComponent, savedChildren) {
+export function registerComponent(newComponent, savedChildren) {
   let constructor = newComponent.getConstructor()
   let key = newComponent.getKey()
   let name = newComponent.getName()
@@ -217,11 +217,11 @@ function registerComponent(newComponent, savedChildren) {
   savedChildren.set(constructor, obj)
 }
 
-function isReactClass(component) {
+export function isReactClass(component) {
   return (component.prototype.render)
 }
 
-function getReactElement(args, jsx) {
+export function getReactElement(args, jsx) {
   let constructor = args['0']
   let props = args['1'] || {}
 
@@ -234,7 +234,7 @@ function getReactElement(args, jsx) {
   return React.createElement.apply(React, args)
 }
 
-function generateNewActions(childrenComponents, next) {
+export function generateNewActions(childrenComponents, next) {
   if (!childrenComponents.length)
     return
 
@@ -245,7 +245,7 @@ function generateNewActions(childrenComponents, next) {
   ))
 }
 
-function validateChild(child, timesRendered) {
+export function validateChild(child, timesRendered) {
   if (!child.getErrorState() && timesRendered === 1) {
     child.setErrorState(true)
     
@@ -256,7 +256,7 @@ function validateChild(child, timesRendered) {
   }
 }
 
-function generateSources(domSelectors, childActions, componentLifecycle) {
+export function generateSources(domSelectors, childActions, componentLifecycle) {
   return {
     DOM: (selector) => ({
       events: (event) => getDomObservable(domSelectors, selector, event)
@@ -267,7 +267,7 @@ function generateSources(domSelectors, childActions, componentLifecycle) {
   }
 }
 
-function jsxFactory(component) {
+export function jsxFactory(component) {
   return function() {
     if (typeof arguments['0'] == 'function') {
 
