@@ -1,7 +1,5 @@
 # Generated code
-/component.js
-/index.js
-/rxjs.js
+dist
 
 node_modules
 .DS_Store

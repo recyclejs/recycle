@@ -1,8 +1,9 @@
 import { Observable } from 'rxjs/Observable'
+import { Subject } from 'rxjs/Subject'
 import Rx from 'rxjs/Rx'
 
 function makeSubject() {
-  var stream = new Rx.Subject();
+  var stream = new Subject();
   var observer = {
       next: function (x) { stream.next(x); },
       error: function (err) { stream.error(err); },
@@ -39,6 +40,7 @@ Observable.prototype.mapCatched = function(cb) {
 }
 
 export {
+  Subject, 
   Observable, 
   makeSubject,
   mergeArray
