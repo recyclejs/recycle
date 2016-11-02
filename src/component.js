@@ -189,14 +189,14 @@ export function updateDomStreams(domNodes, el) {
   }
 }
 
-export function createStateStream(componentReducers, initialState, notifyHandler) {
+export function createStateStream(componentReducers, initialState, notify) {
   if (!Array.isArray(componentReducers))
       componentReducers = [componentReducers]
 
   return mergeArray(componentReducers)
     .startWith(initialState)
     .scan((state, {reducer, action}) => {
-      notifyHandler({ type: 'willCallReducer', action, reducer})
+      notify({ type: 'willCallReducer', action, reducer})
       return reducer(state, action)
     })
     .share()
