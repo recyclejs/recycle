@@ -12,7 +12,7 @@ export default function recycleComponent(constructor, componentKey, parent) {
   let childrenComponents = []
   let savedChildren = new Map()
   let timesRendered = 0
-  let domSelectors = {}
+  let domNodes = {}
   let inErrorState = false
 
   function createReactComponent() {
@@ -43,13 +43,13 @@ export default function recycleComponent(constructor, componentKey, parent) {
 
       componentDidUpdate() {
         let el = ReactDOM.findDOMNode(this)
-        updateDomObservables(domSelectors, el)
+        updateDomStreams(domNodes, el)
         componentLifecycle.observer.next({ type: 'componentUpdated', state: this.state })
       },
 
       componentDidMount() {
         
-        let componentSources = generateSources(domSelectors, childActions, componentLifecycle)
+        let componentSources = generateSources(domNodes, childActions, componentLifecycle)
 
         if (actions) {
           let componentActions = actions(componentSources, this.props)
@@ -121,6 +121,7 @@ export default function recycleComponent(constructor, componentKey, parent) {
     childrenComponents.push(component);
   }
 
+
   function updateChildActions() {
     if (parent)
       parent.updateChildActions()
@@ -167,23 +168,23 @@ export default function recycleComponent(constructor, componentKey, parent) {
   return thisComponent;
 }
 
-export function getDomObservable(domSelectors, selector, event) {
-  if (domSelectors[selector] && domSelectors[selector][event])
-    return domSelectors[selector][event].stream.switch().share()
-
-  if (!domSelectors[selector])
-    domSelectors[selector] = {}
-
-  domSelectors[selector][event] = makeSubject()
-
-  return domSelectors[selector][event].stream.switch().share()
+export function prepareDomNode(domNodes, selector, event) {
+  if (!domNodes[selector])
+    domNodes[selector] = {}
+  
+  if (!domNodes[selector][event])
+    domNodes[selector][event] = makeSubject()
 }
 
-export function updateDomObservables(domSelectors, el) {
-  for (let selector in domSelectors) {
-    for (let event in domSelectors[selector]) {
+export function getDomStream(domNodes, selector, event) {
+  return domNodes[selector][event].stream.switch().share()
+}
+
+export function updateDomStreams(domNodes, el) {
+  for (let selector in domNodes) {
+    for (let event in domNodes[selector]) {
       let domEl = el.querySelectorAll(selector)
-      domSelectors[selector][event].observer.next(Observable.fromEvent(domEl, event))
+      domNodes[selector][event].observer.next(Observable.fromEvent(domEl, event))
     }
   }
 }
@@ -257,10 +258,13 @@ export function generateNewActions(childrenComponents, next) {
   ))
 }
 
-export function generateSources(domSelectors, childActions, componentLifecycle) {
+export function generateSources(domNodes, childActions, componentLifecycle) {
   return {
     DOM: (selector) => ({
-      events: (event) => getDomObservable(domSelectors, selector, event)
+      events: (event) => {
+        prepareDomNode(domNodes, selector, event)
+        return getDomStream(domNodes, selector, event)
+      }
     }),
     componentLifecycle: componentLifecycle.stream,
     childrenActions: childActions.stream.switch().share(),

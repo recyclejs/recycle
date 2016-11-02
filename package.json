@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "mocha": "mocha dist/*spec.js",
+    "mocha": "mocha test/*spec.js  --compilers js:babel-register --watch",
     "karma": "karma start karma.conf.js",
     "build": "babel src test -d ./dist"
   },
