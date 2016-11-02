@@ -59,7 +59,7 @@ export default function recycleComponent(constructor, componentKey, parent) {
 
         if (reducers) {
           let componentReducers = reducers(componentSources, this.props)
-          let state$ = createStateStream(componentReducers, initialState, componentLifecycle)
+          let state$ = createStateStream(componentReducers, initialState, componentLifecycle.observer.next)
 
           state$.subscribe((state) => {
             this.setState(state)
@@ -189,14 +189,14 @@ export function updateDomStreams(domNodes, el) {
   }
 }
 
-export function createStateStream(componentReducers, initialState, componentLifecycle) {
+export function createStateStream(componentReducers, initialState, notifyHandler) {
   if (!Array.isArray(componentReducers))
       componentReducers = [componentReducers]
 
   return mergeArray(componentReducers)
     .startWith(initialState)
     .scan((state, {reducer, action}) => {
-      componentLifecycle.observer.next({ type: 'willCallReducer', action, reducer})
+      notifyHandler({ type: 'willCallReducer', action, reducer})
       return reducer(state, action)
     })
     .share()
