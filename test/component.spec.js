@@ -1,7 +1,15 @@
 import {expect} from 'chai'
 import jsdom from 'mocha-jsdom'
-import { createStateStream, prepareDomNode, getDomStream, updateDomStreams} from '../src/component'
+import { 
+  createStateStream, 
+  prepareDomNode, 
+  getDomStream, 
+  updateDomStreams,
+  createActionsStream
+} from '../src/component'
+
 import { Observable, makeSubject, mergeArray } from '../src/rxjs'
+
 jsdom()
 
 describe('Unit testing', function() {
@@ -57,5 +65,24 @@ describe('Unit testing', function() {
     })
 
     subj.observer.next()
+  });
+
+  it('createActionsStream() should create action stream and filter null values', function(done) {
+    const subj = makeSubject()
+
+    const actions = [
+      subj.stream,
+      subj.stream.mapTo(false)
+    ]
+
+    const actions$ = createActionsStream(actions)
+
+    actions$.subscribe(function(action) {
+      expect(action.type).to.equal('testActions')
+      done()
+    })
+
+    subj.observer.next()
+    subj.observer.next({type: 'testActions'})
   });
 });
