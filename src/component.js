@@ -93,7 +93,7 @@ export default function recycleComponent(constructor, componentKey, parent) {
       let key = props.key
 
       if (isReactComponent(constructor))
-        return getReactElement(arguments, jsxHandler)
+        return createReactElement(arguments, jsxHandler)
 
       let child = getChild(constructor, key, savedChildren)
       if (child) {
@@ -234,9 +234,9 @@ export function isReactComponent(constructor) {
   return (constructor.prototype.render) ? true : false
 }
 
-export function getReactElement(args, jsx) {
+export function createReactElement(args, jsx) {
   let constructor = args['0']
-  let props = args['1'] || {}
+  let props = args['1'] || {}
 
   let originalRender = constructor.prototype.render
   constructor.prototype.render = function() {
@@ -244,7 +244,18 @@ export function getReactElement(args, jsx) {
   }
   
   props._renderHandler = jsx
-  return React.createElement.apply(React, args)
+  
+  let newArgs = []
+  for (let i=0; i < args.length || i < 2; i++) {
+    if (i === 0)
+      newArgs.push(constructor)
+    if (i === 1)
+      newArgs.push(props)
+    if (i > 1)
+      newArgs.push(args[i])
+  }
+
+  return React.createElement.apply(React, newArgs)
 }
 
 export function generateNewActions(childrenComponents, next) {

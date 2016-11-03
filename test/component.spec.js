@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 import jsdom from 'mocha-jsdom'
-import React from 'react'
+import { React, ReactDOM } from '../src/index'
 import { Observable, makeSubject } from '../src/rxjs'
 import recycleComponent, { 
   createStateStream, 
@@ -11,6 +11,7 @@ import recycleComponent, {
   getChild,
   registerComponent,
   isReactComponent,
+  createReactElement,
 } from '../src/component'
 
 jsdom()
@@ -131,5 +132,27 @@ describe('Unit testing', function() {
     })
     
     expect(isReactComponent(reactComponent)).to.equal(true)
+  });
+  
+  it('createReactElement() should pass jsx as property in react render method', function(done) {
+    let reactComponent = React.createClass({
+      render(jsx) {
+        jsx()
+        return null
+      } 
+    })
+
+    let getArgs = function(constrctor, props) {
+      return arguments
+    }
+
+    let jsx = function() {
+      done()
+    }
+
+    ReactDOM.render(
+      createReactElement(getArgs(reactComponent), jsx), 
+      document.createElement('div')
+    )
   });
 });
