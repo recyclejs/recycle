@@ -92,7 +92,7 @@ export default function recycleComponent(constructor, componentKey, parent) {
       let props = arguments['1'] || {}
       let key = props.key
 
-      if (isReactClass(constructor))
+      if (isReactComponent(constructor))
         return getReactElement(arguments, jsxHandler)
 
       let child = getChild(constructor, key, savedChildren)
@@ -230,8 +230,8 @@ export function registerComponent(newComponent, savedChildren) {
   savedChildren.set(constructor, obj)
 }
 
-export function isReactClass(constructor) {
-  return (constructor.prototype.render)
+export function isReactComponent(constructor) {
+  return (constructor.prototype.render) ? true : false
 }
 
 export function getReactElement(args, jsx) {

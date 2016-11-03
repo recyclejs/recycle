@@ -1,5 +1,6 @@
 import {expect} from 'chai'
 import jsdom from 'mocha-jsdom'
+import React from 'react'
 import { Observable, makeSubject } from '../src/rxjs'
 import recycleComponent, { 
   createStateStream, 
@@ -9,6 +10,7 @@ import recycleComponent, {
   createActionsStream,
   getChild,
   registerComponent,
+  isReactComponent,
 } from '../src/component'
 
 jsdom()
@@ -121,5 +123,13 @@ describe('Unit testing', function() {
       registerComponent(component2, savedChildren)
     })
     .to.throw(`Could not register recycle component 'constructor1'. Key 'key1' is already in use.`)
+  });
+
+  it('isReactComponent() should check if component is created with react', function() {
+    let reactComponent = React.createClass({
+      render() {} 
+    })
+    
+    expect(isReactComponent(reactComponent)).to.equal(true)
   });
 });
