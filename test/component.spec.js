@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 import jsdom from 'mocha-jsdom'
-import { React, ReactDOM } from '../src/index'
+import Recycle, { React, ReactDOM } from '../src/index'
 import { Observable, makeSubject } from '../src/rxjs'
 import recycleComponent, { 
   createStateStream, 
@@ -12,6 +12,7 @@ import recycleComponent, {
   registerComponent,
   isReactComponent,
   createReactElement,
+  mergeChildrenActions,
 } from '../src/component'
 
 jsdom()
@@ -154,5 +155,37 @@ describe('Unit testing', function() {
       createReactElement(getArgs(reactComponent), jsx), 
       document.createElement('div')
     )
+  });
+
+  it('mergeChildrenActions should return action created by recycle component', function(done) {
+
+    const subj = makeSubject()
+
+    let component = function() {
+      return {
+        actions: function() {
+          return subj.stream
+        },
+        view: () => {
+          return null
+        }
+      }
+    }
+    let rc = recycleComponent(component)
+
+    ReactDOM.render(
+      React.createElement(rc.getReactComponent(), null), 
+      document.createElement('div')
+    )
+
+    let merged$ = mergeChildrenActions([rc])
+
+    rc.getActions().subscribe(function(action) {
+      expect(action.type).to.equal('testActions')
+      done()
+    })
+
+    subj.observer.next()
+    subj.observer.next({type: 'testActions'})
   });
 });
