@@ -121,7 +121,6 @@ export default function recycleComponent(constructor, componentKey, parent) {
     childrenComponents.push(component);
   }
 
-
   function updateChildActions() {
     if (parent)
       parent.updateChildActions()
@@ -185,7 +184,7 @@ export function getDomStream(domNodes, selector, event) {
 export function updateDomStreams(domNodes, el) {
   for (let selector in domNodes) {
     for (let event in domNodes[selector]) {
-      let domEl = el.querySelectorAll(selector)
+      let domEl = el.querySelector(selector)
       domNodes[selector][event].observer.next(Observable.fromEvent(domEl, event))
     }
   }

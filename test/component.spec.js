@@ -2,6 +2,7 @@ import {expect} from 'chai'
 import jsdom from 'mocha-jsdom'
 import Recycle, { React, ReactDOM } from '../src/index'
 import { Observable, makeSubject } from '../src/rxjs'
+import ReactTestUtils from 'react-addons-test-utils'
 import recycleComponent, { 
   createStateStream, 
   prepareDomNode, 
@@ -18,7 +19,7 @@ import recycleComponent, {
 
 jsdom()
 
-describe('Unit testing', function() {
+describe('Unit tests', function() {
 
   it('prepareDomNode should create a subject', function() {
     let domSelectors = {}
@@ -201,4 +202,61 @@ describe('Unit testing', function() {
     expect(sources.childrenActions instanceof Observable).to.equal(true)
     expect(sources.actions instanceof Observable).to.equal(true)
   });
+});
+
+describe('Integration tests', function() {
+
+  it('should change state on button click', function() {
+
+    function ButtonClick() {
+      return {
+        initialState: {
+          timesClicked: 0
+        },
+
+        actions: function(sources) {
+          const button = sources.DOM('button');
+
+          return [
+            button.events('click')
+              .mapTo({type: 'buttonClicked'})
+          ]
+        },
+        
+        reducers: function(sources) { 
+          return [
+            sources.actions
+              .filter(action => action.type == 'buttonClicked')
+              .reducer(function(state) {
+                state.timesClicked++;
+                return state
+              })
+          ]
+        },
+
+        view: function(state, props, jsx) {
+          return jsx('div', null,
+            jsx('span', null, state.timesClicked),
+            jsx('button', null, 'Click me')
+          )
+        }
+      }
+    }
+
+    
+    var renderedComponent = ReactTestUtils.renderIntoDocument(
+      Recycle(ButtonClick)
+    )
+
+    let componentEl = ReactDOM.findDOMNode(renderedComponent)
+    let buttonEl = componentEl.querySelector('button')
+    var evt = document.createEvent("HTMLEvents");
+    evt.initEvent("click", false, true);
+
+    buttonEl.dispatchEvent(evt)
+    buttonEl.dispatchEvent(evt)
+
+    expect(renderedComponent.state.timesClicked).to.equal(2)
+  });
+
 });
