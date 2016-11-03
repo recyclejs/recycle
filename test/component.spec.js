@@ -1,13 +1,14 @@
 import {expect} from 'chai'
 import jsdom from 'mocha-jsdom'
 import { Observable, makeSubject } from '../src/rxjs'
-import { 
+import recycleComponent, { 
   createStateStream, 
   prepareDomNode, 
   getDomStream, 
   updateDomStreams,
   createActionsStream,
   getChild,
+  registerComponent,
 } from '../src/component'
 
 jsdom()
@@ -99,5 +100,26 @@ describe('Unit testing', function() {
 
     expect(getChild(fn1, 'key1', map)).to.equal(1)
     expect(getChild(fn2, 'key1', map)).to.equal(false)
+  });
+  
+  it('registerComponent() should add new component in map', function() {
+    let savedChildren = new Map()
+
+    let constructor1 = function(){ return {} }
+    let constructor2 = function(){ return {} }
+
+    let component1 = recycleComponent(constructor1, 'key1')
+    let component2 = recycleComponent(constructor1, 'key1')
+    
+    
+    registerComponent(component1, savedChildren)
+
+    expect(getChild(constructor1, 'key1', savedChildren) !== false)
+      .to.equal(true)
+
+    expect(function() {
+      registerComponent(component2, savedChildren)
+    })
+    .to.throw(`Could not register recycle component 'constructor1'. Key 'key1' is already in use.`)
   });
 });
