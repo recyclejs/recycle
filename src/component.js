@@ -240,18 +240,18 @@ export function createReactElement(args, jsx) {
 
   let originalRender = constructor.prototype.render
   constructor.prototype.render = function() {
-    return originalRender.call(this, this.props._renderHandler)
+    return originalRender.call(this, this.props._recycleRenderHandler)
   }
   
-  props._renderHandler = jsx
+  props._recycleRenderHandler = jsx
   
   let newArgs = []
   for (let i=0; i < args.length || i < 2; i++) {
     if (i === 0)
       newArgs.push(constructor)
-    if (i === 1)
+    else if (i === 1)
       newArgs.push(props)
-    if (i > 1)
+    else if (i > 1)
       newArgs.push(args[i])
   }
 
