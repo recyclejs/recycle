@@ -1,19 +1,19 @@
 import {expect} from 'chai'
 import jsdom from 'mocha-jsdom'
+import { Observable, makeSubject } from '../src/rxjs'
 import { 
   createStateStream, 
   prepareDomNode, 
   getDomStream, 
   updateDomStreams,
-  createActionsStream
+  createActionsStream,
+  getChild,
 } from '../src/component'
-
-import { Observable, makeSubject, mergeArray } from '../src/rxjs'
 
 jsdom()
 
 describe('Unit testing', function() {
-  
+
   it('prepareDomNode() should create a subject', function() {
     let domSelectors = {}
     prepareDomNode(domSelectors, 'test', 'click')
@@ -84,5 +84,20 @@ describe('Unit testing', function() {
 
     subj.observer.next()
     subj.observer.next({type: 'testActions'})
+  });
+
+  it('getChild() should retrive object from map', function() {
+    let map = new Map()
+    let fn1 = function() {}
+    let fn2 = function() {}
+
+    let obj1 = {
+      key1: 1
+    }
+    
+    map.set(fn1, obj1)
+
+    expect(getChild(fn1, 'key1', map)).to.equal(1)
+    expect(getChild(fn2, 'key1', map)).to.equal(false)
   });
 });
