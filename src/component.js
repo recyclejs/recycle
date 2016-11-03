@@ -49,7 +49,7 @@ export default function recycleComponent(constructor, componentKey, parent) {
 
       componentDidMount() {
         
-        let componentSources = generateSources(domNodes, childActions, componentLifecycle)
+        let componentSources = generateSources(domNodes, childActions.stream, componentLifecycle.stream)
 
         if (actions) {
           let componentActions = actions(componentSources, this.props)
@@ -191,6 +191,20 @@ export function updateDomStreams(domNodes, el) {
   }
 }
 
+export function generateSources(domNodes, childActions$, componentLifecycle$) {
+  return {
+    DOM: (selector) => ({
+      events: (event) => {
+        prepareDomNode(domNodes, selector, event)
+        return getDomStream(domNodes, selector, event)
+      }
+    }),
+    componentLifecycle: componentLifecycle$,
+    childrenActions: childActions$.switch().share(),
+    actions: makeSubject().stream
+  }
+}
+
 export function createStateStream(componentReducers, initialState, notify) {
   if (!Array.isArray(componentReducers))
       componentReducers = [componentReducers]
@@ -269,18 +283,4 @@ export function mergeChildrenActions(childrenComponents) {
       .filter(component => component.getActions())
       .map(component => component.getActions())
   )
-}
-
-export function generateSources(domNodes, childActions, componentLifecycle) {
-  return {
-    DOM: (selector) => ({
-      events: (event) => {
-        prepareDomNode(domNodes, selector, event)
-        return getDomStream(domNodes, selector, event)
-      }
-    }),
-    componentLifecycle: componentLifecycle.stream,
-    childrenActions: childActions.stream.switch().share(),
-    actions: makeSubject().stream
-  }
 }

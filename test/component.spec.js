@@ -13,6 +13,7 @@ import recycleComponent, {
   isReactComponent,
   createReactElement,
   mergeChildrenActions,
+  generateSources,
 } from '../src/component'
 
 jsdom()
@@ -187,5 +188,17 @@ describe('Unit testing', function() {
 
     subj.observer.next()
     subj.observer.next({type: 'testActions'})
+  });
+
+  it('generateSources should return component sources', function() {
+    let childActions$ = makeSubject().stream
+    let componentLifecycle$ = makeSubject().stream
+
+    let sources = generateSources({}, childActions$, componentLifecycle$)
+    
+    expect(typeof sources.DOM).to.equal('function')
+    expect(sources.componentLifecycle instanceof Observable).to.equal(true)
+    expect(sources.childrenActions instanceof Observable).to.equal(true)
+    expect(sources.actions instanceof Observable).to.equal(true)
   });
 });
