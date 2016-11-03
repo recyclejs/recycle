@@ -18,7 +18,7 @@ jsdom()
 
 describe('Unit testing', function() {
 
-  it('prepareDomNode() should create a subject', function() {
+  it('prepareDomNode should create a subject', function() {
     let domSelectors = {}
     prepareDomNode(domSelectors, 'test', 'click')
     
@@ -26,7 +26,7 @@ describe('Unit testing', function() {
     expect(domSelectors.test.click.stream !== undefined).to.equal(true);
   });
 
-  it('getDomStream() should return previously created subject', function() {
+  it('getDomStream should return previously created subject', function() {
     let domSelectors = {}
     prepareDomNode(domSelectors, 'test', 'click')
     let stream = getDomStream(domSelectors, 'test', 'click')
@@ -34,7 +34,7 @@ describe('Unit testing', function() {
     expect(stream instanceof Observable).to.equal(true);
   });
 
-  it('updateDomStreams() should call observer.next', function(done) {
+  it('updateDomStreams should call observer.next', function(done) {
     let domSelectors = {}
     prepareDomNode(domSelectors, 'test', 'click')
     domSelectors.test.click.observer.next = function() {
@@ -44,7 +44,7 @@ describe('Unit testing', function() {
     updateDomStreams(domSelectors, el)
   });
 
-  it('createStateStream() should create new state and notify', function(done) {
+  it('createStateStream should create new state and notify', function(done) {
     const subj = makeSubject()
 
     const reducers = [
@@ -71,7 +71,7 @@ describe('Unit testing', function() {
     subj.observer.next()
   });
 
-  it('createActionsStream() should create action stream and filter null values', function(done) {
+  it('createActionsStream should create action stream and filter null values', function(done) {
     const subj = makeSubject()
 
     const actions = [
@@ -90,7 +90,7 @@ describe('Unit testing', function() {
     subj.observer.next({type: 'testActions'})
   });
 
-  it('getChild() should retrive object from map', function() {
+  it('getChild should retrive object from map', function() {
     let map = new Map()
     let fn1 = function() {}
     let fn2 = function() {}
@@ -105,7 +105,7 @@ describe('Unit testing', function() {
     expect(getChild(fn2, 'key1', map)).to.equal(false)
   });
   
-  it('registerComponent() should add new component in map', function() {
+  it('registerComponent should add new component in map', function() {
     let savedChildren = new Map()
 
     let constructor1 = function(){ return {} }
@@ -126,7 +126,7 @@ describe('Unit testing', function() {
     .to.throw(`Could not register recycle component 'constructor1'. Key 'key1' is already in use.`)
   });
 
-  it('isReactComponent() should check if component is created with react', function() {
+  it('isReactComponent should check if component is created with react', function() {
     let reactComponent = React.createClass({
       render() {} 
     })
@@ -134,7 +134,7 @@ describe('Unit testing', function() {
     expect(isReactComponent(reactComponent)).to.equal(true)
   });
   
-  it('createReactElement() should pass jsx as property in react render method', function(done) {
+  it('createReactElement should pass jsx as property in react render method', function(done) {
     let reactComponent = React.createClass({
       render(jsx) {
         jsx()

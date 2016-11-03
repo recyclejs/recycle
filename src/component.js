@@ -126,7 +126,9 @@ export default function recycleComponent(constructor, componentKey, parent) {
     if (parent)
       parent.updateChildActions()
     
-    generateNewActions(childrenComponents, childActions.observer.next)
+    let newActions = mergeChildrenActions(childrenComponents)
+    if (newActions)
+      childActions.observer.next(newActions)
   }
 
   const getActions = () => {
@@ -258,15 +260,15 @@ export function createReactElement(args, jsx) {
   return React.createElement.apply(React, newArgs)
 }
 
-export function generateNewActions(childrenComponents, next) {
+export function mergeChildrenActions(childrenComponents) {
   if (!childrenComponents.length)
-    return
+    return false
 
-  next(mergeArray(
+  return mergeArray(
     childrenComponents
       .filter(component => component.getActions())
       .map(component => component.getActions())
-  ))
+  )
 }
 
 export function generateSources(domNodes, childActions, componentLifecycle) {
