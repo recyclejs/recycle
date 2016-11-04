@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import jsdomify from 'jsdomify'
 
-describe('ClicksCounter example', function() {
+describe('SingleCounter example', function() {
 
   before(function() {
     jsdomify.create()
@@ -14,10 +14,10 @@ describe('ClicksCounter example', function() {
   let ReactTestUtils = require('react-addons-test-utils')
   let Recycle = require('../../../src/index').default
   let ReactDOM = require('../../../src/index').ReactDOM
-  let ClicksCounter = require('../../../examples/ClicksCounter/singleCounter').default
+  let SingleCounter = require('../../../examples/ClickCounter/SingleCounter').default
 
   it('should change state on button click', function() {
-    var renderedComponent = ReactTestUtils.renderIntoDocument(Recycle(ClicksCounter))
+    var renderedComponent = ReactTestUtils.renderIntoDocument(Recycle(SingleCounter))
     let componentEl = ReactDOM.findDOMNode(renderedComponent)
     let buttonEl = componentEl.querySelector('button')
     var evt = document.createEvent("HTMLEvents");

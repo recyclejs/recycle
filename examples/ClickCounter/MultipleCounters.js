@@ -1,4 +1,4 @@
-import ClicksCounter from './clicksCounter'
+import SingleCounter from './SingleCounter'
 
 export default function MultipleCounters() {
   return {
@@ -26,9 +26,9 @@ export default function MultipleCounters() {
       return (
         <div>
           <ul>
-            <li><ClicksCounter key="1" /></li>
-            <li><ClicksCounter key="2" /></li>
-            <li><ClicksCounter key="3" /></li>
+            <li><SingleCounter key="1" /></li>
+            <li><SingleCounter key="2" /></li>
+            <li><SingleCounter key="3" /></li>
           </ul>
           <div className="message">
             Total child button clicks: {state.childButtonClicked}
