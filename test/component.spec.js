@@ -1,262 +1,291 @@
 import {expect} from 'chai'
-import jsdom from 'mocha-jsdom'
-import Recycle, { React, ReactDOM } from '../src/index'
-import { Observable, makeSubject } from '../src/rxjs'
-import ReactTestUtils from 'react-addons-test-utils'
-import recycleComponent, { 
-  createStateStream, 
-  prepareDomNode, 
-  getDomStream, 
-  updateDomStreams,
-  createActionsStream,
-  getChild,
-  registerComponent,
-  isReactComponent,
-  createReactElement,
-  mergeChildrenActions,
-  generateSources,
-} from '../src/component'
+import jsdomify from 'jsdomify'
 
-jsdom()
+describe('component.js unit tests', function() {
 
-describe('Unit tests', function() {
+  describe('prepareDomNode', () => {
 
-  it('prepareDomNode should create a subject', function() {
-    let domSelectors = {}
-    prepareDomNode(domSelectors, 'test', 'click')
+    let prepareDomNode = require('../src/component').prepareDomNode
+    let Observable = require('../src/rxjs').Observable
+
+    it('should create a subject', function() {
+      let domSelectors = {}
+      prepareDomNode(domSelectors, 'test', 'click')
+      
+      expect(domSelectors.test.click.observer !== undefined).to.equal(true);
+      expect(domSelectors.test.click.stream !== undefined).to.equal(true);
+    })
     
-    expect(domSelectors.test.click.observer !== undefined).to.equal(true);
-    expect(domSelectors.test.click.stream !== undefined).to.equal(true);
-  });
+  })
 
-  it('getDomStream should return previously created subject', function() {
-    let domSelectors = {}
-    prepareDomNode(domSelectors, 'test', 'click')
-    let stream = getDomStream(domSelectors, 'test', 'click')
+  describe('getDomStream', () => {
 
-    expect(stream instanceof Observable).to.equal(true);
-  });
+    let prepareDomNode = require('../src/component').prepareDomNode
+    let getDomStream = require('../src/component').getDomStream
+    let Observable = require('../src/rxjs').Observable
 
-  it('updateDomStreams should call observer.next', function(done) {
-    let domSelectors = {}
-    prepareDomNode(domSelectors, 'test', 'click')
-    domSelectors.test.click.observer.next = function() {
-      done()
-    }
-    let el = document.createElement('div')
-    updateDomStreams(domSelectors, el)
-  });
+    it('should return previously created subject', function() {
+      let domSelectors = {}
+      prepareDomNode(domSelectors, 'test', 'click')
+      let stream = getDomStream(domSelectors, 'test', 'click')
 
-  it('createStateStream should create new state and notify', function(done) {
-    const subj = makeSubject()
+      expect(stream instanceof Observable).to.equal(true);
+    })
+    
+  })
 
-    const reducers = [
-      subj.stream
-        .reducer(function(state) {
-          state.test = true;
-          return state
-        })
-    ]
+  describe('updateDomStreams', () => {
+    before(function() {
+      jsdomify.create()
+    })
 
-    let initialState = { test: false }
+    after(function() {
+      jsdomify.destroy()
+    })
 
-    let notify = function(action) {
-      expect(action.type).to.equal('willCallReducer')
-    }
+    let prepareDomNode = require('../src/component').prepareDomNode
+    let updateDomStreams = require('../src/component').updateDomStreams
 
-    const state$ = createStateStream(reducers, initialState, notify)
-
-    state$.subscribe(function(state) {
-      if (state.test == true)
+    it('should call observer.next', function(done) {
+      let domSelectors = {}
+      prepareDomNode(domSelectors, 'test', 'click')
+      domSelectors.test.click.observer.next = function() {
         done()
+      }
+      let el = document.createElement('div')
+      updateDomStreams(domSelectors, el)
+    }) 
+  })
+
+  describe('createStateStream', () => {
+
+    let makeSubject = require('../src/rxjs').makeSubject
+    let createStateStream = require('../src/component').createStateStream
+
+    it('should create new state and notify', function(done) {
+      const subj = makeSubject()
+
+      const reducers = [
+        subj.stream
+          .reducer(function(state) {
+            state.test = true;
+            return state
+          })
+      ]
+
+      let initialState = { test: false }
+
+      let notify = function(action) {
+        expect(action.type).to.equal('willCallReducer')
+      }
+
+      const state$ = createStateStream(reducers, initialState, notify)
+
+      state$.subscribe(function(state) {
+        if (state.test == true)
+          done()
+      })
+
+      subj.observer.next()
     })
+  })
 
-    subj.observer.next()
-  });
+  describe('createActionsStream', () => {
 
-  it('createActionsStream should create action stream and filter null values', function(done) {
-    const subj = makeSubject()
+    let makeSubject = require('../src/rxjs').makeSubject
+    let createActionsStream = require('../src/component').createActionsStream
 
-    const actions = [
-      subj.stream,
-      subj.stream.mapTo(false)
-    ]
+    it('should create action stream and filter null values', function(done) {
+      const subj = makeSubject()
 
-    const actions$ = createActionsStream(actions)
+      const actions = [
+        subj.stream,
+        subj.stream.mapTo(false)
+      ]
 
-    actions$.subscribe(function(action) {
-      expect(action.type).to.equal('testActions')
-      done()
+      const actions$ = createActionsStream(actions)
+
+      actions$.subscribe(function(action) {
+        expect(action.type).to.equal('testActions')
+        done()
+      })
+
+      subj.observer.next()
+      subj.observer.next({type: 'testActions'})
     })
+  })
 
-    subj.observer.next()
-    subj.observer.next({type: 'testActions'})
-  });
+  describe('getChild', () => {
 
-  it('getChild should retrive object from map', function() {
-    let map = new Map()
-    let fn1 = function() {}
-    let fn2 = function() {}
+    let getChild = require('../src/component').getChild
 
-    let obj1 = {
-      key1: 1
-    }
-    
-    map.set(fn1, obj1)
+    it('should retrive object from map', function() {
+      let map = new Map()
+      let fn1 = function() {}
+      let fn2 = function() {}
 
-    expect(getChild(fn1, 'key1', map)).to.equal(1)
-    expect(getChild(fn2, 'key1', map)).to.equal(false)
-  });
+      let obj1 = {
+        key1: 1
+      }
+      
+      map.set(fn1, obj1)
+
+      expect(getChild(fn1, 'key1', map)).to.equal(1)
+      expect(getChild(fn2, 'key1', map)).to.equal(false)
+    })
+  })
   
-  it('registerComponent should add new component in map', function() {
-    let savedChildren = new Map()
+  describe('registerComponent', () => {
 
-    let constructor1 = function(){ return {} }
-    let constructor2 = function(){ return {} }
+    let recycleComponent = require('../src/component').default
+    let registerComponent = require('../src/component').registerComponent
+    let getChild = require('../src/component').getChild
 
-    let component1 = recycleComponent(constructor1, 'key1')
-    let component2 = recycleComponent(constructor1, 'key1')
-    
-    
-    registerComponent(component1, savedChildren)
+    it('should add new component in map', function() {
+      let savedChildren = new Map()
 
-    expect(getChild(constructor1, 'key1', savedChildren) !== false)
-      .to.equal(true)
+      let constructor1 = function(){ return {} }
+      let constructor2 = function(){ return {} }
 
-    expect(function() {
-      registerComponent(component2, savedChildren)
+      let component1 = recycleComponent(constructor1, 'key1')
+      let component2 = recycleComponent(constructor1, 'key1')
+      
+      registerComponent(component1, savedChildren)
+
+      expect(getChild(constructor1, 'key1', savedChildren) !== false)
+        .to.equal(true)
+
+      expect(function() {
+        registerComponent(component2, savedChildren)
+      })
+      .to.throw(`Could not register recycle component 'constructor1'. Key 'key1' is already in use.`)
     })
-    .to.throw(`Could not register recycle component 'constructor1'. Key 'key1' is already in use.`)
-  });
-
-  it('isReactComponent should check if component is created with react', function() {
-    let reactComponent = React.createClass({
-      render() {} 
-    })
-    
-    expect(isReactComponent(reactComponent)).to.equal(true)
-  });
+  })
   
-  it('createReactElement should pass jsx as property in react render method', function(done) {
-    let reactComponent = React.createClass({
-      render(jsx) {
-        jsx()
-        return null
-      } 
+  describe('isReactComponent', () => {
+
+    let React = require('../src/index').React
+    let isReactComponent = require('../src/component').isReactComponent
+
+    it('should check if component is created with react', function() {
+      let reactComponent = React.createClass({
+        render() {} 
+      })
+      
+      expect(isReactComponent(reactComponent)).to.equal(true)
+    })
+  })
+
+  describe('createReactElement', () => {
+
+    before(function() {
+      jsdomify.create()
     })
 
-    let getArgs = function(constrctor, props) {
-      return arguments
-    }
+    after(function() {
+      jsdomify.destroy()
+    })
 
-    let jsx = function() {
-      done()
-    }
+    let React = require('../src/index').React
+    let ReactDOM = require('../src/index').ReactDOM
+    let createReactElement = require('../src/component').createReactElement
 
-    ReactDOM.render(
-      createReactElement(getArgs(reactComponent), jsx), 
-      document.createElement('div')
-    )
-  });
-
-  it('mergeChildrenActions should return action created by recycle component', function(done) {
-
-    const subj = makeSubject()
-
-    let component = function() {
-      return {
-        actions: function() {
-          return subj.stream
-        },
-        view: () => {
+    it('should pass jsx as property in react render method', function(done) {
+      let reactComponent = React.createClass({
+        render(jsx) {
+          jsx()
           return null
-        }
+        } 
+      })
+
+      let getArgs = function(constrctor, props) {
+        return arguments
       }
-    }
-    let rc = recycleComponent(component)
 
-    ReactDOM.render(
-      React.createElement(rc.getReactComponent(), null), 
-      document.createElement('div')
-    )
+      let jsx = function() {
+        done()
+      }
 
-    let merged$ = mergeChildrenActions([rc])
+      ReactDOM.render(
+        createReactElement(getArgs(reactComponent), jsx), 
+        document.createElement('div')
+      )
+    })
+  })
+  
+  describe('mergeChildrenActions', () => {
 
-    rc.getActions().subscribe(function(action) {
-      expect(action.type).to.equal('testActions')
-      done()
+    before(function() {
+      jsdomify.create()
     })
 
-    subj.observer.next()
-    subj.observer.next({type: 'testActions'})
-  });
+    after(function() {
+      jsdomify.destroy()
+    })
 
-  it('generateSources should return component sources', function() {
-    let childActions$ = makeSubject().stream
-    let componentLifecycle$ = makeSubject().stream
+    let React = require('../src/index').React
+    let ReactDOM = require('../src/index').ReactDOM
+    let recycleComponent = require('../src/component').default
+    let mergeChildrenActions = require('../src/component').mergeChildrenActions
+    let makeSubject = require('../src/rxjs').makeSubject
+    it('should return action created by recycle component', function(done) {
 
-    let sources = generateSources({}, childActions$, componentLifecycle$)
-    
-    expect(typeof sources.DOM).to.equal('function')
-    expect(sources.componentLifecycle instanceof Observable).to.equal(true)
-    expect(sources.childrenActions instanceof Observable).to.equal(true)
-    expect(sources.actions instanceof Observable).to.equal(true)
-  });
-});
+      const subj = makeSubject()
 
-describe('Integration tests', function() {
-
-  it('should change state on button click', function() {
-
-    function ButtonClick() {
-      return {
-        initialState: {
-          timesClicked: 0
-        },
-
-        actions: function(sources) {
-          const button = sources.DOM('button');
-
-          return [
-            button.events('click')
-              .mapTo({type: 'buttonClicked'})
-          ]
-        },
-        
-        reducers: function(sources) { 
-          return [
-            sources.actions
-              .filter(action => action.type == 'buttonClicked')
-              .reducer(function(state) {
-                state.timesClicked++;
-                return state
-              })
-          ]
-        },
-
-        view: function(state, props, jsx) {
-          return jsx('div', null,
-            jsx('span', null, state.timesClicked),
-            jsx('button', null, 'Click me')
-          )
+      let component = function() {
+        return {
+          actions: function() {
+            return subj.stream
+          },
+          view: () => {
+            return null
+          }
         }
       }
-    }
+      let rc = recycleComponent(component)
 
-    
-    var renderedComponent = ReactTestUtils.renderIntoDocument(
-      Recycle(ButtonClick)
-    )
+      ReactDOM.render(
+        React.createElement(rc.getReactComponent(), null), 
+        document.createElement('div')
+      )
 
-    let componentEl = ReactDOM.findDOMNode(renderedComponent)
-    let buttonEl = componentEl.querySelector('button')
-    var evt = document.createEvent("HTMLEvents");
-    evt.initEvent("click", false, true);
+      let merged$ = mergeChildrenActions([rc])
 
-    buttonEl.dispatchEvent(evt)
-    buttonEl.dispatchEvent(evt)
+      rc.getActions().subscribe(function(action) {
+        expect(action.type).to.equal('testActions')
+        done()
+      })
 
-    expect(renderedComponent.state.timesClicked).to.equal(2)
-  });
+      subj.observer.next()
+      subj.observer.next({type: 'testActions'})
+    })
+  })
 
+  describe('generateSources', () => {
+
+    before(function() {
+      jsdomify.create()
+    })
+
+    after(function() {
+      jsdomify.destroy()
+    })
+
+    let makeSubject = require('../src/rxjs').makeSubject
+    let Observable = require('../src/rxjs').Observable
+    let generateSources = require('../src/component').generateSources
+
+    it('generateSources should return component sources', function() {
+      let childActions$ = makeSubject().stream
+      let componentLifecycle$ = makeSubject().stream
+
+      let sources = generateSources({}, childActions$, componentLifecycle$)
+      
+      expect(typeof sources.DOM).to.equal('function')
+      expect(sources.componentLifecycle instanceof Observable).to.equal(true)
+      expect(sources.childrenActions instanceof Observable).to.equal(true)
+      expect(sources.actions instanceof Observable).to.equal(true)
+    })
+  })
+  
 });
