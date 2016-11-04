@@ -16,7 +16,7 @@ export default function ClicksCounter() {
     reducers: function(sources) { 
       return [
         sources.actions
-          .filter(action => action.type == 'buttonClicked')
+          .filterByType('buttonClicked')
           .reducer(function(state) {
             state.timesClicked++;
             return state

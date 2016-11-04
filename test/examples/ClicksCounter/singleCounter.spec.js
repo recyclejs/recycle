@@ -12,9 +12,9 @@ describe('ClicksCounter example', function() {
   })
 
   let ReactTestUtils = require('react-addons-test-utils')
-  let Recycle = require('../../src/index').default
-  let ReactDOM = require('../../src/index').ReactDOM
-  let ClicksCounter = require('../../examples/ClicksCounter/clicksCounter').default
+  let Recycle = require('../../../src/index').default
+  let ReactDOM = require('../../../src/index').ReactDOM
+  let ClicksCounter = require('../../../examples/ClicksCounter/singleCounter').default
 
   it('should change state on button click', function() {
     var renderedComponent = ReactTestUtils.renderIntoDocument(Recycle(ClicksCounter))
