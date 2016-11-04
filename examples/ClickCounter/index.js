@@ -1,6 +1,5 @@
 import Recycle from '../../src/index'
 import ReactDOM from 'react-dom'
-import React from 'react'
-import ClicksCounter from './clickscounter'
+import WrapMultipleCounters from './WrapMultipleCounters'
 
-ReactDOM.render(Recycle(ClicksCounter), document.getElementById('app'))
+ReactDOM.render(Recycle(WrapMultipleCounters), document.getElementById('app'))
