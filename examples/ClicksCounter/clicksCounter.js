@@ -25,9 +25,11 @@ export default function ClicksCounter() {
     },
 
     view: function(state, props, jsx) {
-      return jsx('div', null,
-        jsx('span', null, state.timesClicked),
-        jsx('button', null, 'Click me')
+      return (
+        <div>
+          <span>Times clicked: {state.timesClicked}</span>
+          <button>Click me</button>
+        </div>
       )
     }
   }
