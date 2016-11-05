@@ -1,23 +1,27 @@
-import recycleComponent from './component'
+import Recycle from './recycle'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {Observable, Subject} from 'rxjs'
+import {reducer, filterByType} from './observable'
 
-export function createReactElement(Component, jsx) {
-  let key = 0
-  return React.createClass({
-    render() {
-      key++
-      let props = Object.assign({}, {key: key}, this.props)
-      return jsx(Component, props)
-    }
+Observable.prototype.filterByType = filterByType
+Observable.prototype.reducer = reducer
+
+export default function (constructor, props) {
+
+  let { Component } = Recycle({
+    createClass: React.createClass, 
+    createElement: React.createElement, 
+    findDOMNode: ReactDOM.findDOMNode,
+    Observable,
+    Subject
   })
-}
 
-export default function Recycle(constructor, props) {
-  return React.createElement(recycleComponent(constructor).getReactComponent(), props)
+  return React.createElement(Component(constructor).getReactComponent(), props)
 }
 
 export {
   React,
-  ReactDOM
+  ReactDOM,
+  Observable
 }

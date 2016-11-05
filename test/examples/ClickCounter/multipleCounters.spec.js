@@ -13,7 +13,7 @@ describe('MultipleCounters example', function() {
 
   let ReactTestUtils = require('react-addons-test-utils')
   let Recycle = require('../../../src/index').default
-  let ReactDOM = require('../../../src/index').ReactDOM
+  let ReactDOM = require('react-dom')
   let MultipleCounters = require('../../../examples/ClickCounter/MultipleCounters').default
 
   it('should change state on button click', function() {

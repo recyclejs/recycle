@@ -13,7 +13,7 @@ describe('SingleCounter example', function() {
 
   let ReactTestUtils = require('react-addons-test-utils')
   let Recycle = require('../../../src/index').default
-  let ReactDOM = require('../../../src/index').ReactDOM
+  let ReactDOM = require('react-dom')
   let SingleCounter = require('../../../examples/ClickCounter/SingleCounter').default
 
   it('should change state on button click', function() {
