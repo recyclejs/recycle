@@ -1,5 +1,7 @@
 import {expect} from 'chai'
 import jsdomify from 'jsdomify'
+import createRecycle from '../../../src/index'
+import MultipleCounters from '../../../examples/ClickCounter/MultipleCounters'
 
 describe('MultipleCounters example', function() {
 
@@ -11,15 +13,12 @@ describe('MultipleCounters example', function() {
     jsdomify.destroy()
   })
 
-  let ReactTestUtils = require('react-addons-test-utils')
-  let Recycle = require('../../../src/index').default
-  let ReactDOM = require('react-dom')
-  let MultipleCounters = require('../../../examples/ClickCounter/MultipleCounters').default
-
   it('should change state on button click', function() {
-    var renderedComponent = ReactTestUtils.renderIntoDocument(Recycle(MultipleCounters))
-    let componentEl = ReactDOM.findDOMNode(renderedComponent)
-    let buttonEl = componentEl.querySelector('button')
+    let el = document.createElement('div')
+    let recycle = createRecycle()
+    var renderedComponent = recycle.render(MultipleCounters, el)
+    
+    let buttonEl = el.querySelector('button')
     var evt = document.createEvent("HTMLEvents");
     evt.initEvent("click", false, true);
 

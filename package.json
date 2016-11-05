@@ -26,7 +26,6 @@
     "chai": "^3.5.0",
     "jsdomify": "^3.1.0",
     "mocha": "^3.1.2",
-    "react-addons-test-utils": "^15.3.2",
     "watchify": "^3.7.0"
   },
   "dependencies": {

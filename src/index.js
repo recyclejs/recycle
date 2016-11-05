@@ -7,9 +7,9 @@ import {reducer, filterByType} from './observable'
 Observable.prototype.filterByType = filterByType
 Observable.prototype.reducer = reducer
 
-export default function (constructor, props) {
+export default function createRecycle() {
 
-  let { Component } = Recycle({
+  let recycle = Recycle({
     createClass: React.createClass, 
     createElement: React.createElement, 
     findDOMNode: ReactDOM.findDOMNode,
@@ -17,7 +17,19 @@ export default function (constructor, props) {
     Subject
   })
 
-  return React.createElement(Component(constructor).getReactComponent(), props)
+  let key = 0
+  function createReactElement(constructor, props) {
+    return React.createElement(recycle.Component(constructor, key++).getReactComponent(), props)
+  }
+
+  function render(Component, target) {
+    return ReactDOM.render(createReactElement(Component), target)
+  }
+
+  return {
+    render,
+    createReactElement
+  }
 }
 
 export {
