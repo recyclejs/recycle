@@ -1,9 +1,9 @@
 import createRecycle from 'recyclejs'
-import ReactRxJS from 'recyclejs/adapter/react-rxjs'
+import reactRxjs from 'recyclejs/adapter/react-rxjs'
 import WrapMultipleCounters from './WrapMultipleCounters'
 
 let recycle = createRecycle({
-  adapter: ReactRxJS
+  adapter: reactRxjs
 })
 
 recycle.render(WrapMultipleCounters, document.getElementById('app'))
