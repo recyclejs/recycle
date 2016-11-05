@@ -1,4 +1,4 @@
-export default function({createClass, createElement, findDOMNode, Observable, Subject}) {
+export default function({createClass, createElement, findDOMNode, Observable, Subject, additionalSources}) {
 
   function Component(constructor, key, parent) {
 
@@ -12,8 +12,15 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
     let timesRendered = 0
     let domNodes = {}
     let inErrorState = false
-    let componentSources = generateSources(domNodes, childActions.stream, componentLifecycle.stream)
 
+    let componentSources = {
+      ...additionalSources,
+      DOM: generateDOMSource(domNodes),
+      componentLifecycle: componentLifecycle.stream,
+      childrenActions: childActions.stream.switch().share(),
+      actions: makeSubject().stream
+    }
+    
     function createReactComponent() {
       let {
         view, 
@@ -178,10 +185,10 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
     return { stream: stream, observer: observer }
   }
 
-  function generateSources(domNodes, childActions$, componentLifecycle$) {
-    return {
-      DOM: (selector) => ({
-        events: (event) => {
+  function generateDOMSource(domNodes) {
+    return function(selector) {
+      return {
+        events: function(event) {
           if (!domNodes[selector])
             domNodes[selector] = {}
           
@@ -190,10 +197,7 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
 
           return domNodes[selector][event].stream.switch().share()
         }
-      }),
-      componentLifecycle: componentLifecycle$,
-      childrenActions: childActions$.switch().share(),
-      actions: makeSubject().stream
+      }
     }
   }
 
@@ -281,7 +285,7 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
   return {
     Component,
     makeSubject,
-    generateSources,
+    generateDOMSource,
     updateDomStreams,
     createStateStream,
     createActionsStream,

@@ -5,7 +5,10 @@ export default function createRecycle(config) {
     throw new Error('Missing adapter property for creating Recycle instance')
 
   let adapter = config.adapter()
-  var recycle = Recycle(adapter)
+  var recycle = Recycle({
+    ...adapter,
+    additionalSources: config.sources
+  })
 
   function createReactElement(constructor, props) {
     return adapter.createElement(recycle.Component(constructor).getReactComponent(), props)

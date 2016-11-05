@@ -197,7 +197,7 @@ describe('unit tests', function() {
     })
   })
   
-  describe('generateSources', () => {
+  describe('generateDOMSource', () => {
 
     before(function() {
       jsdomify.create()
@@ -208,15 +208,12 @@ describe('unit tests', function() {
     })
    
     it('generateSources should return component sources', function() {
-      let childActions$ = recycle.makeSubject().stream
-      let componentLifecycle$ = recycle.makeSubject().stream
-
-      let sources = recycle.generateSources({}, childActions$, componentLifecycle$)
       
-      expect(typeof sources.DOM).to.equal('function')
-      expect(sources.componentLifecycle instanceof Observable).to.equal(true)
-      expect(sources.childrenActions instanceof Observable).to.equal(true)
-      expect(sources.actions instanceof Observable).to.equal(true)
+      let DOMSource = recycle.generateDOMSource({})
+      
+      expect(typeof DOMSource).to.equal('function')
+      expect(typeof DOMSource().events).to.equal('function')
+      expect(DOMSource().events('click') instanceof Observable).to.equal(true)
     })
   })
   
