@@ -1,5 +1,7 @@
 # Generated code
-dist
+index.js
+recycle.js
+adapter
 
 node_modules
 .DS_Store

@@ -1,6 +1,7 @@
 import {expect} from 'chai'
 import jsdomify from 'jsdomify'
 import createRecycle from '../../../src/index'
+import reactAdapter from '../../../src/adapter/react-rxjs'
 import SingleCounter from '../../../examples/ClickCounter/SingleCounter'
 
 describe('SingleCounter example', function() {
@@ -15,7 +16,10 @@ describe('SingleCounter example', function() {
 
   it('should change state on button click', function() {
     let el = document.createElement('div')
-    let recycle = createRecycle()
+    let recycle = createRecycle({
+      adapter: reactAdapter
+    })
+    
     var renderedComponent = recycle.render(SingleCounter, el)
     
     let buttonEl = el.querySelector('button')

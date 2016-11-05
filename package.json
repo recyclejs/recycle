@@ -1,11 +1,11 @@
 {
   "name": "recyclejs",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "mocha test/*.js test/**/*.js  --compilers js:babel-register --watch",
-    "build": "babel src -d ./dist"
+    "build": "babel src -d ./"
   },
   "repository": {
     "type": "git",

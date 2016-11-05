@@ -1,36 +1,26 @@
 import Recycle from './recycle'
-import React from 'react'
-import ReactDOM from 'react-dom'
-import {Observable, Subject} from 'rxjs'
-import {reducer, filterByType} from './observable'
 
-Observable.prototype.filterByType = filterByType
-Observable.prototype.reducer = reducer
+export default function createRecycle(config) {
+  if (!config || !config.adapter)
+    throw new Error('Missing adapter property for creating Recycle instance')
 
-export default function createRecycle() {
+  let adapter = config.adapter()
+  var recycle = Recycle(adapter)
 
-  let recycle = Recycle({
-    createClass: React.createClass, 
-    createElement: React.createElement, 
-    findDOMNode: ReactDOM.findDOMNode,
-    Observable,
-    Subject,
-  })
-  
   function createReactElement(constructor, props) {
-    return React.createElement(recycle.Component(constructor).getReactComponent(), props)
+    return adapter.createElement(recycle.Component(constructor).getReactComponent(), props)
   }
 
   function render(Component, target) {
-    return ReactDOM.render(createReactElement(Component), target)
+    return adapter.render(createReactElement(Component), target)
   }
 
-  let key = 0
+  var key = 0
   function createReactClass(constructor, jsx) {
-    return React.createClass({
-      render() {
+    return adapter.createClass({
+      render: function () {
         key++
-        let props = Object.assign({}, {key}, this.props)
+        var props = Object.assign({}, { key: key }, this.props)
         return jsx(constructor, props)
       }
     })
@@ -41,10 +31,4 @@ export default function createRecycle() {
     createReactClass,
     createReactElement
   }
-}
-
-export {
-  React,
-  ReactDOM,
-  Observable
 }

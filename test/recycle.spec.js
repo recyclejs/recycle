@@ -1,16 +1,13 @@
 import {expect} from 'chai'
 import jsdomify from 'jsdomify'
+import reactAdapter from '../src/adapter/react-rxjs'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Observable, Subject} from 'rxjs'
+import Recycle from '../src/recycle'
 
-let recycle = require('../src/recycle').default({
-  createClass: React.createClass, 
-  createElement: React.createElement, 
-  findDOMNode: ReactDOM.findDOMNode,
-  Observable,
-  Subject
-})
+let adapter = reactAdapter()
+let recycle = Recycle(adapter)
+let Observable = adapter.Observable
 
 describe('unit tests', function() {
   

@@ -117,7 +117,7 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
     }
 
     function addChild(component) {
-      childrenComponents.push(component);
+      childrenComponents.push(component)
     }
 
     function updateChildActions() {
@@ -130,23 +130,23 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
     }
 
     const getActions = () => {
-      return actions$;
+      return actions$
     }
 
     const getReactComponent = () => {
-      return ReactComponent;
+      return ReactComponent
     }
     
     const getName = () => {
-      return componentName;
+      return componentName
     }
     
     const getKey = () => {
-      return key;
+      return key
     }
     
     const getConstructor = () => {
-      return constructor;
+      return constructor
     }
 
     const thisComponent =  {
@@ -165,17 +165,17 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
 
     ReactComponent = createReactComponent()
 
-    return thisComponent;
+    return thisComponent
   }
 
   function makeSubject() {
-    var stream = new Subject();
+    var stream = new Subject()
     var observer = {
-        next: function (x) { stream.next(x); },
-        error: function (err) { stream.error(err); },
-        complete: function () { stream.complete(); },
-    };
-    return { stream: stream, observer: observer };
+        next: function (x) { stream.next(x) },
+        error: function (err) { stream.error(err) },
+        complete: function () { stream.complete() },
+    }
+    return { stream: stream, observer: observer }
   }
 
   function generateSources(domNodes, childActions$, componentLifecycle$) {
