@@ -73,7 +73,7 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
                 this.forceUpdate()
             })
           }
-          
+
           updateChildActions()
           componentLifecycle.observer.next({ type: 'componentMounted', state: this.state })
         },
@@ -98,7 +98,8 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
         let constructor = arguments['0']
         let props = arguments['1'] || {}
         let key = props.key
-
+        delete props.key
+        
         if (isReactComponent(constructor))
           return createReactElement(createElement, arguments, jsxHandler)
 
