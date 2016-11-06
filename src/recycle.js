@@ -67,12 +67,14 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
             let state$ = createStateStream(componentReducers, initialState, componentLifecycle.observer.next)
 
             state$.subscribe((state) => {
-              this.setState(state)
+              if (state)
+                this.setState(state)
+              else
+                this.forceUpdate()
             })
-
-            updateChildActions()
           }
-
+          
+          updateChildActions()
           componentLifecycle.observer.next({ type: 'componentMounted', state: this.state })
         },
 
