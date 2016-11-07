@@ -8,19 +8,11 @@ export default function ({
   initialStoreState,
   additionalSources,
 }) {
-  const containerActions = []
+  const containerActionsStreams = []
   const storeActions = makeSubject()
   const storeActionsStream = storeActions.stream.switch().share()
+  const storeState$ = createStoreState(storeReducers, storeActionsStream)
   let rootComponent
-  let storeState = initialStoreState
-  let storeState$
-
-  if (storeReducers) {
-    storeState$ = createStateStream(storeReducers(storeActionsStream), initialStoreState)
-    storeState$.subscribe((newState) => {
-      storeState = newState
-    })
-  }
 
   function createComponent(constructor, key, parent) {
     const childActions = makeSubject()
@@ -80,17 +72,13 @@ export default function ({
           let componentActions
 
           if (wrap) {
-            componentActions = (actions) ?
-              actions(componentSources.childrenActions, this.props) :
-              componentSources.childrenActions
-
-            if (storeState$) {
+            componentActions = containerActions(actions, componentSources.childrenActions, this.props)
+            /* if (storeState$) {
               // todo: unsubscribe, shouldComponentUpdate check
               storeState$.subscribe(() => {
                 this.forceUpdate()
               })
-            }
-            registerContainerActions(componentActions)
+            }*/
           } else if (actions) {
             componentActions = actions(componentSources, this.props)
           }
@@ -139,10 +127,10 @@ export default function ({
             const props = this.props
 
             if (mapStateToProps) {
-              this.calcProps = mapStateToProps(storeState, props)
+              this.calcProps = mapStateToProps(/* storeState, */props)
             }
 
-            return jsxHandler(wrap, this.calcProps)
+            return jsxHandler(wrap, this.calcProps || props)
           }
 
           return view(this.state, this.props, jsxHandler)
@@ -233,9 +221,19 @@ export default function ({
     return thisComponent
   }
 
-  function registerContainerActions(actionStream) {
-    containerActions.push(actionStream)
-    storeActions.observer.next(Observable.merge(...containerActions))
+  function containerActions(actions, childrenActions, props) {
+    const actionStream = (actions) ? actions(childrenActions, props) : childrenActions
+    containerActionsStreams.push(actionStream)
+    storeActions.observer.next(Observable.merge(...containerActionsStreams))
+
+    return actionStream
+  }
+
+  function createStoreState(reducers, actions$) {
+    if (reducers) {
+      return createStateStream(storeReducers(actions$), initialStoreState)
+    }
+    return false
   }
 
   function makeSubject() {
@@ -350,13 +348,34 @@ export default function ({
     return createElementHandler.apply(this, newArgs)
   }
 
-  function getRootComponent() {
-    return rootComponent
+  function getComponentStructure() {
+    function addInStructure(parent, component) {
+      const current = {
+        component,
+        name: component.getName(),
+        children: [],
+      }
+      if (parent.children) {
+        parent.children.push(current)
+      } else {
+        structure = current
+      }
+
+      if (component.getChildren()) {
+        component.getChildren().forEach((c) => {
+          addInStructure(current, c)
+        })
+      }
+    }
+
+    let structure = {}
+    addInStructure(structure, rootComponent)
+    return structure
   }
 
   return {
     createComponent,
-    getRootComponent,
+    getComponentStructure,
     makeSubject,
     generateDOMSource,
     updateDomStreams,
