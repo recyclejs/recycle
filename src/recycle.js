@@ -155,7 +155,6 @@ export default function ({
         const component = arguments['0']
         const props = arguments['1'] || {}
         const componentKey = props.key
-        delete props.key
 
         if (isReactComponent(component)) {
           return createReactElement(createElement, arguments, jsxHandler)
