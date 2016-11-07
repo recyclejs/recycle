@@ -20,7 +20,7 @@ describe('SingleCounter example', function() {
       adapter: reactAdapter
     })
     
-    var renderedComponent = recycle.render(SingleCounter, el)
+    recycle.render(SingleCounter, el)
     
     let buttonEl = el.querySelector('button')
     var evt = document.createEvent("HTMLEvents");
@@ -29,7 +29,8 @@ describe('SingleCounter example', function() {
     buttonEl.dispatchEvent(evt)
     buttonEl.dispatchEvent(evt)
 
-    expect(renderedComponent.state.timesClicked).to.equal(2)
+    let structure = recycle.getComponentStructure()
+    expect(structure.children[0].component.getState().timesClicked).to.equal(2)
   });
 
 });

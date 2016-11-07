@@ -1,44 +1,72 @@
-export default function({createClass, createElement, findDOMNode, Observable, Subject, additionalSources}) {
+export default function ({
+  createClass,
+  createElement,
+  findDOMNode,
+  Observable,
+  Subject,
+  storeReducers,
+  initialStoreState,
+  additionalSources,
+}) {
+  const containerActions = []
+  const storeActions = makeSubject()
+  const storeActionsStream = storeActions.stream.switch().share()
+  let rootComponent
+  let storeState = initialStoreState
+  let storeState$
 
-  function Component(constructor, key, parent) {
+  if (storeReducers) {
+    storeState$ = createStateStream(storeReducers(storeActionsStream), initialStoreState)
+    storeState$.subscribe((newState) => {
+      storeState = newState
+    })
+  }
 
-    let ReactComponent
+  function createComponent(constructor, key, parent) {
+    const childActions = makeSubject()
+    const componentLC = makeSubject()
+    const childrenComponents = []
+    const savedChildren = new Map()
+    const domNodes = {}
+    let reactComponent
     let actions$
     let componentName
-    let childActions = makeSubject()
-    let componentLifecycle = makeSubject()
-    let childrenComponents = []
-    let savedChildren = new Map()
     let timesRendered = 0
-    let domNodes = {}
     let inErrorState = false
+    let componentState = null
 
-    let componentSources = {
+    const componentSources = {
       ...additionalSources,
       DOM: generateDOMSource(domNodes),
-      componentLifecycle: componentLifecycle.stream,
+      componentLC: componentLC.stream,
       childrenActions: childActions.stream.switch().share(),
-      actions: makeSubject().stream
+      actions: makeSubject().stream,
     }
-    
+
     function createReactComponent() {
-      let {
-        view, 
-        actions, 
-        reducers, 
-        initialState, 
-        shouldComponentUpdate, 
-        propTypes, 
-        defaultProps, 
-        displayName
+      const {
+        wrap,
+        mapStateToProps,
+        view,
+        actions,
+        reducers,
+        initialState,
+        shouldComponentUpdate,
+        propTypes,
+        defaultProps,
+        displayName,
       } = constructor()
 
+      if (wrap) {
+        if (view) throw new Error('Container components can not have a view')
+      }
+
       componentName = displayName || constructor.name
-      
 
       return createClass({
-        propTypes: propTypes || null,
         displayName: componentName,
+
+        propTypes: propTypes || null,
 
         getDefaultProps() {
           return defaultProps || null
@@ -48,39 +76,45 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
           return initialState || null
         },
 
-        componentDidUpdate() {
-          let el = findDOMNode(this)
-          updateDomStreams(domNodes, el)
-          componentLifecycle.observer.next({ type: 'componentUpdated', state: this.state })
-        },
-
         componentDidMount() {
-          
-          if (actions) {
-            let componentActions = actions(componentSources, this.props)
+          let componentActions
+
+          if (wrap) {
+            componentActions = (actions) ?
+              actions(componentSources.childrenActions, this.props) :
+              componentSources.childrenActions
+
+            if (storeState$) {
+              // todo: unsubscribe, shouldComponentUpdate check
+              storeState$.subscribe(() => {
+                this.forceUpdate()
+              })
+            }
+            registerContainerActions(componentActions)
+          } else if (actions) {
+            componentActions = actions(componentSources, this.props)
+          }
+
+          if (componentActions) {
             actions$ = createActionsStream(componentActions)
             actions$.subscribe(componentSources.actions)
           }
 
           if (reducers) {
-            let componentReducers = reducers(componentSources, this.props)
-            let state$ = createStateStream(componentReducers, initialState, componentLifecycle.observer.next)
+            const componentReducers = reducers(componentSources, this.props)
+            const state$ = createStateStream(componentReducers, initialState, componentLC.observer.next)
 
             state$.subscribe((state) => {
-              if (state)
+              if (state) {
                 this.setState(state)
-              else
+              } else {
                 this.forceUpdate()
+              }
             })
           }
 
           updateChildActions()
-          componentLifecycle.observer.next({ type: 'componentMounted', state: this.state })
-        },
-
-        render() {
-          timesRendered++
-          return view(this.state, this.props, jsxHandler)
+          componentLC.observer.next({ type: 'componentMounted', state: this.state })
         },
 
         shouldComponentUpdate(nextProps, nextState) {
@@ -88,40 +122,64 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
             return shouldComponentUpdate(nextProps, nextState, this.props, this.state)
           }
           return true
-        }
+        },
+
+        componentDidUpdate() {
+          const el = findDOMNode(this)
+          updateDomStreams(domNodes, el)
+          componentState = this.state
+          componentLC.observer.next({ type: 'componentUpdated', state: this.state })
+        },
+
+
+        render() {
+          timesRendered++
+
+          if (wrap) {
+            const props = this.props
+
+            if (mapStateToProps) {
+              this.calcProps = mapStateToProps(storeState, props)
+            }
+
+            return jsxHandler(wrap, this.calcProps)
+          }
+
+          return view(this.state, this.props, jsxHandler)
+        },
       })
     }
 
     function jsxHandler() {
-      if (typeof arguments['0'] == 'function') {
-
-        let constructor = arguments['0']
-        let props = arguments['1'] || {}
-        let key = props.key
+      if (typeof arguments['0'] === 'function') {
+        const component = arguments['0']
+        const props = arguments['1'] || {}
+        const componentKey = props.key
         delete props.key
-        
-        if (isReactComponent(constructor))
-          return createReactElement(createElement, arguments, jsxHandler)
 
-        let child = (savedChildren.has(constructor)) ? savedChildren.get(constructor)[key] : false
+        if (isReactComponent(component)) {
+          return createReactElement(createElement, arguments, jsxHandler)
+        }
+
+        const child = (savedChildren.has(component)) ? savedChildren.get(component)[componentKey] : false
 
         if (child) {
           if (!inErrorState && timesRendered === 1) {
             inErrorState = true
-            
-            if (!child.getKey())
+
+            if (!child.getKey()) {
               throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
-            else
+            } else {
               throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
+            }
           }
 
           return createElement(child.getReactComponent(), props)
         }
 
-        let newComponent = Component(constructor, key, thisComponent)
+        const newComponent = createComponent(component, componentKey, thisComponent)
         registerComponent(newComponent, savedChildren)
         return createElement(newComponent.getReactComponent(), props)
-
       }
       return createElement.apply(this, arguments)
     }
@@ -131,75 +189,80 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
     }
 
     function updateChildActions() {
-      if (parent)
+      if (parent) {
         parent.updateChildActions()
-      
-      let newActions = mergeChildrenActions(childrenComponents)
-      if (newActions)
+      }
+
+      const newActions = mergeChildrenActions(childrenComponents)
+
+      if (newActions) {
         childActions.observer.next(newActions)
+      }
     }
 
-    const getActions = () => {
-      return actions$
-    }
+    const getActions = () => actions$
+    const getReactComponent = () => reactComponent
+    const getName = () => componentName
+    const getKey = () => key
+    const getConstructor = () => constructor
+    const getChildren = () => childrenComponents
+    const getState = () => componentState
 
-    const getReactComponent = () => {
-      return ReactComponent
-    }
-    
-    const getName = () => {
-      return componentName
-    }
-    
-    const getKey = () => {
-      return key
-    }
-    
-    const getConstructor = () => {
-      return constructor
-    }
-
-    const thisComponent =  {
+    const thisComponent = {
       updateChildActions,
       addChild,
       getActions,
       getReactComponent,
       getName,
       getKey,
+      getChildren,
+      getState,
       getConstructor,
     }
 
     if (parent) {
       parent.addChild(thisComponent)
+    } else {
+      if (rootComponent) {
+        throw new Error('rootComponent already set')
+      }
+      rootComponent = thisComponent
     }
 
-    ReactComponent = createReactComponent()
+    reactComponent = createReactComponent()
 
     return thisComponent
   }
 
+  function registerContainerActions(actionStream) {
+    containerActions.push(actionStream)
+    storeActions.observer.next(Observable.merge(...containerActions))
+  }
+
   function makeSubject() {
-    var stream = new Subject()
-    var observer = {
-        next: function (x) { stream.next(x) },
-        error: function (err) { stream.error(err) },
-        complete: function () { stream.complete() },
+    const stream = new Subject()
+    const observer = {
+      next: x => stream.next(x),
+      error: err => stream.error(err),
+      complete: () => stream.complete(),
     }
-    return { stream: stream, observer: observer }
+    return { stream, observer }
   }
 
   function generateDOMSource(domNodes) {
-    return function(selector) {
+    return function domSelector(selector) {
       return {
-        events: function(event) {
-          if (!domNodes[selector])
+        events: function getEvent(event) {
+          if (!domNodes[selector]) {
             domNodes[selector] = {}
-          
-          if (!domNodes[selector][event])
+          }
+
+          if (!domNodes[selector][event]) {
             domNodes[selector][event] = makeSubject()
+          }
 
           return domNodes[selector][event].stream.switch().share()
-        }
+        },
       }
     }
   }
@@ -220,7 +283,9 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
     return Observable.merge(...componentReducers)
       .startWith(initialState)
       .scan((state, {reducer, action}) => {
-        notify({ type: 'willCallReducer', action, reducer})
+        if (notify)
+          notify({ type: 'willCallReducer', action, reducer})
+
         return reducer(state, action)
       })
       .share()
@@ -285,8 +350,13 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
     return createElement.apply(this, newArgs)
   }
 
+  function getRootComponent() {
+    return rootComponent
+  }
+
   return {
-    Component,
+    createComponent,
+    getRootComponent,
     makeSubject,
     generateDOMSource,
     updateDomStreams,
@@ -295,6 +365,6 @@ export default function({createClass, createElement, findDOMNode, Observable, Su
     mergeChildrenActions,
     registerComponent,
     isReactComponent,
-    createReactElement
+    createReactElement,
   }
 }

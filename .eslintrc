@@ -1,0 +1,12 @@
+{
+  "extends": "airbnb",
+  "rules": {
+    "no-use-before-define": "off",
+    "react/prefer-es6-class": 0,
+    "max-len": ["error", 150],
+    "prefer-rest-params": 0,
+    "no-plusplus": 0,
+    "no-param-reassign": 0,
+    "semi": 0
+  }
+}

@@ -7,15 +7,41 @@ export default function createRecycle(config) {
   let adapter = config.adapter()
   var recycle = Recycle({
     ...adapter,
-    additionalSources: config.sources
+    initialStoreState: (config.store) ? config.store.initialState : null,
+    storeReducers: (config.store) ? config.store.reducers : null,
+    additionalSources: (config.store) ? config.additionalSources : null
   })
 
   function createReactElement(constructor, props) {
-    return adapter.createElement(recycle.Component(constructor).getReactComponent(), props)
+    return adapter.createElement(recycle.createComponent(constructor).getReactComponent(), props)
   }
 
   function render(Component, target) {
     return adapter.render(createReactElement(Component), target)
+  }
+
+  function getComponentStructure() {    
+    function addInStructure(parent, component) {
+      let current = {
+        component,
+        name:component.getName(),
+        children: []
+      }
+      if (parent.children)
+        parent.children.push(current)
+      else
+        structure = current
+
+      if (component.getChildren()) {
+        component.getChildren().forEach(c => {
+          addInStructure(current, c)
+        })
+      }
+    }
+
+    let structure = {}
+    addInStructure(structure, recycle.getRootComponent())
+    return structure
   }
 
   var key = 0
@@ -30,6 +56,7 @@ export default function createRecycle(config) {
   }
 
   return {
+    getComponentStructure,
     render,
     createReactClass,
     createReactElement

@@ -1,4 +1,4 @@
-export default function SingleCounter() {
+function SingleCounter() {
   return {
     initialState: {
       timesClicked: 0
@@ -31,6 +31,20 @@ export default function SingleCounter() {
           <button>Click me</button>
         </div>
       )
+    }
+  }
+}
+
+export default function SingleCounterContainer() {
+  return {
+    wrap: SingleCounter,
+    
+    mapStateToProps: function(storeState, ownProps) {
+      return storeState
+    },
+
+    actions: function(componentActions, ownProps) {
+      return componentActions
     }
   }
 }

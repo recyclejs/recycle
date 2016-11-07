@@ -89,13 +89,16 @@ describe('unit tests', function() {
   describe('registerComponent', () => {
 
     it('should add new component in map', function() {
+      let recycle = Recycle(adapter)
+
       let savedChildren = new Map()
 
       let constructor1 = function(){ return {} }
       let constructor2 = function(){ return {} }
 
-      let component1 = recycle.Component(constructor1, 'key1')
-      let component2 = recycle.Component(constructor1, 'key1')
+      let rootComponent = recycle.createComponent(constructor1)
+      let component1 = recycle.createComponent(constructor1, 'key1', rootComponent)
+      let component2 = recycle.createComponent(constructor1, 'key1', rootComponent)
       
       recycle.registerComponent(component1, savedChildren)
 
@@ -178,7 +181,7 @@ describe('unit tests', function() {
         }
       }
 
-      let rc = recycle.Component(constructor)
+      let rc = recycle.createComponent(constructor)
 
       ReactDOM.render(
         React.createElement(rc.getReactComponent(), null), 

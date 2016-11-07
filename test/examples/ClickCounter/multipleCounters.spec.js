@@ -17,7 +17,15 @@ describe('MultipleCounters example', function() {
   it('should change state on button click', function() {
     let el = document.createElement('div')
     let recycle = createRecycle({
-      adapter: reactAdapter
+      adapter: reactAdapter,
+      store: {
+        initialState: 4,
+        reducers: function(actions) { 
+          return actions.reducer(function(state) {
+            return 3
+          })
+        } 
+      }
     })
     var renderedComponent = recycle.render(MultipleCounters, el)
     
@@ -26,9 +34,9 @@ describe('MultipleCounters example', function() {
     evt.initEvent("click", false, true);
 
     buttonEl.dispatchEvent(evt)
-    buttonEl.dispatchEvent(evt)
-
-    expect(renderedComponent.state.childButtonClicked).to.equal(2)
+    //buttonEl.dispatchEvent(evt)
+    
+    expect(renderedComponent.state.childButtonClicked).to.equal(1)
   });
 
 });
