@@ -4,14 +4,8 @@ export default function ({
   findDOMNode,
   Observable,
   Subject,
-  storeReducers,
-  initialStoreState,
   additionalSources,
 }) {
-  const containerActionsStreams = []
-  const storeActions = makeSubject()
-  const storeActionsStream = storeActions.stream.switch().share()
-  const storeState$ = createStoreState(storeReducers, storeActionsStream)
   let rootComponent
 
   function createComponent(constructor, key, parent) {
@@ -21,7 +15,6 @@ export default function ({
     const savedChildren = new Map()
     const domNodes = {}
     let ReactComponent
-    let actions$
     let componentName
     let timesRendered = 0
     let inErrorState = false
@@ -37,8 +30,6 @@ export default function ({
 
     function createReactComponent() {
       const {
-        wrap,
-        mapStateToProps,
         view,
         actions,
         reducers,
@@ -50,7 +41,7 @@ export default function ({
 
       componentName = displayName || constructor.name
 
-      class PresentationalComponent extends Component {
+      class ReactClass extends Component {
         constructor(props) {
           super(props)
           this.state = initialState
@@ -59,8 +50,7 @@ export default function ({
         componentDidMount() {
           if (actions) {
             const componentActions = actions(componentSources, this.props)
-            actions$ = createActionsStream(componentActions)
-            actions$.subscribe(componentSources.actions)
+            createActionsStream(componentActions).subscribe(componentSources.actions)
           }
 
           if (reducers) {
@@ -100,41 +90,10 @@ export default function ({
         }
       }
 
-      PresentationalComponent.displayName = componentName
-      PresentationalComponent.propTypes = propTypes || null
+      ReactClass.displayName = componentName
+      ReactClass.propTypes = propTypes || null
 
-      if (!wrap) {
-        return PresentationalComponent
-      }
-
-      // if wrap property is provided
-      // return Container Component
-      return class ContainerComponent extends PresentationalComponent {
-        componentDidMount() {
-          const componentActions = containerActions(actions, componentSources.childrenActions, this.props)
-          actions$ = createActionsStream(componentActions)
-          actions$.subscribe(componentSources.actions)
-          updateChildActions()
-
-          /* if (storeState$) {
-            // todo: unsubscribe, shouldComponentUpdate check
-            storeState$.subscribe(() => {
-              this.forceUpdate()
-            })
-          }*/
-        }
-
-        render() {
-          timesRendered++
-          let props = this.props
-
-          if (mapStateToProps) {
-            props = mapStateToProps(/* storeState, */props)
-          }
-
-          return jsxHandler(wrap, props)
-        }
-      }
+      return ReactClass
     }
 
     function jsxHandler() {
@@ -189,7 +148,7 @@ export default function ({
     const thisComponent = {
       updateChildActions,
       addChild,
-      getActions: () => actions$,
+      getActions: () => componentSources.actions,
       getReactComponent: () => ReactComponent,
       getName: () => componentName,
       getKey: () => key,
@@ -208,21 +167,6 @@ export default function ({
     ReactComponent = createReactComponent()
 
     return thisComponent
-  }
-
-  function containerActions(actions, childrenActions, props) {
-    const actionStream = (actions) ? actions(childrenActions, props) : childrenActions
-    containerActionsStreams.push(actionStream)
-    storeActions.observer.next(Observable.merge(...containerActionsStreams))
-
-    return actionStream
-  }
-
-  function createStoreState(reducers, actions$) {
-    if (reducers) {
-      return createStateStream(storeReducers(actions$), initialStoreState)
-    }
-    return false
   }
 
   function makeSubject() {
