@@ -186,32 +186,22 @@ export default function ({
       }
     }
 
-    const getActions = () => actions$
-    const getReactComponent = () => ReactComponent
-    const getName = () => componentName
-    const getKey = () => key
-    const getConstructor = () => constructor
-    const getChildren = () => childrenComponents
-    const getState = () => componentState
-
     const thisComponent = {
       updateChildActions,
       addChild,
-      getActions,
-      getReactComponent,
-      getName,
-      getKey,
-      getChildren,
-      getState,
-      getConstructor,
+      getActions: () => actions$,
+      getReactComponent: () => ReactComponent,
+      getName: () => componentName,
+      getKey: () => key,
+      getChildren: () => childrenComponents,
+      getState: () => componentState,
+      getConstructor: () => constructor,
     }
 
     if (parent) {
       parent.addChild(thisComponent)
     } else {
-      if (rootComponent) {
-        throw new Error('rootComponent already set')
-      }
+      if (rootComponent) throw new Error('rootComponent already set')
       rootComponent = thisComponent
     }
 
