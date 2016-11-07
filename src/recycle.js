@@ -38,7 +38,7 @@ export default function ({
     const componentSources = {
       ...additionalSources,
       DOM: generateDOMSource(domNodes),
-      componentLC: componentLC.stream,
+      componentLifecycle: componentLC.stream,
       childrenActions: childActions.stream.switch().share(),
       actions: makeSubject().stream,
     }
@@ -268,39 +268,37 @@ export default function ({
   }
 
   function updateDomStreams(domNodes, el) {
-    for (let selector in domNodes) {
-      for (let event in domNodes[selector]) {
-        let domEl = el.querySelector(selector)
+    Object.keys(domNodes).forEach((selector) => {
+      Object.keys(domNodes[selector]).forEach((event) => {
+        const domEl = el.querySelector(selector)
         domNodes[selector][event].observer.next(Observable.fromEvent(domEl, event))
-      }
-    }
+      })
+    })
   }
 
   function createStateStream(componentReducers, initialState, notify) {
-    if (!Array.isArray(componentReducers))
-        componentReducers = [componentReducers]
+    if (!Array.isArray(componentReducers)) {
+      componentReducers = [componentReducers]
+    }
 
     return Observable.merge(...componentReducers)
       .startWith(initialState)
-      .scan((state, {reducer, action}) => {
-        if (notify)
-          notify({ type: 'willCallReducer', action, reducer})
-
+      .scan((state, { reducer, action }) => {
+        if (notify) notify({ type: 'willCallReducer', action, reducer })
         return reducer(state, action)
       })
       .share()
   }
 
   function createActionsStream(componentActions) {
-    if (!Array.isArray(componentActions))
+    if (!Array.isArray(componentActions)) {
       componentActions = [componentActions]
-
+    }
     return Observable.merge(...componentActions).filter(action => action)
   }
 
   function mergeChildrenActions(childrenComponents) {
-    if (!childrenComponents.length)
-      return false
+    if (!childrenComponents.length) return false
 
     return Observable.merge(...childrenComponents
         .filter(component => component.getActions())
@@ -309,45 +307,48 @@ export default function ({
   }
 
   function registerComponent(newComponent, savedChildren) {
-    let constructor = newComponent.getConstructor()
-    let key = newComponent.getKey()
-    let name = newComponent.getName()
+    const constructor = newComponent.getConstructor()
+    const key = newComponent.getKey()
+    const name = newComponent.getName()
 
-    let obj = savedChildren.get(constructor) || {}
+    const obj = savedChildren.get(constructor) || {}
 
-    if (obj[key])
-      throw Error(`Could not register recycle component '${name}'. Key '${key}' is already in use.`)
-    
+    if (obj[key]) throw Error(`Could not register recycle component '${name}'. Key '${key}' is already in use.`)
+
     obj[key] = newComponent
     savedChildren.set(constructor, obj)
   }
 
   function isReactComponent(constructor) {
-    return (constructor.prototype.render) ? true : false
+    if (constructor.prototype.render) {
+      return true
+    }
+    return false
   }
 
-  function createReactElement(createElement, args, jsx) {
-    let constructor = args['0']
-    let props = args['1'] || {}
+  function createReactElement(createElementHandler, args, jsx) {
+    const constructor = args['0']
+    const props = args['1'] || {}
 
-    let originalRender = constructor.prototype.render
-    constructor.prototype.render = function() {
+    const originalRender = constructor.prototype.render
+    constructor.prototype.render = function render() {
       return originalRender.call(this, this.props._recycleRenderHandler)
     }
-    
+
     props._recycleRenderHandler = jsx
-    
-    let newArgs = []
-    for (let i=0; i < args.length || i < 2; i++) {
-      if (i === 0)
+
+    const newArgs = []
+    for (let i = 0; i < args.length || i < 2; i++) {
+      if (i === 0) {
         newArgs.push(constructor)
-      else if (i === 1)
+      } else if (i === 1) {
         newArgs.push(props)
-      else if (i > 1)
+      } else if (i > 1) {
         newArgs.push(args[i])
+      }
     }
 
-    return createElement.apply(this, newArgs)
+    return createElementHandler.apply(this, newArgs)
   }
 
   function getRootComponent() {
