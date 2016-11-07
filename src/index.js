@@ -1,15 +1,15 @@
-import Recycle from './recycle'
+import createRecycle from './recycle'
 
-export default function createRecycle(config) {
-  if (!config || !config.adapter)
+export default (config) => {
+  if (!config || !config.adapter) {
     throw new Error('Missing adapter property for creating Recycle instance')
-
-  let adapter = config.adapter()
-  var recycle = Recycle({
+  }
+  const adapter = config.adapter()
+  const recycle = createRecycle({
     ...adapter,
     initialStoreState: (config.store) ? config.store.initialState : null,
     storeReducers: (config.store) ? config.store.reducers : null,
-    additionalSources: (config.store) ? config.additionalSources : null
+    additionalSources: (config.store) ? config.additionalSources : null,
   })
 
   function createReactElement(constructor, props) {
@@ -20,20 +20,21 @@ export default function createRecycle(config) {
     return adapter.render(createReactElement(Component), target)
   }
 
-  function getComponentStructure() {    
+  function getComponentStructure() {
     function addInStructure(parent, component) {
-      let current = {
+      const current = {
         component,
-        name:component.getName(),
-        children: []
+        name: component.getName(),
+        children: [],
       }
-      if (parent.children)
+      if (parent.children) {
         parent.children.push(current)
-      else
+      } else {
         structure = current
+      }
 
       if (component.getChildren()) {
-        component.getChildren().forEach(c => {
+        component.getChildren().forEach((c) => {
           addInStructure(current, c)
         })
       }
@@ -44,14 +45,14 @@ export default function createRecycle(config) {
     return structure
   }
 
-  var key = 0
+  let key = 0
   function createReactClass(constructor, jsx) {
     return adapter.createClass({
-      render: function () {
+      render() {
         key++
-        var props = Object.assign({}, { key: key }, this.props)
+        const props = Object.assign({}, { key }, this.props)
         return jsx(constructor, props)
-      }
+      },
     })
   }
 
@@ -59,6 +60,6 @@ export default function createRecycle(config) {
     getComponentStructure,
     render,
     createReactClass,
-    createReactElement
+    createReactElement,
   }
 }
