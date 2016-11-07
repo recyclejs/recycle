@@ -2,17 +2,17 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Observable, Subject } from 'rxjs'
 
-Observable.prototype.reducer = function reducer(reducer) {
+Observable.prototype.reducer = function reducer(reducerFn) {
   if (arguments.length > 1) {
-    return this.switchMap(action => {
-      let reducers = []
+    return this.switchMap((action) => {
+      const reducers = []
       for (let i = 0; i < arguments.length; i++) {
         reducers.push({ reducer: arguments[i], action })
       }
       return Observable.of(...reducers)
     })
   }
-  return this.map(action => ({ reducer, action }))
+  return this.map(action => ({ reducer: reducerFn, action }))
 }
 
 Observable.prototype.filterByType = function filterByType(type) {
@@ -26,7 +26,7 @@ export default function () {
     findDOMNode: ReactDOM.findDOMNode,
     render: ReactDOM.render,
     Observable,
-    Subject
+    Subject,
   }
 }
 
@@ -34,5 +34,5 @@ export {
   React,
   ReactDOM,
   Observable,
-  Subject
+  Subject,
 }

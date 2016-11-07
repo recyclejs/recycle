@@ -3,26 +3,26 @@ import SingleCounter from './SingleCounter'
 export default function MultipleCounters() {
   return {
     initialState: {
-      childButtonClicked: 0
+      childButtonClicked: 0,
     },
-    actions: function(sources) {
+    actions: function actions(sources) {
       return [
         sources.childrenActions
           .filterByType('buttonClicked')
-          .mapTo({type: 'childButtonClicked'})
-      ] 
+          .mapTo({ type: 'childButtonClicked' })
+      ]
     },
-    reducers: function(sources) {
+    reducers: function reducers(sources) {
       return [
         sources.actions
           .filterByType('childButtonClicked')
-          .reducer(function(state) {
+          .reducer(function increment(state) {
             state.childButtonClicked++;
             return state
-          })
+          }),
       ]
     },
-    view: function(state, props, jsx) {
+    view: function view(state, props, jsx) {
       return (
         <div>
           <ul>
@@ -33,6 +33,6 @@ export default function MultipleCounters() {
           </div>
         </div>
       )
-    }
+    },
   }
 }
