@@ -1,5 +1,5 @@
 export default function ({
-  createClass,
+  Component,
   createElement,
   findDOMNode,
   Observable,
@@ -20,7 +20,7 @@ export default function ({
     const childrenComponents = []
     const savedChildren = new Map()
     const domNodes = {}
-    let reactComponent
+    let ReactComponent
     let actions$
     let componentName
     let timesRendered = 0
@@ -45,45 +45,20 @@ export default function ({
         initialState,
         shouldComponentUpdate,
         propTypes,
-        defaultProps,
         displayName,
       } = constructor()
 
-      if (wrap) {
-        if (view) throw new Error('Container components can not have a view')
-      }
-
       componentName = displayName || constructor.name
 
-      return createClass({
-        displayName: componentName,
-
-        propTypes: propTypes || null,
-
-        getDefaultProps() {
-          return defaultProps || null
-        },
-
-        getInitialState() {
-          return initialState || null
-        },
+      class PresentationalComponent extends Component {
+        constructor(props) {
+          super(props)
+          this.state = initialState
+        }
 
         componentDidMount() {
-          let componentActions
-
-          if (wrap) {
-            componentActions = containerActions(actions, componentSources.childrenActions, this.props)
-            /* if (storeState$) {
-              // todo: unsubscribe, shouldComponentUpdate check
-              storeState$.subscribe(() => {
-                this.forceUpdate()
-              })
-            }*/
-          } else if (actions) {
-            componentActions = actions(componentSources, this.props)
-          }
-
-          if (componentActions) {
+          if (actions) {
+            const componentActions = actions(componentSources, this.props)
             actions$ = createActionsStream(componentActions)
             actions$.subscribe(componentSources.actions)
           }
@@ -103,39 +78,63 @@ export default function ({
 
           updateChildActions()
           componentLC.observer.next({ type: 'componentMounted', state: this.state })
-        },
+        }
 
         shouldComponentUpdate(nextProps, nextState) {
           if (shouldComponentUpdate) {
             return shouldComponentUpdate(nextProps, nextState, this.props, this.state)
           }
           return true
-        },
+        }
 
         componentDidUpdate() {
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
           componentState = this.state
           componentLC.observer.next({ type: 'componentUpdated', state: this.state })
-        },
-
+        }
 
         render() {
           timesRendered++
+          return view(this.state, this.props, jsxHandler)
+        }
+      }
 
-          if (wrap) {
-            const props = this.props
+      PresentationalComponent.displayName = componentName
+      PresentationalComponent.propTypes = propTypes || null
 
-            if (mapStateToProps) {
-              this.calcProps = mapStateToProps(/* storeState, */props)
-            }
+      if (!wrap) {
+        return PresentationalComponent
+      }
 
-            return jsxHandler(wrap, this.calcProps || props)
+      // if wrap property is provided
+      // return Container Component
+      return class ContainerComponent extends PresentationalComponent {
+        componentDidMount() {
+          const componentActions = containerActions(actions, componentSources.childrenActions, this.props)
+          actions$ = createActionsStream(componentActions)
+          actions$.subscribe(componentSources.actions)
+          updateChildActions()
+
+          /* if (storeState$) {
+            // todo: unsubscribe, shouldComponentUpdate check
+            storeState$.subscribe(() => {
+              this.forceUpdate()
+            })
+          }*/
+        }
+
+        render() {
+          timesRendered++
+          let props = this.props
+
+          if (mapStateToProps) {
+            props = mapStateToProps(/* storeState, */props)
           }
 
-          return view(this.state, this.props, jsxHandler)
-        },
-      })
+          return jsxHandler(wrap, props)
+        }
+      }
     }
 
     function jsxHandler() {
@@ -188,7 +187,7 @@ export default function ({
     }
 
     const getActions = () => actions$
-    const getReactComponent = () => reactComponent
+    const getReactComponent = () => ReactComponent
     const getName = () => componentName
     const getKey = () => key
     const getConstructor = () => constructor
@@ -216,7 +215,7 @@ export default function ({
       rootComponent = thisComponent
     }
 
-    reactComponent = createReactComponent()
+    ReactComponent = createReactComponent()
 
     return thisComponent
   }

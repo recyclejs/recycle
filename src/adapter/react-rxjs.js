@@ -21,7 +21,7 @@ Observable.prototype.filterByType = function filterByType(type) {
 
 export default function () {
   return {
-    createClass: React.createClass,
+    Component: React.Component,
     createElement: React.createElement,
     findDOMNode: ReactDOM.findDOMNode,
     render: ReactDOM.render,
