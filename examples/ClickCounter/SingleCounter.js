@@ -62,7 +62,7 @@ function SingleCounter() {
 */
 export default function SingleCounterContainer() {
   return {
-    record: 'todos.list',
+    store: 'todos.list',
 
     initialState: {},
 

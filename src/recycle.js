@@ -18,7 +18,7 @@ export default function ({
     let ReactComponent
     let componentName
     let timesRendered = 0
-    let componentState = null
+    let state = null
 
     const componentSources = {
       ...additionalSources,
@@ -40,26 +40,23 @@ export default function ({
       } = constructor(props)
 
       componentName = displayName || constructor.name
+      state = initialState
 
       class ReactClass extends Component {
-        constructor(ownProps) {
-          super(ownProps)
-          this.state = initialState
-        }
 
         componentDidMount() {
           if (actions) {
-            const componentActions = actions(componentSources, this.props)
+            const componentActions = actions(componentSources, props)
             createActionsStream(componentActions).subscribe(componentSources.actions)
           }
 
           if (reducers) {
-            const componentReducers = reducers(componentSources, this.props)
+            const componentReducers = reducers(componentSources, props)
             const state$ = createStateStream(componentReducers, initialState, componentLC.observer.next)
 
-            state$.subscribe((state) => {
-              if (state) {
-                this.setState(state)
+            state$.subscribe((newState) => {
+              if (newState) {
+                this.setState(newState)
               } else {
                 this.forceUpdate()
               }
@@ -67,12 +64,12 @@ export default function ({
           }
 
           updateChildActions()
-          componentLC.observer.next({ type: 'componentMounted', state: this.state })
+          componentLC.observer.next({ type: 'componentMounted', state })
         }
 
         shouldComponentUpdate(nextProps, nextState) {
           if (shouldComponentUpdate) {
-            return shouldComponentUpdate(nextProps, nextState, this.props, this.state)
+            return shouldComponentUpdate(nextProps, nextState, props, state)
           }
           return true
         }
@@ -80,14 +77,14 @@ export default function ({
         componentDidUpdate() {
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
-          componentState = this.state
-          componentLC.observer.next({ type: 'componentUpdated', state: this.state })
+          state = this.state
+          componentLC.observer.next({ type: 'componentUpdated', state })
         }
 
         render() {
           timesRendered++
           if (!view) return null
-          return view(this.state, this.props, jsxHandler)
+          return view(state, props, jsxHandler)
         }
       }
 
@@ -150,7 +147,7 @@ export default function ({
       getName: () => componentName,
       getKey: () => key,
       getChildren: () => childrenComponents,
-      getState: () => componentState,
+      getState: () => state,
       getConstructor: () => constructor,
     }
 
@@ -259,7 +256,7 @@ export default function ({
 
     const originalRender = constructor.prototype.render
     constructor.prototype.render = function render() {
-      return originalRender.call(this, this.props._recycleRenderHandler)
+      return originalRender.call(this, props._recycleRenderHandler)
     }
 
     props._recycleRenderHandler = jsx
