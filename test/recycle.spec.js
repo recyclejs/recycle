@@ -97,8 +97,8 @@ describe('unit tests', function () {
       const constructor2 = function () { return {} }
 
       const rootComponent = recycle.createComponent(constructor1)
-      const component1 = recycle.createComponent(constructor1, 'key1', rootComponent)
-      const component2 = recycle.createComponent(constructor1, 'key1', rootComponent)
+      const component1 = recycle.createComponent(constructor1, { key: 'key1' }, rootComponent)
+      const component2 = recycle.createComponent(constructor1, { key: 'key1' }, rootComponent)
 
       recycle.registerComponent(component1, savedChildren)
 

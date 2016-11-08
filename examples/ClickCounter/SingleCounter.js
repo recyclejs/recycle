@@ -35,17 +35,6 @@ function SingleCounter() {
   }
 }
 
-export default function SingleCounterContainer() {
-  return {
-    actions: (sources, props) => {
-      return sources.childrenActions
-    },
-
-    view: (state, props, jsx) => {
-      return <SingleCounter {...props} />
-    },
-  }
-}
 /*
   primjer todomvc
   todolist i todo mijenjaju todos.list
@@ -71,18 +60,18 @@ export default function SingleCounterContainer() {
   ako se promijeni store iz vana, rendane komponente se ne mijenjaju!
   ali parent koji ih poziva, sad poziva "nove" komponente (promjenom statea od strane parenta, on sam radi update)
 */
-/*function SingleCounterContainer(connect) {
-  return connect('todos.list', function (storeState) {
-    return {
-      initialState: storeState,
+export default function SingleCounterContainer() {
+  return {
+    record: 'todos.list',
 
-      actions: (sources, props) => {
-        return sources.childrenActions
-      },
+    initialState: {},
 
-      view: (state, props, jsx) => {
-        return <SingleCounter {...props} />
-      },
-    }
-  })
-}*/
+    actions: (sources, props) => {
+      return sources.childrenActions
+    },
+
+    view: (state, props, jsx) => {
+      return <SingleCounter {...props} />
+    },
+  }
+}

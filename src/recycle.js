@@ -8,16 +8,16 @@ export default function ({
 }) {
   let rootComponent
 
-  function createComponent(constructor, key, parent) {
+  function createComponent(constructor, props, parent) {
     const childActions = makeSubject()
     const componentLC = makeSubject()
     const childrenComponents = []
-    const savedChildren = new Map()
+    const childrenConstructors = new Map()
     const domNodes = {}
+    const key = (props) ? props.key : null
     let ReactComponent
     let componentName
     let timesRendered = 0
-    let inErrorState = false
     let componentState = null
 
     const componentSources = {
@@ -37,13 +37,13 @@ export default function ({
         shouldComponentUpdate,
         propTypes,
         displayName,
-      } = constructor()
+      } = constructor(props)
 
       componentName = displayName || constructor.name
 
       class ReactClass extends Component {
-        constructor(props) {
-          super(props)
+        constructor(ownProps) {
+          super(ownProps)
           this.state = initialState
         }
 
@@ -99,33 +99,29 @@ export default function ({
 
     function jsxHandler() {
       if (typeof arguments['0'] === 'function') {
-        const component = arguments['0']
-        const props = arguments['1'] || {}
-        const componentKey = props.key
+        const childConstructor = arguments['0']
+        const childProps = arguments['1'] || {}
 
-        if (isReactComponent(component)) {
+        if (isReactComponent(childConstructor)) {
           return createReactElement(createElement, arguments, jsxHandler)
         }
 
-        const child = (savedChildren.has(component)) ? savedChildren.get(component)[componentKey] : false
+        const child = (childrenConstructors.has(childConstructor)) ? childrenConstructors.get(childConstructor)[childProps.key] : false
 
         if (child) {
-          if (!inErrorState && timesRendered === 1) {
-            inErrorState = true
-
+          if (timesRendered === 1) {
             if (!child.getKey()) {
               throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
             } else {
               throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
             }
           }
-
-          return createElement(child.getReactComponent(), props)
+          return createElement(child.getReactComponent(), childProps)
         }
 
-        const newComponent = createComponent(component, componentKey, thisComponent)
-        registerComponent(newComponent, savedChildren)
-        return createElement(newComponent.getReactComponent(), props)
+        const newComponent = createComponent(childConstructor, childProps, thisComponent)
+        registerComponent(newComponent, childrenConstructors)
+        return createElement(newComponent.getReactComponent(), childProps)
       }
       return createElement.apply(this, arguments)
     }
@@ -237,17 +233,17 @@ export default function ({
     )
   }
 
-  function registerComponent(newComponent, savedChildren) {
+  function registerComponent(newComponent, childrenConstructors) {
     const constructor = newComponent.getConstructor()
     const key = newComponent.getKey()
     const name = newComponent.getName()
 
-    const obj = savedChildren.get(constructor) || {}
+    const obj = childrenConstructors.get(constructor) || {}
 
     if (obj[key]) throw Error(`Could not register recycle component '${name}'. Key '${key}' is already in use.`)
 
     obj[key] = newComponent
-    savedChildren.set(constructor, obj)
+    childrenConstructors.set(constructor, obj)
   }
 
   function isReactComponent(constructor) {
