@@ -86,6 +86,7 @@ export default function ({
 
         render() {
           timesRendered++
+          if (!view) return null
           return view(this.state, this.props, jsxHandler)
         }
       }

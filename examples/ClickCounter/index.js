@@ -1,7 +1,7 @@
-/*
-Initializing example of Recycle app
-(not actually used in this repository)
-*/
+/* global document */
+/* eslint import/no-extraneous-dependencies: "off" */
+/* eslint import/no-unresolved: "off" */
+/* eslint import/extensions: "off" */
 
 import createRecycle from 'recyclejs'
 import reactRxjs from 'recyclejs/adapter/react-rxjs'

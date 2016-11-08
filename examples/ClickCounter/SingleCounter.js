@@ -37,14 +37,12 @@ function SingleCounter() {
 
 export default function SingleCounterContainer() {
   return {
-    wrap: SingleCounter,
-
-    mapStateToProps: (storeState) => {
-      return storeState
+    actions: (sources, props) => {
+      return sources.childrenActions
     },
 
-    actions: (componentActions, ownProps) => {
-      return componentActions
+    view: (state, props, jsx) => {
+      return <SingleCounter {...props} />
     },
   }
 }

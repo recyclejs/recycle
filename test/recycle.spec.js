@@ -1,4 +1,7 @@
 /* global describe before after it document */
+/* eslint import/no-extraneous-dependencies: "off" */
+/* eslint func-names: "off" */
+
 import { expect } from 'chai'
 import jsdomify from 'jsdomify'
 import React from 'react'

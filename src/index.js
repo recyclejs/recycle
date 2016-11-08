@@ -8,8 +8,7 @@ export default (config) => {
   const recycle = createRecycle({
     ...adapter,
     initialStoreState: (config.store) ? config.store.initialState : null,
-    storeReducers: (config.store) ? config.store.reducers : null,
-    additionalSources: (config.store) ? config.additionalSources : null,
+    additionalSources: config.additionalSources,
   })
 
   function createReactElement(constructor, props) {

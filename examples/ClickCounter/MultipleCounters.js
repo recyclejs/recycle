@@ -9,7 +9,7 @@ export default function MultipleCounters() {
       return [
         sources.childrenActions
           .filterByType('buttonClicked')
-          .mapTo({ type: 'childButtonClicked' })
+          .mapTo({ type: 'childButtonClicked' }),
       ]
     },
     reducers: function reducers(sources) {
