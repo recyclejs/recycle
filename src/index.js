@@ -19,7 +19,7 @@ export default (config) => {
     return adapter.render(createReactElement(Component), target)
   }
 
-  function createReactClass(constructor, jsx) {
+  function createReactComponent(constructor, jsx) {
     return class extends adapter.Component {
       render() {
         return jsx(constructor, this.props)
@@ -30,7 +30,7 @@ export default (config) => {
   return {
     getComponentStructure: recycle.getComponentStructure,
     render,
-    createReactClass,
+    createReactComponent,
     createReactElement,
   }
 }
