@@ -9,12 +9,12 @@ export default function ({
   let rootComponent
 
   function createComponent(constructor, props, parent) {
+    const key = (props) ? props.key : null
+    const domNodes = {}
+    const children = new Map()
     const childActions = makeSubject()
     const componentLC = makeSubject()
-    const childrenComponents = []
-    const childrenConstructors = new Map()
-    const domNodes = {}
-    const key = (props) ? props.key : null
+    const updateState = makeSubject()
     let ReactComponent
     let componentName
     let timesRendered = 0
@@ -54,17 +54,21 @@ export default function ({
             const componentReducers = reducers(componentSources, props)
             const state$ = createStateStream(componentReducers, initialState, componentLC.observer.next)
 
-            state$.subscribe((newState) => {
-              if (newState) {
-                this.setState(newState)
-              } else {
-                this.forceUpdate()
-              }
-            })
+            state$
+              .merge(updateState.stream)
+              .subscribe((newState) => {
+                state = newState
+                componentLC.observer.next({ type: 'componentUpdated', state })
+
+                if (newState) {
+                  this.setState(newState)
+                } else {
+                  this.forceUpdate()
+                }
+              })
           }
 
           updateChildActions()
-          componentLC.observer.next({ type: 'componentMounted', state })
         }
 
         shouldComponentUpdate(nextProps, nextState) {
@@ -77,8 +81,10 @@ export default function ({
         componentDidUpdate() {
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
-          state = this.state
-          componentLC.observer.next({ type: 'componentUpdated', state })
+        }
+
+        componentWillUnmount() {
+          console.log("unmount")
         }
 
         render() {
@@ -103,7 +109,7 @@ export default function ({
           return createReactElement(createElement, arguments, jsxHandler)
         }
 
-        const child = (childrenConstructors.has(childConstructor)) ? childrenConstructors.get(childConstructor)[childProps.key] : false
+        const child = (children.has(childConstructor)) ? children.get(childConstructor)[childProps.key] : false
 
         if (child) {
           if (timesRendered === 1) {
@@ -117,14 +123,10 @@ export default function ({
         }
 
         const newComponent = createComponent(childConstructor, childProps, thisComponent)
-        registerComponent(newComponent, childrenConstructors)
+        registerComponent(newComponent, children)
         return createElement(newComponent.getReactComponent(), childProps)
       }
       return createElement.apply(this, arguments)
-    }
-
-    function addChild(component) {
-      childrenComponents.push(component)
     }
 
     function updateChildActions() {
@@ -132,28 +134,38 @@ export default function ({
         parent.updateChildActions()
       }
 
-      const newActions = mergeChildrenActions(childrenComponents)
+      const newActions = mergeChildrenActions(getChildren())
 
       if (newActions) {
         childActions.observer.next(newActions)
       }
     }
 
+    function getChildren() {
+      const childrenArr = []
+
+      for (const childrenConstructor of children.keys()) {
+        const components = children.get(childrenConstructor)
+        Object.keys(components).forEach((componentKey) => {
+          childrenArr.push(components[componentKey])
+        })
+      }
+
+      return childrenArr
+    }
+
     const thisComponent = {
       updateChildActions,
-      addChild,
+      getChildren,
       getActions: () => componentSources.actions,
       getReactComponent: () => ReactComponent,
       getName: () => componentName,
       getKey: () => key,
-      getChildren: () => childrenComponents,
       getState: () => state,
       getConstructor: () => constructor,
     }
 
-    if (parent) {
-      parent.addChild(thisComponent)
-    } else {
+    if (!parent) {
       if (rootComponent) throw new Error('rootComponent already set')
       rootComponent = thisComponent
     }
@@ -230,17 +242,17 @@ export default function ({
     )
   }
 
-  function registerComponent(newComponent, childrenConstructors) {
+  function registerComponent(newComponent, children) {
     const constructor = newComponent.getConstructor()
     const key = newComponent.getKey()
     const name = newComponent.getName()
 
-    const obj = childrenConstructors.get(constructor) || {}
+    const obj = children.get(constructor) || {}
 
     if (obj[key]) throw Error(`Could not register recycle component '${name}'. Key '${key}' is already in use.`)
 
     obj[key] = newComponent
-    childrenConstructors.set(constructor, obj)
+    children.set(constructor, obj)
   }
 
   function isReactComponent(constructor) {

@@ -19,15 +19,12 @@ export default (config) => {
     return adapter.render(createReactElement(Component), target)
   }
 
-  let key = 0
   function createReactClass(constructor, jsx) {
-    return adapter.createClass({
+    return class extends adapter.Component {
       render() {
-        key++
-        const props = Object.assign({}, { key }, this.props)
-        return jsx(constructor, props)
-      },
-    })
+        return jsx(constructor, this.props)
+      }
+    }
   }
 
   return {
