@@ -1,5 +1,5 @@
 export default function ({
-  Component,
+  BaseComponent,
   createElement,
   findDOMNode,
   Observable,
@@ -8,6 +8,7 @@ export default function ({
 }) {
   let rootComponent
   const hooks = {}
+  recycleObservable(Observable)
 
   function createComponent(constructor, props, parent) {
     const key = (props) ? props.key : null
@@ -51,7 +52,7 @@ export default function ({
           .share()
       }
 
-      class ReactClass extends Component {
+      class ReactClass extends BaseComponent {
 
         componentDidMount() {
           this.stateSubsription = state$.subscribe((newState) => {
@@ -74,6 +75,9 @@ export default function ({
         componentDidUpdate() {
           state = this.state
           componentUpdate.observer.next(state)
+          if (hooks.stateUpdated) {
+            hooks.stateUpdated(thisComponent)
+          }
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
         }
@@ -210,7 +214,7 @@ export default function ({
             domNodes[selector][event] = makeSubject()
           }
 
-          return domNodes[selector][event].stream.switch().share()
+          return domNodes[selector][event].stream.share()
         },
       }
     }
@@ -220,7 +224,10 @@ export default function ({
     Object.keys(domNodes).forEach((selector) => {
       Object.keys(domNodes[selector]).forEach((event) => {
         const domEl = el.querySelector(selector)
-        domNodes[selector][event].observer.next(Observable.fromEvent(domEl, event))
+        if (domEl) {
+          domEl.removeEventListener(event, domNodes[selector][event].observer.next)
+          domEl.addEventListener(event, domNodes[selector][event].observer.next)
+        }
       })
     })
   }
@@ -337,5 +344,24 @@ export default function ({
     registerComponent,
     isReactComponent,
     createReactElement,
+  }
+}
+
+export function recycleObservable(Observable) {
+  Observable.prototype.reducer = function reducer(reducerFn) {
+    if (arguments.length > 1) {
+      return this.switchMap((action) => {
+        const reducers = []
+        for (let i = 0; i < arguments.length; i++) {
+          reducers.push({ reducer: arguments[i], action })
+        }
+        return Observable.of(...reducers)
+      })
+    }
+    return this.map(action => ({ reducer: reducerFn, action }))
+  }
+
+  Observable.prototype.filterByType = function filterByType(type) {
+    return this.filter(action => action.type === type)
   }
 }

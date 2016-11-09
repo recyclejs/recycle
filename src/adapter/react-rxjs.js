@@ -1,48 +1,23 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Observable, Subject } from 'rxjs'
+import { Subject } from 'rxjs/Subject'
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/merge'
+import 'rxjs/add/observable/dom/ajax'
+import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/mapTo'
+import 'rxjs/add/operator/share'
+import 'rxjs/add/operator/switch'
+import 'rxjs/add/operator/filter'
+import 'rxjs/add/operator/merge'
+import 'rxjs/add/operator/scan'
+import 'rxjs/add/operator/startWith'
 
-Observable.prototype.reducer = function reducer(reducerFn) {
-  if (arguments.length > 1) {
-    return this.switchMap((action) => {
-      const reducers = []
-      for (let i = 0; i < arguments.length; i++) {
-        reducers.push({ reducer: arguments[i], action })
-      }
-      return Observable.of(...reducers)
-    })
-  }
-  return this.map(action => ({ reducer: reducerFn, action }))
-}
-
-Observable.prototype.filterByType = function filterByType(type) {
-  return this.filter(action => action.type === type)
-}
-
-export default function (api) {
-  /*api.registerHook('createComponent', () => {})
-  api.setDependencies({
-    Component: React.Component,
-    createElement: React.createElement,
-    findDOMNode: ReactDOM.findDOMNode,
-    render: ReactDOM.render,
-    Observable,
-    Subject,
-  })*/
-
-  return {
-    Component: React.Component,
-    createElement: React.createElement,
-    findDOMNode: ReactDOM.findDOMNode,
-    render: ReactDOM.render,
-    Observable,
-    Subject,
-  }
-}
-
-export {
-  React,
-  ReactDOM,
+export default {
+  BaseComponent: React.Component,
+  createElement: React.createElement,
+  findDOMNode: ReactDOM.findDOMNode,
+  render: ReactDOM.render,
   Observable,
   Subject,
 }

@@ -13,20 +13,15 @@ function memory(recycle) {
     const record = component.get('record')
     store.set(record, component.getState())
   })
-
-  recycle.registerHook('createComponent', () => {
-
-  })
 }
 
 export default (config) => {
   if (!config || !config.adapter) {
     throw new Error('Missing adapter property for creating Recycle instance')
   }
-  const adapter = config.adapter()
+  const adapter = config.adapter
   const recycle = createRecycle({
     ...adapter,
-    hooks: {},
     additionalSources: config.additionalSources,
   })
 
@@ -43,7 +38,7 @@ export default (config) => {
   }
 
   function createReactComponent(constructor, jsx) {
-    return class extends adapter.Component {
+    return class extends adapter.BaseComponent {
       render() {
         return jsx(constructor, this.props)
       }

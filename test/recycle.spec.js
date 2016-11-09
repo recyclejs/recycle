@@ -9,12 +9,12 @@ import ReactDOM from 'react-dom'
 import Recycle from '../src/recycle'
 import reactAdapter from '../src/adapter/react-rxjs'
 
-const adapter = reactAdapter()
+const adapter = reactAdapter
 const recycle = Recycle({ ...adapter, hooks: {} })
 const Observable = adapter.Observable
 
 describe('unit tests', function () {
-  describe('updateDomStreams', () => {
+  /*describe('updateDomStreams', () => {
     before(function () {
       jsdomify.create()
     })
@@ -35,7 +35,7 @@ describe('unit tests', function () {
       const el = document.createElement('div')
       recycle.updateDomStreams(domSelectors, el)
     })
-  })
+  })*/
 
   /*describe('createStateStream', () => {
     it('should create new state and notify', function (done) {
