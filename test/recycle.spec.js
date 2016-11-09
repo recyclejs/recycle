@@ -37,7 +37,7 @@ describe('unit tests', function () {
     })
   })
 
-  describe('createStateStream', () => {
+  /*describe('createStateStream', () => {
     it('should create new state and notify', function (done) {
       const subj = recycle.makeSubject()
 
@@ -85,7 +85,7 @@ describe('unit tests', function () {
       subj.observer.next()
       subj.observer.next({ type: 'testActions' })
     })
-  })
+  })*/
 
   describe('registerComponent', () => {
     it('should add new component in map', function () {

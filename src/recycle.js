@@ -5,6 +5,7 @@ export default function ({
   Observable,
   Subject,
   additionalSources,
+  createComponentHook,
 }) {
   let rootComponent
 
@@ -13,22 +14,24 @@ export default function ({
     const domNodes = {}
     const children = new Map()
     const childActions = makeSubject()
-    const componentLC = makeSubject()
+    const componentUpdate = makeSubject()
     const updateState = makeSubject()
     let ReactComponent
     let componentName
     let timesRendered = 0
     let state = null
+    let recycleProps
 
     const componentSources = {
       ...additionalSources,
       DOM: generateDOMSource(domNodes),
-      componentLifecycle: componentLC.stream,
+      componentUpdate: componentUpdate.stream.share(),
       childrenActions: childActions.stream.switch().share(),
-      actions: makeSubject().stream,
+      actions: makeSubject().stream.share(),
     }
 
     function createReactComponent() {
+      recycleProps = (createComponentHook) ? createComponentHook(constructor, props) : constructor(props)
       const {
         view,
         actions,
@@ -37,37 +40,37 @@ export default function ({
         shouldComponentUpdate,
         propTypes,
         displayName,
-      } = constructor(props)
+      } = recycleProps
 
       componentName = displayName || constructor.name
       state = initialState
 
+      if (actions) {
+        const componentActions = actions(componentSources, props)
+        Observable.merge(...forceArray(componentActions))
+          .filter(action => action)
+          .subscribe(componentSources.actions)
+      }
+
+      let state$ = updateState.stream.share()
+      if (reducers) {
+        state$ = Observable.merge(...forceArray(reducers(componentSources, props)))
+          .startWith(initialState)
+          .scan((currentState, { reducer, action }) => reducer(currentState, action))
+          .merge(updateState.stream)
+          .share()
+      }
+
       class ReactClass extends Component {
 
         componentDidMount() {
-          if (actions) {
-            const componentActions = actions(componentSources, props)
-            createActionsStream(componentActions).subscribe(componentSources.actions)
-          }
-
-          if (reducers) {
-            const componentReducers = reducers(componentSources, props)
-            const state$ = createStateStream(componentReducers, initialState, componentLC.observer.next)
-
-            state$
-              .merge(updateState.stream)
-              .subscribe((newState) => {
-                state = newState
-                componentLC.observer.next({ type: 'componentUpdated', state })
-
-                if (newState) {
-                  this.setState(newState)
-                } else {
-                  this.forceUpdate()
-                }
-              })
-          }
-
+          this.stateSubsription = state$.subscribe((newState) => {
+            if (newState) {
+              this.setState(newState)
+            } else {
+              this.forceUpdate()
+            }
+          })
           updateChildActions()
         }
 
@@ -79,11 +82,14 @@ export default function ({
         }
 
         componentDidUpdate() {
+          state = this.state
+          componentUpdate.observer.next(state)
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
         }
 
         componentWillUnmount() {
+          this.stateSubsription.unsubscribe()
           parent.removeChild(thisComponent)
         }
 
@@ -219,25 +225,9 @@ export default function ({
     })
   }
 
-  function createStateStream(componentReducers, initialState, notify) {
-    if (!Array.isArray(componentReducers)) {
-      componentReducers = [componentReducers]
-    }
-
-    return Observable.merge(...componentReducers)
-      .startWith(initialState)
-      .scan((state, { reducer, action }) => {
-        if (notify) notify({ type: 'willCallReducer', action, reducer })
-        return reducer(state, action)
-      })
-      .share()
-  }
-
-  function createActionsStream(componentActions) {
-    if (!Array.isArray(componentActions)) {
-      componentActions = [componentActions]
-    }
-    return Observable.merge(...componentActions).filter(action => action)
+  function forceArray(arr) {
+    if (!Array.isArray(arr)) return [arr]
+    return arr
   }
 
   function mergeChildrenActions(childrenComponents) {
@@ -325,8 +315,7 @@ export default function ({
     makeSubject,
     generateDOMSource,
     updateDomStreams,
-    createStateStream,
-    createActionsStream,
+    forceArray,
     mergeChildrenActions,
     registerComponent,
     isReactComponent,
