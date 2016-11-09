@@ -1,5 +1,24 @@
 import createRecycle from './recycle'
 
+function memory(recycle) {
+  const store = {}
+
+  store.onUpdate((record, state) => {
+    recycle.getAllComponents()
+      .filter(c => c.get('record') === record)
+      .map(c => c.setState(state))
+  })
+
+  recycle.on('componentUpdated', (component) => {
+    const record = component.get('record')
+    store.set(record, component.getState())
+  })
+
+  recycle.registerHook('createComponent', () => {
+
+  })
+}
+
 export default (config) => {
   if (!config || !config.adapter) {
     throw new Error('Missing adapter property for creating Recycle instance')
@@ -7,7 +26,7 @@ export default (config) => {
   const adapter = config.adapter()
   const recycle = createRecycle({
     ...adapter,
-    initialStoreState: (config.store) ? config.store.initialState : null,
+    hooks: {},
     additionalSources: config.additionalSources,
   })
 
@@ -33,6 +52,7 @@ export default (config) => {
 
   return {
     getComponentStructure: recycle.getComponentStructure,
+    getAllComponents: recycle.getAllComponents,
     render,
     createReactComponent,
     createReactElement,

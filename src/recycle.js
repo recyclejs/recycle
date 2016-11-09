@@ -5,9 +5,9 @@ export default function ({
   Observable,
   Subject,
   additionalSources,
-  createComponentHook,
 }) {
   let rootComponent
+  const hooks = {}
 
   function createComponent(constructor, props, parent) {
     const key = (props) ? props.key : null
@@ -20,7 +20,7 @@ export default function ({
     let componentName
     let timesRendered = 0
     let state = null
-    let recycleProps
+    let config
 
     const componentSources = {
       ...additionalSources,
@@ -31,31 +31,21 @@ export default function ({
     }
 
     function createReactComponent() {
-      recycleProps = (createComponentHook) ? createComponentHook(constructor, props) : constructor(props)
-      const {
-        view,
-        actions,
-        reducers,
-        initialState,
-        shouldComponentUpdate,
-        propTypes,
-        displayName,
-      } = recycleProps
+      config = (hooks.createComponent) ? hooks.createComponent(constructor, props) : constructor(props)
+      componentName = config.displayName || constructor.name
+      state = config.initialState
 
-      componentName = displayName || constructor.name
-      state = initialState
-
-      if (actions) {
-        const componentActions = actions(componentSources, props)
+      if (config.actions) {
+        const componentActions = config.actions(componentSources, props)
         Observable.merge(...forceArray(componentActions))
           .filter(action => action)
           .subscribe(componentSources.actions)
       }
 
       let state$ = updateState.stream.share()
-      if (reducers) {
-        state$ = Observable.merge(...forceArray(reducers(componentSources, props)))
-          .startWith(initialState)
+      if (config.reducers) {
+        state$ = Observable.merge(...forceArray(config.reducers(componentSources, props)))
+          .startWith(config.initialState)
           .scan((currentState, { reducer, action }) => reducer(currentState, action))
           .merge(updateState.stream)
           .share()
@@ -75,8 +65,8 @@ export default function ({
         }
 
         shouldComponentUpdate(nextProps, nextState) {
-          if (shouldComponentUpdate) {
-            return shouldComponentUpdate(nextProps, nextState, props, state)
+          if (config.shouldComponentUpdate) {
+            return config.shouldComponentUpdate(nextProps, nextState, props, state)
           }
           return true
         }
@@ -95,13 +85,13 @@ export default function ({
 
         render() {
           timesRendered++
-          if (!view) return null
-          return view(state, props, jsxHandler)
+          if (!config.view) return null
+          return config.view(state, props, jsxHandler)
         }
       }
 
       ReactClass.displayName = componentName
-      ReactClass.propTypes = propTypes || null
+      ReactClass.propTypes = config.propTypes || null
 
       return ReactClass
     }
@@ -122,7 +112,7 @@ export default function ({
             if (!child.getKey()) {
               throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
             } else {
-              throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
+              throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key config '${child.getKey()}'`)
             }
           }
           return createElement(child.getReactComponent(), childProps)
@@ -166,7 +156,17 @@ export default function ({
       children.set(component.getConstructor(), components)
     }
 
+    function get(prop) {
+      return config[prop]
+    }
+
+    function set(prop, val) {
+      config[prop] = val
+    }
+
     const thisComponent = {
+      get,
+      set,
       updateChildActions,
       getChildren,
       removeChild,
@@ -309,9 +309,26 @@ export default function ({
     return structure
   }
 
+  function getAllComponents() {
+    const components = []
+    function addInArray(component) {
+      components.push(component)
+
+      if (component.getChildren()) {
+        component.getChildren().forEach((c) => {
+          addInArray(c)
+        })
+      }
+    }
+
+    addInArray(rootComponent)
+    return components
+  }
+
   return {
     createComponent,
     getComponentStructure,
+    getAllComponents,
     makeSubject,
     generateDOMSource,
     updateDomStreams,

@@ -19,7 +19,17 @@ Observable.prototype.filterByType = function filterByType(type) {
   return this.filter(action => action.type === type)
 }
 
-export default function () {
+export default function (api) {
+  /*api.registerHook('createComponent', () => {})
+  api.setDependencies({
+    Component: React.Component,
+    createElement: React.createElement,
+    findDOMNode: ReactDOM.findDOMNode,
+    render: ReactDOM.render,
+    Observable,
+    Subject,
+  })*/
+
   return {
     Component: React.Component,
     createElement: React.createElement,
