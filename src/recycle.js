@@ -1,14 +1,13 @@
-export default function ({
-  BaseComponent,
-  createElement,
-  findDOMNode,
-  Observable,
-  Subject,
-  additionalSources,
-}) {
+export default function ({ adapter, additionalSources }) {
+  const {
+    BaseComponent,
+    createElement,
+    findDOMNode,
+    Observable,
+    Subject,
+  } = adapter
+
   let rootComponent
-  const hooks = {}
-  recycleObservable(Observable)
 
   function createComponent(constructor, props, parent) {
     const key = (props) ? props.key : null
@@ -32,7 +31,7 @@ export default function ({
     }
 
     function createReactComponent() {
-      config = (hooks.createComponent) ? hooks.createComponent(constructor, props) : constructor(props)
+      config = constructor(props)
       componentName = config.displayName || constructor.name
       state = config.initialState
 
@@ -75,9 +74,6 @@ export default function ({
         componentDidUpdate() {
           state = this.state
           componentUpdate.observer.next(state)
-          if (hooks.stateUpdated) {
-            hooks.stateUpdated(thisComponent)
-          }
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
         }
@@ -232,11 +228,6 @@ export default function ({
     })
   }
 
-  function forceArray(arr) {
-    if (!Array.isArray(arr)) return [arr]
-    return arr
-  }
-
   function mergeChildrenActions(childrenComponents) {
     if (!childrenComponents.length) return false
 
@@ -332,6 +323,8 @@ export default function ({
     return components
   }
 
+  recycleObservable(Observable)
+
   return {
     createComponent,
     getComponentStructure,
@@ -364,4 +357,9 @@ export function recycleObservable(Observable) {
   Observable.prototype.filterByType = function filterByType(type) {
     return this.filter(action => action.type === type)
   }
+}
+
+export function forceArray(arr) {
+  if (!Array.isArray(arr)) return [arr]
+  return arr
 }

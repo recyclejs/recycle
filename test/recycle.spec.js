@@ -10,7 +10,7 @@ import Recycle from '../src/recycle'
 import reactAdapter from '../src/adapter/react-rxjs'
 
 const adapter = reactAdapter
-const recycle = Recycle({ ...adapter, hooks: {} })
+const recycle = Recycle({ adapter })
 const Observable = adapter.Observable
 
 describe('unit tests', function () {
@@ -89,7 +89,7 @@ describe('unit tests', function () {
 
   describe('registerComponent', () => {
     it('should add new component in map', function () {
-      const recycle = Recycle({ ...adapter, hooks: {} })
+      const recycle = Recycle({ adapter })
 
       const savedChildren = new Map()
 
