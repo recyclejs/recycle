@@ -15,8 +15,12 @@ export default (config) => {
     return adapter.createElement(recycle.createComponent(constructor).getReactComponent(), props)
   }
 
-  function render(Component, target) {
-    return adapter.render(createReactElement(Component), target)
+  function render(Component, props, target) {
+    if (!target) {
+      target = props
+      props = null
+    }
+    return adapter.render(createReactElement(Component, props), target)
   }
 
   function createReactComponent(constructor, jsx) {
