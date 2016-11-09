@@ -323,7 +323,7 @@ export default function ({ adapter, additionalSources }) {
     return components
   }
 
-  recycleObservable(Observable)
+  applyRecycleObservable(Observable)
 
   return {
     createComponent,
@@ -340,7 +340,7 @@ export default function ({ adapter, additionalSources }) {
   }
 }
 
-export function recycleObservable(Observable) {
+export function applyRecycleObservable(Observable) {
   Observable.prototype.reducer = function reducer(reducerFn) {
     if (arguments.length > 1) {
       return this.switchMap((action) => {

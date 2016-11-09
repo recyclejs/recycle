@@ -6,7 +6,14 @@ export default (config) => {
   }
 
   const adapter = config.adapter
-  const recycle = createRecycle(config)
+  const recycle = createRecycle({
+    adapter: config.adapter,
+    additionalSources: config.additionalSources,
+  })
+
+  if (config.middleware) {
+    config.middleware.map(m => m(recycle))
+  }
 
   function createReactElement(constructor, props) {
     return adapter.createElement(recycle.createComponent(constructor).getReactComponent(), props)
@@ -31,8 +38,8 @@ export default (config) => {
   return {
     getComponentStructure: recycle.getComponentStructure,
     getAllComponents: recycle.getAllComponents,
-    render,
     createReactComponent,
     createReactElement,
+    render,
   }
 }
