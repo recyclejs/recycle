@@ -84,7 +84,7 @@ export default function ({
         }
 
         componentWillUnmount() {
-          console.log("unmount")
+          parent.removeChild(thisComponent)
         }
 
         render() {
@@ -154,9 +154,16 @@ export default function ({
       return childrenArr
     }
 
+    function removeChild(component) {
+      const components = children.get(component.getConstructor())
+      delete components[component.getKey()]
+      children.set(component.getConstructor(), components)
+    }
+
     const thisComponent = {
       updateChildActions,
       getChildren,
+      removeChild,
       getActions: () => componentSources.actions,
       getReactComponent: () => ReactComponent,
       getName: () => componentName,
