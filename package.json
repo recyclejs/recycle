@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/*.js test/**/*.js  --compilers js:babel-register --watch",
+    "test": "mocha test/examples/**/*.js  --compilers js:babel-register --watch",
     "build": "babel src -d ./"
   },
   "repository": {
