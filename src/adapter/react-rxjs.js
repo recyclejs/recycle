@@ -4,7 +4,6 @@ import { Subject } from 'rxjs/Subject'
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/merge'
 import 'rxjs/add/observable/fromEvent'
-import 'rxjs/add/operator/do'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/mapTo'
 import 'rxjs/add/operator/share'

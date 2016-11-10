@@ -50,9 +50,11 @@ export default function ({ adapter, additionalSources }) {
         return ReactComponent
       }
 
-      state = config.initialState
-
       class ReactClass extends BaseComponent {
+        constructor(ownProps) {
+          super(ownProps)
+          this.state = state = config.initialState
+        }
 
         componentDidMount() {
           if (config.actions) {
@@ -62,7 +64,6 @@ export default function ({ adapter, additionalSources }) {
           }
 
           this.stateSubsription = getStateStream().subscribe((newState) => {
-            state = newState
             if (newState) {
               this.setState(newState)
             } else {
@@ -75,13 +76,18 @@ export default function ({ adapter, additionalSources }) {
 
         shouldComponentUpdate(nextProps, nextState) {
           if (config.shouldComponentUpdate) {
-            return config.shouldComponentUpdate(nextProps, nextState, props, state)
+            return config.shouldComponentUpdate(nextProps, nextState, this.props, this.state)
           }
           return true
         }
 
+        componentWillUpdate() {
+          setConfig(this.props)
+        }
+
         componentDidUpdate() {
-          componentUpdate.observer.next(state)
+          state = this.state
+          componentUpdate.observer.next(this.state)
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
         }
@@ -96,7 +102,7 @@ export default function ({ adapter, additionalSources }) {
         render() {
           timesRendered++
           if (!config.view) return null
-          return config.view(state, props, jsxHandler)
+          return config.view(this.state, this.props, jsxHandler)
         }
       }
 
@@ -125,7 +131,6 @@ export default function ({ adapter, additionalSources }) {
               throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
             }
           }
-          child.setConfig(childProps)
           return createElement(child.getReactComponent(), childProps)
         }
 
@@ -178,6 +183,10 @@ export default function ({ adapter, additionalSources }) {
       children.set(component.getConstructor(), components)
     }
 
+    function setState(newState) {
+      updateState.observer.next(newState)
+    }
+
     function get(prop) {
       return config[prop]
     }
@@ -190,7 +199,7 @@ export default function ({ adapter, additionalSources }) {
       get,
       set,
       updateChildActions,
-      setConfig,
+      setState,
       getChildren,
       removeChild,
       getActions: () => componentSources.actions,
