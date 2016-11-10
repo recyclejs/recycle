@@ -146,7 +146,11 @@ export default function ({ adapter, additionalSources }) {
         parent.updateChildActions()
       }
 
-      const newActions = mergeChildrenActions(getChildren())
+      const newActions = Observable.merge(
+        ...forceArray(getChildren())
+          .filter(component => component.getActions())
+          .map(component => component.getActions())
+      )
 
       if (newActions) {
         childActions.observer.next(newActions)
@@ -253,15 +257,6 @@ export default function ({ adapter, additionalSources }) {
         domNodes[selector][event].observer.next(Observable.fromEvent(domEl, event))
       })
     })
-  }
-
-  function mergeChildrenActions(childrenComponents) {
-    if (!childrenComponents.length) return false
-
-    return Observable.merge(...childrenComponents
-        .filter(component => component.getActions())
-        .map(component => component.getActions())
-    )
   }
 
   applyRecycleObservable(Observable)
