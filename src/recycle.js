@@ -28,39 +28,39 @@ export default function ({ adapter, additionalSources }) {
       componentUpdate: componentUpdate.stream.share(),
       childrenActions: childActions.stream.switch().share(),
       actions: makeSubject().stream.share(),
+      getProp,
+    }
+
+    function getProp(propKey) {
+      if (!props) {
+        return null
+      }
+      return props[propKey]
     }
 
     function createReactComponent() {
-      config = constructor(props)
+      config = constructor()
       componentName = config.displayName || constructor.name
       state = config.initialState
 
       if (config.actions) {
-        const componentActions = config.actions(componentSources, props)
+        const componentActions = config.actions(componentSources)
         Observable.merge(...forceArray(componentActions))
           .filter(action => action)
           .subscribe(componentSources.actions)
       }
 
-      let state$ = updateState.stream.share()
-      if (config.reducers) {
-        state$ = Observable.merge(...forceArray(config.reducers(componentSources, props)))
-          .startWith(config.initialState)
-          .scan((currentState, { reducer, action }) => reducer(currentState, action))
-          .merge(updateState.stream)
-          .share()
-      }
-
       class ReactClass extends BaseComponent {
 
         componentDidMount() {
-          this.stateSubsription = state$.subscribe((newState) => {
+          getStateStream().subscribe((newState) => {
             if (newState) {
               this.setState(newState)
             } else {
               this.forceUpdate()
             }
           })
+
           updateChildActions()
         }
 
@@ -148,6 +148,17 @@ export default function ({ adapter, additionalSources }) {
       }
 
       return childrenArr
+    }
+
+    function getStateStream() {
+      if (config.reducers) {
+        return Observable.merge(...forceArray(config.reducers(componentSources)))
+          .startWith(config.initialState)
+          .scan((currentState, { reducer, action }) => reducer(currentState, action))
+          .share()
+          .merge(updateState.stream)
+      }
+      return updateState.stream
     }
 
     function removeChild(component) {
