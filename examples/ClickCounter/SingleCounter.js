@@ -5,7 +5,7 @@ function SingleCounter() {
     },
 
     actions: function actions(sources) {
-      const button = sources.DOM('button');
+      const button = sources.DOM.select('button')
 
       return [
         button.events('click')
@@ -62,7 +62,7 @@ function SingleCounter() {
 */
 export default function SingleCounterContainer() {
   return {
-    store: 'todos.list',
+    record: getProp => `todos.list[${getProp('k')}]`,
 
     initialState: {},
 

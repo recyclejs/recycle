@@ -28,7 +28,6 @@ export default function ({ adapter, additionalSources }) {
       componentUpdate: componentUpdate.stream.share(),
       childrenActions: childActions.stream.switch().share(),
       actions: makeSubject().stream.share(),
-      getProp,
     }
 
     function getProp(propKey) {
@@ -44,7 +43,7 @@ export default function ({ adapter, additionalSources }) {
       state = config.initialState
 
       if (config.actions) {
-        const componentActions = config.actions(componentSources)
+        const componentActions = config.actions(componentSources, getProp)
         Observable.merge(...forceArray(componentActions))
           .filter(action => action)
           .subscribe(componentSources.actions)
@@ -152,7 +151,7 @@ export default function ({ adapter, additionalSources }) {
 
     function getStateStream() {
       if (config.reducers) {
-        return Observable.merge(...forceArray(config.reducers(componentSources)))
+        return Observable.merge(...forceArray(config.reducers(componentSources, getProp)))
           .startWith(config.initialState)
           .scan((currentState, { reducer, action }) => reducer(currentState, action))
           .share()
@@ -210,20 +209,22 @@ export default function ({ adapter, additionalSources }) {
   }
 
   function generateDOMSource(domNodes) {
-    return function domSelector(selector) {
-      return {
-        events: function getEvent(event) {
-          if (!domNodes[selector]) {
-            domNodes[selector] = {}
-          }
+    return {
+      select: function domSelector(selector) {
+        return {
+          events: function getEvent(event) {
+            if (!domNodes[selector]) {
+              domNodes[selector] = {}
+            }
 
-          if (!domNodes[selector][event]) {
-            domNodes[selector][event] = makeSubject()
-          }
+            if (!domNodes[selector][event]) {
+              domNodes[selector][event] = makeSubject()
+            }
 
-          return domNodes[selector][event].stream.share()
-        },
-      }
+            return domNodes[selector][event].stream.share()
+          },
+        }
+      },
     }
   }
 

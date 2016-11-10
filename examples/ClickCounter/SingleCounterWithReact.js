@@ -28,7 +28,7 @@ export default function SingleCounterWithReact() {
     },
 
     actions: function actions(sources) {
-      const button = sources.DOM('button');
+      const button = sources.DOM.select('button');
 
       return [
         button.events('click')
