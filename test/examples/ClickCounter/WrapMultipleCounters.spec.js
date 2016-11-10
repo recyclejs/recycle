@@ -28,7 +28,7 @@ describe('WrapMultipleCounters example', function() {
     buttonEl.dispatchEvent(evt)
     buttonEl.dispatchEvent(evt)
 
-    expect(renderedComponent.state.multiplechildButtonClicked).to.equal(2)
+    expect(renderedComponent.state.recycleState.multiplechildButtonClicked).to.equal(2)
   });
 
 });

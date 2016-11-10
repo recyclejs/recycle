@@ -28,7 +28,7 @@ describe('SingleCounterWithReact example', function() {
     buttonEl.dispatchEvent(evt)
     buttonEl.dispatchEvent(evt)
 
-    expect(renderedComponent.state.timesClicked).to.equal(2)
+    expect(renderedComponent.state.recycleState.timesClicked).to.equal(2)
   });
 
 });

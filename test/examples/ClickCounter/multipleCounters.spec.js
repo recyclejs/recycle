@@ -36,7 +36,7 @@ describe('MultipleCounters example', function() {
     buttonEl.dispatchEvent(evt)
     //buttonEl.dispatchEvent(evt)
     
-    expect(renderedComponent.state.childButtonClicked).to.equal(1)
+    expect(renderedComponent.state.recycleState.childButtonClicked).to.equal(1)
   });
 
 });

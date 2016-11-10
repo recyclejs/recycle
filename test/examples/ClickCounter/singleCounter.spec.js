@@ -31,6 +31,7 @@ describe('SingleCounter example', function() {
 
     let structure = recycle.getComponentStructure()
     expect(structure.children[0].component.getState().timesClicked).to.equal(2)
+
   });
 
 });

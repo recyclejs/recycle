@@ -53,7 +53,10 @@ export default function ({ adapter, additionalSources }) {
       class ReactClass extends BaseComponent {
         constructor(ownProps) {
           super(ownProps)
-          this.state = state = config.initialState
+          this.state = {
+            recycleState: config.initialState,
+          }
+          state = this.state.recycleState
         }
 
         componentDidMount() {
@@ -65,9 +68,7 @@ export default function ({ adapter, additionalSources }) {
 
           this.stateSubsription = getStateStream().subscribe((newState) => {
             if (newState) {
-              this.setState(newState)
-            } else {
-              this.forceUpdate()
+              this.setState({ recycleState: newState })
             }
           })
 
@@ -76,7 +77,7 @@ export default function ({ adapter, additionalSources }) {
 
         shouldComponentUpdate(nextProps, nextState) {
           if (config.shouldComponentUpdate) {
-            return config.shouldComponentUpdate(nextProps, nextState, this.props, this.state)
+            return config.shouldComponentUpdate(nextProps, nextState.recycleState, this.props, this.state.recycleState)
           }
           return true
         }
@@ -86,8 +87,8 @@ export default function ({ adapter, additionalSources }) {
         }
 
         componentDidUpdate() {
-          state = this.state
-          componentUpdate.observer.next(this.state)
+          state = this.state.recycleState
+          componentUpdate.observer.next(this.state.recycleState)
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
         }
@@ -102,7 +103,7 @@ export default function ({ adapter, additionalSources }) {
         render() {
           timesRendered++
           if (!config.view) return null
-          return config.view(this.state, this.props, jsxHandler)
+          return config.view(this.state.recycleState, this.props, jsxHandler)
         }
       }
 
@@ -171,14 +172,17 @@ export default function ({ adapter, additionalSources }) {
     }
 
     function getStateStream() {
+      let reducers = []
       if (config.reducers) {
-        return Observable.merge(...forceArray(config.reducers(componentSources)))
-          .startWith(config.initialState)
-          .scan((currentState, { reducer, action }) => reducer(currentState, action))
-          .share()
-          .merge(updateState.stream)
+        reducers = [...forceArray(config.reducers(componentSources))]
       }
-      return updateState.stream
+
+      // TODO: hook na reducer
+      return Observable.merge(...reducers)
+        .startWith(config.initialState)
+        .scan((currentState, { reducer, action }) => reducer(currentState, action))
+        .merge(updateState.stream)
+        .share()
     }
 
     function removeChild(component) {
