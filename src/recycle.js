@@ -22,9 +22,11 @@ export default function ({ adapter, additionalSources }) {
     let state = null
     let config
 
+    setConfig(props)
+
     const componentSources = {
       ...additionalSources,
-      DOM: generateDOMSource(domNodes),
+      DOM: { select: generateDOMSource(domNodes) },
       componentUpdate: componentUpdate.stream.share(),
       childrenActions: childActions.stream.switch().share(),
       actions: makeSubject().stream.share(),
@@ -37,22 +39,30 @@ export default function ({ adapter, additionalSources }) {
       return props[propKey]
     }
 
-    function createReactComponent() {
-      config = constructor()
+    function setConfig(ownProps) {
+      config = constructor(ownProps)
+      props = ownProps
       componentName = config.displayName || constructor.name
-      state = config.initialState
+    }
 
-      if (config.actions) {
-        const componentActions = config.actions(componentSources, getProp)
-        Observable.merge(...forceArray(componentActions))
-          .filter(action => action)
-          .subscribe(componentSources.actions)
+    function getReactComponent() {
+      if (ReactComponent) {
+        return ReactComponent
       }
+
+      state = config.initialState
 
       class ReactClass extends BaseComponent {
 
         componentDidMount() {
-          getStateStream().subscribe((newState) => {
+          if (config.actions) {
+            Observable.merge(...forceArray(config.actions(componentSources, getProp)))
+              .filter(action => action)
+              .subscribe(componentSources.actions)
+          }
+
+          this.stateSubsription = getStateStream().subscribe((newState) => {
+            state = newState
             if (newState) {
               this.setState(newState)
             } else {
@@ -71,14 +81,15 @@ export default function ({ adapter, additionalSources }) {
         }
 
         componentDidUpdate() {
-          state = this.state
           componentUpdate.observer.next(state)
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
         }
 
         componentWillUnmount() {
-          this.stateSubsription.unsubscribe()
+          if (this.stateSubsription) {
+            this.stateSubsription.unsubscribe()
+          }
           parent.removeChild(thisComponent)
         }
 
@@ -91,8 +102,8 @@ export default function ({ adapter, additionalSources }) {
 
       ReactClass.displayName = componentName
       ReactClass.propTypes = config.propTypes || null
-
-      return ReactClass
+      ReactComponent = ReactClass
+      return ReactComponent
     }
 
     function jsxHandler() {
@@ -111,9 +122,10 @@ export default function ({ adapter, additionalSources }) {
             if (!child.getKey()) {
               throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
             } else {
-              throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key config '${child.getKey()}'`)
+              throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
             }
           }
+          child.setConfig(childProps)
           return createElement(child.getReactComponent(), childProps)
         }
 
@@ -151,7 +163,7 @@ export default function ({ adapter, additionalSources }) {
 
     function getStateStream() {
       if (config.reducers) {
-        return Observable.merge(...forceArray(config.reducers(componentSources, getProp)))
+        return Observable.merge(...forceArray(config.reducers(componentSources)))
           .startWith(config.initialState)
           .scan((currentState, { reducer, action }) => reducer(currentState, action))
           .share()
@@ -178,10 +190,11 @@ export default function ({ adapter, additionalSources }) {
       get,
       set,
       updateChildActions,
+      setConfig,
       getChildren,
       removeChild,
       getActions: () => componentSources.actions,
-      getReactComponent: () => ReactComponent,
+      getReactComponent,
       getName: () => componentName,
       getKey: () => key,
       getState: () => state,
@@ -192,8 +205,6 @@ export default function ({ adapter, additionalSources }) {
       if (rootComponent) throw new Error('rootComponent already set')
       rootComponent = thisComponent
     }
-
-    ReactComponent = createReactComponent()
 
     return thisComponent
   }
@@ -209,22 +220,20 @@ export default function ({ adapter, additionalSources }) {
   }
 
   function generateDOMSource(domNodes) {
-    return {
-      select: function domSelector(selector) {
-        return {
-          events: function getEvent(event) {
-            if (!domNodes[selector]) {
-              domNodes[selector] = {}
-            }
+    return function domSelector(selector) {
+      return {
+        events: function getEvent(event) {
+          if (!domNodes[selector]) {
+            domNodes[selector] = {}
+          }
 
-            if (!domNodes[selector][event]) {
-              domNodes[selector][event] = makeSubject()
-            }
+          if (!domNodes[selector][event]) {
+            domNodes[selector][event] = makeSubject()
+          }
 
-            return domNodes[selector][event].stream.share()
-          },
-        }
-      },
+          return domNodes[selector][event].stream.switch().share()
+        },
+      }
     }
   }
 
@@ -232,10 +241,7 @@ export default function ({ adapter, additionalSources }) {
     Object.keys(domNodes).forEach((selector) => {
       Object.keys(domNodes[selector]).forEach((event) => {
         const domEl = el.querySelector(selector)
-        if (domEl) {
-          domEl.removeEventListener(event, domNodes[selector][event].observer.next)
-          domEl.addEventListener(event, domNodes[selector][event].observer.next)
-        }
+        domNodes[selector][event].observer.next(Observable.fromEvent(domEl, event))
       })
     })
   }
@@ -344,12 +350,16 @@ export default function ({ adapter, additionalSources }) {
     makeSubject,
     generateDOMSource,
     updateDomStreams,
-    forceArray,
     mergeChildrenActions,
     registerComponent,
     isReactComponent,
     createReactElement,
   }
+}
+
+export function forceArray(arr) {
+  if (!Array.isArray(arr)) return [arr]
+  return arr
 }
 
 export function applyRecycleObservable(Observable) {
@@ -369,9 +379,4 @@ export function applyRecycleObservable(Observable) {
   Observable.prototype.filterByType = function filterByType(type) {
     return this.filter(action => action.type === type)
   }
-}
-
-export function forceArray(arr) {
-  if (!Array.isArray(arr)) return [arr]
-  return arr
 }

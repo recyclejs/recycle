@@ -208,10 +208,9 @@ describe('unit tests', function () {
     it('generateSources should return component sources', function () {
       const DOMSource = recycle.generateDOMSource({})
 
-      expect(typeof DOMSource).to.equal('object')
-      expect(typeof DOMSource.select).to.equal('function')
-      expect(typeof DOMSource.select().events).to.equal('function')
-      expect(DOMSource.select().events('click') instanceof Observable).to.equal(true)
+      expect(typeof DOMSource).to.equal('function')
+      expect(typeof DOMSource().events).to.equal('function')
+      expect(DOMSource().events('click') instanceof Observable).to.equal(true)
     })
   })
 });
