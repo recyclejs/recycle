@@ -2,6 +2,7 @@ import objectpath from 'objectpath'
 
 export default ({ initialState }) => (recycle) => {
   const store = initialState || {}
+  const actionRef = () => {}
 
   recycle.on('componentInit', (component) => {
     const storePath = parsePath(component.get('storePath'))
@@ -19,7 +20,7 @@ export default ({ initialState }) => (recycle) => {
   })
 
   recycle.on('componentUpdated', (state, action, component) => {
-    if (action && action.fromStore) {
+    if (action && action === actionRef) {
       return
     }
     const storePath = parsePath(component.get('storePath'))
@@ -28,7 +29,7 @@ export default ({ initialState }) => (recycle) => {
       recycle.getAllComponents()
         .filter(c => c !== component)
         .filter(c => shouldUpdate(storePath, parsePath(c.get('storePath'))))
-        .map(c => c.setState(getByPath(parsePath(c.get('storePath')), store), { fromStore: true }))
+        .map(c => c.setState(getByPath(parsePath(c.get('storePath')), store), actionRef))
     }
   })
 }
