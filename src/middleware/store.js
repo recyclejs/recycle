@@ -9,7 +9,7 @@ export default (recycle) => {
     }
     const storePath = parsePath(component.get('storePath'))
     if (storePath) {
-      saveByPath(storePath, state, store)
+      setByPath(storePath, state, store)
       recycle.getAllComponents()
         .filter(c => c !== component)
         .filter(c => shouldUpdate(storePath, parsePath(c.get('storePath'))))
@@ -18,32 +18,17 @@ export default (recycle) => {
   })
 }
 
-export function getByPath(parts, source) {
-  let property = source;
-  let i
-
-  for (i = 0; i < parts.length; i++) {
-    if (parts[i + 1]) {
-      const test = property[parts.slice(i).join('.')]
-      if (test) {
-        property = test
-        i++
-        continue
-      }
+export function getByPath(parts, current) {
+  for (let i = 0; i < parts.length; ++i) {
+    if (current[parts[i]] === undefined) {
+      return undefined
     }
-
-    property = property[parts[i]];
-    if (property === undefined) {
-      return undefined;
-    }
+    current = current[parts[i]]
   }
-
-  if (i === 0) return undefined
-  if (property && property.value) return property.value
-  return property
+  return current
 }
 
-export function saveByPath(path, value, current) {
+export function setByPath(path, value, current) {
   path.forEach((i, index) => {
     if (index === path.length - 1) {
       current[i] = value
@@ -67,13 +52,8 @@ export function shouldUpdate(sourcePath, targetPath) {
   if (!targetPath) {
     return false
   }
-  if (targetPath.length > sourcePath.length) {
+  if (targetPath[0] !== sourcePath[0]) {
     return false
-  }
-  for (let i; i < targetPath.length; i++) {
-    if (sourcePath[i] !== targetPath[i]) {
-      return false
-    }
   }
   return true
 }

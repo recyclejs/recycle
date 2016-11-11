@@ -2,12 +2,12 @@
 /* eslint import/no-extraneous-dependencies: "off" */
 /* eslint func-names: "off" */
 
-import { expect } from 'chai'
+import { assert } from 'chai'
 import jsdomify from 'jsdomify'
 import createRecycle from '../src/index'
 import reactRxjs from '../src/adapter/react-rxjs'
 
-describe('createRecycle', function () {
+describe('index.spec.js', function () {
   describe('add additional sources', () => {
     before(function () {
       jsdomify.create()

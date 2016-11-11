@@ -1,124 +1,54 @@
 /* global describe before after it document */
 /* eslint import/no-extraneous-dependencies: "off" */
+/* eslint react/prefer-es6-class: "off" */
+/* eslint react/no-multi-comp: "off" */
 /* eslint func-names: "off" */
 
-import { expect } from 'chai'
+import { assert } from 'chai'
 import jsdomify from 'jsdomify'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Recycle from '../src/recycle'
 import reactAdapter from '../src/adapter/react-rxjs'
+import Recycle, {
+  registerComponent,
+  getAllComponents,
+  getComponentStructure,
+  createReactElement,
+  isReactComponent,
+  forceArray,
+  applyRecycleObservable,
+} from '../src/recycle'
 
-const adapter = reactAdapter
-const recycle = Recycle({ adapter })
-const Observable = adapter.Observable
-
-describe('unit tests', function () {
-  /*describe('updateDomStreams', () => {
-    before(function () {
-      jsdomify.create()
-    })
-
-    after(function () {
-      jsdomify.destroy()
-    })
-
-    it('should call observer.next', function (done) {
-      const domSelectors = {
-        test: {
-          click: recycle.makeSubject(),
-        },
-      }
-      domSelectors.test.click.observer.next = function () {
-        done()
-      }
-      const el = document.createElement('div')
-      recycle.updateDomStreams(domSelectors, el)
-    })
-  })*/
-
-  /*describe('createStateStream', () => {
-    it('should create new state and notify', function (done) {
-      const subj = recycle.makeSubject()
-
-      const reducers = [
-        subj.stream
-          .reducer(function (state) {
-            state.test = true;
-            return state
-          }),
-      ]
-
-      const initialState = { test: false }
-
-      const notify = function (action) {
-        expect(action.type).to.equal('willCallReducer')
-      }
-
-      const state$ = recycle.createStateStream(reducers, initialState, notify)
-
-      state$.subscribe(function (state) {
-        if (state.test == true)
-          {done()}
-      })
-
-      subj.observer.next()
-    })
-  })
-
-  describe('createActionsStream', () => {
-    it('should create action stream and filter null values', function (done) {
-      const subj = recycle.makeSubject()
-
-      const actions = [
-        subj.stream,
-        subj.stream.mapTo(false),
-      ]
-
-      const actions$ = recycle.createActionsStream(actions)
-
-      actions$.subscribe(function (action) {
-        expect(action.type).to.equal('testActions')
-        done()
-      })
-
-      subj.observer.next()
-      subj.observer.next({ type: 'testActions' })
-    })
-  })*/
-
+describe('recycle.spec.js', function () {
   describe('registerComponent', () => {
     it('should add new component in map', function () {
-      const recycle = Recycle({ adapter })
-
+      const recycle = Recycle({ adapter: reactAdapter })
       const savedChildren = new Map()
-
       const constructor1 = function () { return {} }
-      const constructor2 = function () { return {} }
 
       const rootComponent = recycle.createComponent(constructor1)
       const component1 = recycle.createComponent(constructor1, { key: 'key1' }, rootComponent)
       const component2 = recycle.createComponent(constructor1, { key: 'key1' }, rootComponent)
 
-      recycle.registerComponent(component1, savedChildren)
+      registerComponent(component1, savedChildren)
 
-      expect(savedChildren.get(constructor1).key1 !== false)
-        .to.equal(true)
-
-      expect(function () {
-        recycle.registerComponent(component2, savedChildren)
-      })
-      .to.throw('Could not register recycle component \'constructor1\'. Key \'key1\' is already in use.')
+      assert(savedChildren.get(constructor1).key1 !== false, 'component should have key')
+      assert.throws(
+        () => registerComponent(component2, savedChildren),
+        'Could not register recycle component \'constructor1\'. Key \'key1\' is already in use.'
+      )
     })
   })
 
   describe('isReactComponent', () => {
     it('should check if component is created with react', function () {
       const reactComponent = React.createClass({
-        render() {},
+        render() {
+          return null
+        },
       })
 
-      expect(recycle.isReactComponent(reactComponent)).to.equal(true)
+      assert(isReactComponent(reactComponent), 'not recognized as react component')
     })
   })
 
@@ -139,7 +69,7 @@ describe('unit tests', function () {
         },
       })
 
-      const getArgs = function (constrctor, props) {
+      const getArgs = function () {
         return arguments
       }
 
@@ -148,69 +78,51 @@ describe('unit tests', function () {
       }
 
       ReactDOM.render(
-        recycle.createReactElement(React.createElement, getArgs(reactComponent), jsx),
+        createReactElement(React.createElement, getArgs(reactComponent), jsx),
         document.createElement('div')
       )
     })
   })
 
-  describe('mergeChildrenActions', () => {
-    before(function () {
-      jsdomify.create()
-    })
-
-    after(function () {
-      jsdomify.destroy()
-    })
-
-    it('should return action created by recycle component', function (done) {
-      const subj = recycle.makeSubject()
-
-      const constructor = function () {
-        return {
-          actions: function () {
-            return subj.stream
-          },
-          view: () => 
-             null
-          ,
-        }
-      }
-
-      const rc = recycle.createComponent(constructor)
-
-      ReactDOM.render(
-        React.createElement(rc.getReactComponent(), null),
-        document.createElement('div')
-      )
-
-      const merged$ = recycle.mergeChildrenActions([rc])
-
-      rc.getActions().subscribe(function (action) {
-        expect(action.type).to.equal('testActions')
-        done()
-      })
-
-      subj.observer.next()
-      subj.observer.next({ type: 'testActions' })
+  describe('forceArray', () => {
+    it('should always return an array', () => {
+      const a = [1, 2, 3]
+      assert(forceArray(a) === a, 'arrays not equal')
+      const b = 'notarr'
+      assert.deepEqual(forceArray(b), [b])
     })
   })
 
-  describe('generateDOMSource', () => {
-    before(function () {
-      jsdomify.create()
+  describe('applyRecycleObservable', () => {
+    const Observable = reactAdapter.Observable
+
+    it('should add reducer and filterByType filters', () => {
+      applyRecycleObservable(Observable)
+      assert(typeof Observable.prototype.reducer === 'function', 'Observable.reducer not a function')
+      assert(typeof Observable.prototype.filterByType === 'function', 'Observable.filterByType not a function')
     })
+  })
 
-    after(function () {
-      jsdomify.destroy()
+  describe('getComponentStructure', () => {
+    it('should return component structure tree', () => {
+      const recycle = Recycle({ adapter: reactAdapter })
+      const rootComponent = recycle.createComponent(() => ({}))
+      const tree = getComponentStructure(rootComponent)
+
+      assert(typeof tree.component === 'object', 'tree.component not an object')
+      assert(Array.isArray(tree.children), 'tree.children not an array')
     })
+  })
 
-    it('generateSources should return component sources', function () {
-      const DOMSource = recycle.generateDOMSource({})
+  describe('getAllComponents', () => {
+    it('should return component structure tree', () => {
+      const recycle = Recycle({ adapter: reactAdapter })
+      const constructor = () => ({})
+      const rootComponent = recycle.createComponent(constructor)
+      const components = getAllComponents(rootComponent)
 
-      expect(typeof DOMSource).to.equal('function')
-      expect(typeof DOMSource().events).to.equal('function')
-      expect(DOMSource().events('click') instanceof Observable).to.equal(true)
+      assert(Array.isArray(components), 'returned components not an array')
+      assert(components[0].getConstructor() === constructor, 'constructors doesnt match')
     })
   })
 });

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/examples/**/*.js  --compilers js:babel-register --watch",
+    "test": "mocha test/*.js test/**/*.js  --compilers js:babel-register --watch",
     "build": "babel src -d ./"
   },
   "repository": {
@@ -35,6 +35,7 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
+    "objectpath": "^1.2.1",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "rxjs": "^5.0.0-rc.1"
