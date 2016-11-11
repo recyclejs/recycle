@@ -190,25 +190,10 @@ export default function ({ adapter, additionalSources }) {
       // TODO: sideefects middleware (nikakav record nije potreban, druga svrha)
       // user klikne na button
       // pošalje akciju koja radi side effect
-      //  -ovaj dio uzima middleware i u pozadini šalje akciju
-      //  (dovoljno je poslat ovaj action u scanu i instancu komponente)
       // frontend na istu stavlja pending: true
       // u reduceru: sideefects.update postavlja novi state i dodatno
       // pending: false
 
-      // TODO: memory store
-      // user klikne na button
-      // updejta se state
-      // updejta se store
-      // updejtaju se sve komponente po recordu
-
-      // TODO: deepstream store
-      // user klikne na button
-      // updejta se state
-      // updejta se store
-      // sejva se novi store na deepstream
-      // uzima se najnoviji store sa deepstrema
-      // updejtaju se sve komponente po recordu
       return Observable.merge(...reducers)
         .merge(outsideActions.stream.switch())
         .startWith({
@@ -265,6 +250,7 @@ export default function ({ adapter, additionalSources }) {
       rootComponent = thisComponent
     }
 
+    emit('componentInit', thisComponent)
     return thisComponent
   }
 
