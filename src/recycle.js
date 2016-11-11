@@ -7,6 +7,7 @@ export default function ({ adapter, additionalSources }) {
     Subject,
   } = adapter
 
+  const events = {}
   let rootComponent
 
   function createComponent(constructor, props, parent) {
@@ -15,7 +16,7 @@ export default function ({ adapter, additionalSources }) {
     const children = new Map()
     const childActions = makeSubject()
     const componentUpdate = makeSubject()
-    const updateState = makeSubject()
+    const outsideActions = makeSubject()
     let ReactComponent
     let componentName
     let timesRendered = 0
@@ -66,9 +67,12 @@ export default function ({ adapter, additionalSources }) {
               .subscribe(componentSources.actions)
           }
 
-          this.stateSubsription = getStateStream().subscribe((newState) => {
-            if (newState) {
-              this.setState({ recycleState: newState })
+          this.stateSubsription = getStateStream().subscribe((newVal) => {
+            if (newVal.state) {
+              this.setState({
+                recycleState: newVal.state,
+                lastAction: newVal.action,
+              })
             }
           })
 
@@ -89,6 +93,7 @@ export default function ({ adapter, additionalSources }) {
         componentDidUpdate() {
           state = this.state.recycleState
           componentUpdate.observer.next(this.state.recycleState)
+          emit('componentUpdated', [this.state.recycleState, this.state.lastAction, thisComponent])
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
         }
@@ -172,16 +177,50 @@ export default function ({ adapter, additionalSources }) {
     }
 
     function getStateStream() {
-      let reducers = []
+      const reducers = [
+        componentSources.actions
+          .do(a => emit('action', [a, thisComponent]))
+          .filter(() => false),
+      ]
+
       if (config.reducers) {
-        reducers = [...forceArray(config.reducers(componentSources))]
+        reducers.push(...forceArray(config.reducers(componentSources)))
       }
 
-      // TODO: hook na reducer
+      // TODO: sideefects middleware (nikakav record nije potreban, druga svrha)
+      // user klikne na button
+      // pošalje akciju koja radi side effect
+      //  -ovaj dio uzima middleware i u pozadini šalje akciju
+      //  (dovoljno je poslat ovaj action u scanu i instancu komponente)
+      // frontend na istu stavlja pending: true
+      // u reduceru: sideefects.update postavlja novi state i dodatno
+      // pending: false
+
+      // TODO: memory store
+      // user klikne na button
+      // updejta se state
+      // updejta se store
+      // updejtaju se sve komponente po recordu
+
+      // TODO: deepstream store
+      // user klikne na button
+      // updejta se state
+      // updejta se store
+      // sejva se novi store na deepstream
+      // uzima se najnoviji store sa deepstrema
+      // updejtaju se sve komponente po recordu
       return Observable.merge(...reducers)
-        .startWith(config.initialState)
-        .scan((currentState, { reducer, action }) => reducer(currentState, action))
-        .merge(updateState.stream)
+        .merge(outsideActions.stream.switch())
+        .startWith({
+          state: config.initialState,
+        })
+        .scan((last, { reducer, action }) => (
+          {
+            state: reducer(last.state, action),
+            reducer,
+            action,
+          }
+        ))
         .share()
     }
 
@@ -191,8 +230,11 @@ export default function ({ adapter, additionalSources }) {
       children.set(component.getConstructor(), components)
     }
 
-    function setState(newState) {
-      updateState.observer.next(newState)
+    function setState(newState, action) {
+      outsideActions.observer.next(
+        Observable.of(action)
+          .reducer(() => newState)
+      )
     }
 
     function get(prop) {
@@ -263,9 +305,37 @@ export default function ({ adapter, additionalSources }) {
     })
   }
 
+  function addListener(event, cb) {
+    if (!events[event]) {
+      events[event] = new Set()
+    }
+    events[event].add(cb)
+  }
+
+  function removeListener(event, cb) {
+    if (!events[event]) {
+      return
+    }
+    events[event].delete(cb)
+  }
+
+  function emit(event, payload) {
+    if (events[event]) {
+      for (const cb of events[event]) {
+        if (Array.isArray(payload)) {
+          cb(...payload)
+        } else {
+          cb(payload)
+        }
+      }
+    }
+  }
+
   applyRecycleObservable(Observable)
 
   return {
+    on: addListener,
+    unbind: removeListener,
     createComponent,
     getComponentStructure: () => getComponentStructure(rootComponent),
     getAllComponents: () => getAllComponents(rootComponent),

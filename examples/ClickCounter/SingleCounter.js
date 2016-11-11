@@ -37,6 +37,8 @@ function SingleCounter() {
 
 export default function SingleCounterContainer(props) {
   return {
+    storePath: 'test',
+
     initialState: {},
 
     actions: (sources, props) => {
