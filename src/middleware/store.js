@@ -15,7 +15,6 @@ export default ({ initialState }) => (recycle, adapter) => {
           const pathStr = storePath.join('.')
           throw new Error(`'${pathStr}' is already defined. Could not use ${component.getName()}'s initialState. Consider defining it in store.`)
         }
-        // todo: check if store is actualy changed
         setByPath(storePath, componentInitialState, store)
       }
       component.set('initialState', getByPath(storePath, store))
@@ -32,13 +31,12 @@ export default ({ initialState }) => (recycle, adapter) => {
       recycle.getAllComponents()
         .filter(c => c !== component)
         .filter(c => shouldUpdate(storePath, c.get('storePath')))
-        // todo: filter(c => didStateChanged())
         .map(c => c.setState(getByPath(c.get('storePath'), store), actionRef))
     }
   })
 
   /*
-  concept for remote state
+  concept for a remote state
 
   recycle.on('componentInit', (component) => {
     const remoteResponse = new adapter.Subject()
