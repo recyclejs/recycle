@@ -16,7 +16,7 @@ export default (config) => {
 
   if (config.middleware) {
     config.middleware.map((m) => {
-      const instance = m(recycle)
+      const instance = m(recycle, adapter)
       middlewares[instance.name] = instance
       return false
     })

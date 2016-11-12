@@ -14,9 +14,9 @@ export default function ({ adapter, additionalSources }) {
     const key = (props) ? props.key : null
     const domNodes = {}
     const children = new Map()
-    const childActions = makeSubject()
-    const componentUpdate = makeSubject()
-    const outsideActions = makeSubject()
+    const childActions = new Subject()
+    const componentUpdate = new Subject()
+    const outsideActions = new Subject()
     let ReactComponent
     let componentName
     let timesRendered = 0
@@ -28,9 +28,9 @@ export default function ({ adapter, additionalSources }) {
     const componentSources = {
       ...additionalSources,
       DOM: { select: generateDOMSource(domNodes) },
-      componentUpdate: componentUpdate.stream.share(),
-      childrenActions: childActions.stream.switch().share(),
-      actions: makeSubject().stream.share(),
+      componentUpdate: componentUpdate.share(),
+      childrenActions: childActions.switch().share(),
+      actions: new Subject(),
     }
 
     function getProp(propKey) {
@@ -92,7 +92,7 @@ export default function ({ adapter, additionalSources }) {
 
         componentDidUpdate() {
           state = this.state.recycleState
-          componentUpdate.observer.next(this.state.recycleState)
+          componentUpdate.next(this.state.recycleState)
           emit('componentUpdated', [this.state.recycleState, this.state.lastAction, thisComponent])
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
@@ -159,7 +159,7 @@ export default function ({ adapter, additionalSources }) {
       )
 
       if (newActions) {
-        childActions.observer.next(newActions)
+        childActions.next(newActions)
       }
     }
 
@@ -188,7 +188,7 @@ export default function ({ adapter, additionalSources }) {
       }
 
       return Observable.merge(...reducers)
-        .merge(outsideActions.stream.switch())
+        .merge(outsideActions.switch())
         .startWith({
           state: config.initialState,
         })
@@ -209,7 +209,7 @@ export default function ({ adapter, additionalSources }) {
     }
 
     function setState(newState, action) {
-      outsideActions.observer.next(
+      outsideActions.next(
         Observable.of(action)
           .reducer(() => newState)
       )
@@ -261,16 +261,6 @@ export default function ({ adapter, additionalSources }) {
     return thisComponent
   }
 
-  function makeSubject() {
-    const stream = new Subject()
-    const observer = {
-      next: x => stream.next(x),
-      error: err => stream.error(err),
-      complete: () => stream.complete(),
-    }
-    return { stream, observer }
-  }
-
   function generateDOMSource(domNodes) {
     return function domSelector(selector) {
       return {
@@ -280,10 +270,10 @@ export default function ({ adapter, additionalSources }) {
           }
 
           if (!domNodes[selector][event]) {
-            domNodes[selector][event] = makeSubject()
+            domNodes[selector][event] = new Subject()
           }
 
-          return domNodes[selector][event].stream.switch().share()
+          return domNodes[selector][event].switch().share()
         },
       }
     }
@@ -293,7 +283,7 @@ export default function ({ adapter, additionalSources }) {
     Object.keys(domNodes).forEach((selector) => {
       Object.keys(domNodes[selector]).forEach((event) => {
         const domEl = el.querySelector(selector)
-        domNodes[selector][event].observer.next(Observable.fromEvent(domEl, event))
+        domNodes[selector][event].next(Observable.fromEvent(domEl, event))
       })
     })
   }

@@ -1,12 +1,8 @@
 import objectpath from 'objectpath'
 
-export default ({ initialState }) => (recycle) => {
+export default ({ initialState }) => (recycle, adapter) => {
   const store = initialState || {}
   const actionRef = () => {}
-
-   recycle.on('initialize', () => {
-    console.log(recycle.getMiddleware('store'))
-   })
 
   recycle.on('componentInit', (component) => {
     const storePath = parsePath(component.get('storePath'))
@@ -41,11 +37,22 @@ export default ({ initialState }) => (recycle) => {
     }
   })
 
-  /* recycle.on('action', (action, component) => {
-    const deepStreamState = getStoreFromDeepstream(action, component.get('storePath'))
-    
-    component.soruces.deepStreamResponse.next(deepStreamState)
-  })*/
+  /*
+  concept for remote state
+
+  recycle.on('componentInit', (component) => {
+    const remoteResponse = new adapter.Subject()
+    component.setSource('remoteResponse', remoteResponse)
+  })
+
+  recycle.on('action', (action, component) => {
+    if (action.something === 'should send to remote') {
+      getStoreFromRemote(action, component.get('storePath'), function done(remoteState) {
+        component.getSource('remoteResponse').next(remoteState)
+      })
+    }
+  })
+  */
 
   return {
     name: 'store',
