@@ -6,6 +6,8 @@ export default ({ initialState }) => (recycle) => {
 
   recycle.on('componentInit', (component) => {
     const storePath = parsePath(component.get('storePath'))
+    component.set('storePath', storePath)
+
     const componentInitialState = component.get('initialState')
     if (storePath) {
       if (componentInitialState) {
@@ -13,6 +15,7 @@ export default ({ initialState }) => (recycle) => {
           const pathStr = storePath.join('.')
           throw new Error(`'${pathStr}' is already defined. Could not use ${component.getName()}'s initialState. Consider defining it in store.`)
         }
+        // todo: check if store is actualy changed
         setByPath(storePath, componentInitialState, store)
       }
       component.set('initialState', getByPath(storePath, store))
@@ -23,15 +26,22 @@ export default ({ initialState }) => (recycle) => {
     if (action && action === actionRef) {
       return
     }
-    const storePath = parsePath(component.get('storePath'))
+    const storePath = component.get('storePath')
     if (storePath) {
       setByPath(storePath, state, store)
       recycle.getAllComponents()
         .filter(c => c !== component)
-        .filter(c => shouldUpdate(storePath, parsePath(c.get('storePath'))))
-        .map(c => c.setState(getByPath(parsePath(c.get('storePath')), store), actionRef))
+        .filter(c => shouldUpdate(storePath, c.get('storePath')))
+        // todo: filter(c => didStateChanged())
+        .map(c => c.setState(getByPath(c.get('storePath'), store), actionRef))
     }
   })
+
+  /* recycle.on('action', (action, component) => {
+    const deepStreamState = getStoreFromDeepstream(action, component.get('storePath'))
+    
+    component.soruces.deepStreamResponse.next(deepStreamState)
+  })*/
 }
 
 export function getByPath(parts, current) {

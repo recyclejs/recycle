@@ -187,13 +187,6 @@ export default function ({ adapter, additionalSources }) {
         reducers.push(...forceArray(config.reducers(componentSources)))
       }
 
-      // TODO: sideefects middleware (nikakav record nije potreban, druga svrha)
-      // user klikne na button
-      // pošalje akciju koja radi side effect
-      // frontend na istu stavlja pending: true
-      // u reduceru: sideefects.update postavlja novi state i dodatno
-      // pending: false
-
       return Observable.merge(...reducers)
         .merge(outsideActions.stream.switch())
         .startWith({
@@ -230,15 +223,28 @@ export default function ({ adapter, additionalSources }) {
       config[prop] = val
     }
 
+    function getSource(sourceName) {
+      return componentSources[sourceName]
+    }
+
+    function setSource(sourceName, source) {
+      if (componentSources[sourceName]) {
+        throw new Error(`Could not set component source. '${sourceName}' is already defined.`)
+      }
+      componentSources[sourceName] = source
+    }
+
     const thisComponent = {
       get,
       set,
+      getSource,
+      setSource,
       updateChildActions,
       setState,
       getChildren,
       removeChild,
-      getActions: () => componentSources.actions,
       getReactComponent,
+      getActions: () => componentSources.actions,
       getName: () => componentName,
       getKey: () => key,
       getState: () => state,
