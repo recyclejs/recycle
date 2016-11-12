@@ -12,11 +12,11 @@ export default (config) => {
   })
 
   const middlewares = {}
-  const getMiddleware = name => middlewares[name]
+  recycle.getMiddleware = name => middlewares[name]
 
   if (config.middleware) {
     config.middleware.map((m) => {
-      const instance = m(recycle, getMiddleware)
+      const instance = m(recycle)
       middlewares[instance.name] = instance
       return false
     })

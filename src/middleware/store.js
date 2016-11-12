@@ -1,12 +1,12 @@
 import objectpath from 'objectpath'
 
-export default ({ initialState }) => (recycle, getMiddleware) => {
+export default ({ initialState }) => (recycle) => {
   const store = initialState || {}
   const actionRef = () => {}
 
-  // recycle.on('initialize', () => {
-  //  console.log(getMiddleware('store'))
-  // })
+   recycle.on('initialize', () => {
+    console.log(recycle.getMiddleware('store'))
+   })
 
   recycle.on('componentInit', (component) => {
     const storePath = parsePath(component.get('storePath'))
