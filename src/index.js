@@ -11,8 +11,15 @@ export default (config) => {
     additionalSources: config.additionalSources,
   })
 
+  const middlewares = {}
+  const getMiddleware = name => middlewares[name]
+
   if (config.middleware) {
-    config.middleware.map(m => m(recycle))
+    config.middleware.map((m) => {
+      const instance = m(recycle, getMiddleware)
+      middlewares[instance.name] = instance
+      return false
+    })
   }
 
   function createReactElement(constructor, props) {

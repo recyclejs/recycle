@@ -254,6 +254,7 @@ export default function ({ adapter, additionalSources }) {
     if (!parent) {
       if (rootComponent) throw new Error('rootComponent already set')
       rootComponent = thisComponent
+      emit('initialize')
     }
 
     emit('componentInit', thisComponent)

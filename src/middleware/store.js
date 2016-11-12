@@ -1,8 +1,12 @@
 import objectpath from 'objectpath'
 
-export default ({ initialState }) => (recycle) => {
+export default ({ initialState }) => (recycle, getMiddleware) => {
   const store = initialState || {}
   const actionRef = () => {}
+
+  // recycle.on('initialize', () => {
+  //  console.log(getMiddleware('store'))
+  // })
 
   recycle.on('componentInit', (component) => {
     const storePath = parsePath(component.get('storePath'))
@@ -42,6 +46,10 @@ export default ({ initialState }) => (recycle) => {
     
     component.soruces.deepStreamResponse.next(deepStreamState)
   })*/
+
+  return {
+    name: 'store',
+  }
 }
 
 export function getByPath(parts, current) {
