@@ -15,7 +15,6 @@ export default function ({ adapter, additionalSources }) {
     const domNodes = {}
     const children = new Map()
     const childActions = new Subject()
-    const componentUpdate = new Subject()
     const outsideActions = new Subject()
     let ReactComponent
     let componentName
@@ -28,8 +27,8 @@ export default function ({ adapter, additionalSources }) {
     const componentSources = {
       ...additionalSources,
       DOM: { select: generateDOMSource(domNodes) },
-      componentUpdate: componentUpdate.share(),
       childrenActions: childActions.switch().share(),
+      componentUpdate: new Subject(),
       actions: new Subject(),
     }
 
@@ -92,7 +91,7 @@ export default function ({ adapter, additionalSources }) {
 
         componentDidUpdate() {
           state = this.state.recycleState
-          componentUpdate.next(this.state.recycleState)
+          componentSources.componentUpdate.next(this.state.recycleState)
           emit('componentUpdated', [this.state.recycleState, this.state.lastAction, thisComponent])
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
