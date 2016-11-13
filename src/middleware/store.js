@@ -8,14 +8,10 @@ export default ({ initialState }) => (recycle, adapter) => {
     const storePath = parsePath(component.get('storePath'))
     component.set('storePath', storePath)
 
-    const componentInitialState = component.get('initialState')
     if (storePath) {
-      if (componentInitialState) {
-        if (getByPath(storePath, store)) {
-          const pathStr = storePath.join('.')
-          throw new Error(`'${pathStr}' is already defined. Could not use ${component.getName()}'s initialState. Consider defining it in store.`)
-        }
-        setByPath(storePath, componentInitialState, store)
+      if (component.get('initialState')) {
+        const pathStr = storePath.join('.')
+        throw new Error(`Could not use ${component.getName()}'s initialState. It should be defined in store (path: '${pathStr}')`)
       }
       component.set('initialState', getByPath(storePath, store))
     }
