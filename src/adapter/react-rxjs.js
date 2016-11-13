@@ -23,3 +23,11 @@ export default {
   Observable,
   Subject,
 }
+
+export const jsx = React.createElement
+export {
+  React,
+  ReactDOM,
+  Observable,
+  Subject,
+}

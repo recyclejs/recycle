@@ -33,12 +33,12 @@ export default (config) => {
     return adapter.render(createReactElement(Component, props), target)
   }
 
-  function wrapInReact(constructor, jsx) {
+  function toReact(constructor, jsx) {
     return class extends adapter.BaseComponent {
       render() {
         if (!jsx) {
           if (!recycle.getRootComponent()) {
-            throw new Error('Missing jsx handler function')
+            return createReactElement(constructor, this.props)
           }
           jsx = recycle.getRootComponent().jsxHandler
         }
@@ -50,7 +50,7 @@ export default (config) => {
   return {
     getComponentStructure: recycle.getComponentStructure,
     getAllComponents: recycle.getAllComponents,
-    wrapInReact,
+    toReact,
     createReactElement,
     render,
   }

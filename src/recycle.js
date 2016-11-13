@@ -40,6 +40,9 @@ export default function ({ adapter }) {
 
     function setConfig(ownProps) {
       config = constructor(ownProps)
+      if (typeof config === 'function') {
+        config = { view: config }
+      }
       props = ownProps
       componentName = config.displayName || constructor.name
     }
@@ -100,7 +103,9 @@ export default function ({ adapter }) {
           if (this.stateSubsription) {
             this.stateSubsription.unsubscribe()
           }
-          parent.removeChild(thisComponent)
+          if (parent) {
+            parent.removeChild(thisComponent)
+          }
         }
 
         render() {
