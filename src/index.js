@@ -8,7 +8,6 @@ export default (config) => {
   const adapter = config.adapter
   const recycle = createRecycle({
     adapter: config.adapter,
-    additionalSources: config.additionalSources,
   })
 
   const middlewares = {}
@@ -34,9 +33,15 @@ export default (config) => {
     return adapter.render(createReactElement(Component, props), target)
   }
 
-  function createReactComponent(constructor, jsx) {
+  function wrapInReact(constructor, jsx) {
     return class extends adapter.BaseComponent {
       render() {
+        if (!jsx) {
+          if (!recycle.getRootComponent()) {
+            throw new Error('Missing jsx handler function')
+          }
+          jsx = recycle.getRootComponent().jsxHandler
+        }
         return jsx(constructor, this.props)
       }
     }
@@ -45,7 +50,7 @@ export default (config) => {
   return {
     getComponentStructure: recycle.getComponentStructure,
     getAllComponents: recycle.getAllComponents,
-    createReactComponent,
+    wrapInReact,
     createReactElement,
     render,
   }

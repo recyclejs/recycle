@@ -1,4 +1,4 @@
-export default function ({ adapter, additionalSources }) {
+export default function ({ adapter }) {
   const {
     BaseComponent,
     createElement,
@@ -25,7 +25,6 @@ export default function ({ adapter, additionalSources }) {
     setConfig(props)
 
     const componentSources = {
-      ...additionalSources,
       DOM: { select: generateDOMSource(domNodes) },
       childrenActions: childActions.switch().share(),
       componentUpdate: new Subject(),
@@ -243,6 +242,7 @@ export default function ({ adapter, additionalSources }) {
       getChildren,
       removeChild,
       getReactComponent,
+      jsxHandler,
       getActions: () => componentSources.actions,
       getName: () => componentName,
       getKey: () => key,
@@ -320,6 +320,7 @@ export default function ({ adapter, additionalSources }) {
     unbind: removeListener,
     createComponent,
     getComponentStructure: () => getComponentStructure(rootComponent),
+    getRootComponent: () => rootComponent,
     getAllComponents: () => getAllComponents(rootComponent),
   }
 }
