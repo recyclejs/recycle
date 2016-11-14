@@ -21,16 +21,17 @@ export default (config) => {
     })
   }
 
-  function createReactElement(constructor, props) {
-    return adapter.createElement(recycle.createComponent(constructor).getReactComponent(), props)
+  function createRootComponent(constructor) {
+    return recycle.createComponent(constructor)
   }
 
-  function render(Component, props, target) {
+  function render(constructor, props, target) {
     if (!target) {
       target = props
       props = null
     }
-    return adapter.render(createReactElement(Component, props), target)
+    const reactRootComponent = createRootComponent(constructor).getReactComponent()
+    return adapter.render(adapter.createElement(reactRootComponent, props), target)
   }
 
   function toReact(constructor, jsx) {
@@ -38,7 +39,8 @@ export default (config) => {
       render() {
         if (!jsx) {
           if (!recycle.getRootComponent()) {
-            return createReactElement(constructor, this.props)
+            const reactRootComponent = createRootComponent(constructor).getReactComponent()
+            return adapter.createElement(reactRootComponent, this.props)
           }
           jsx = recycle.getRootComponent().jsxHandler
         }
@@ -51,7 +53,7 @@ export default (config) => {
     getComponentStructure: recycle.getComponentStructure,
     getAllComponents: recycle.getAllComponents,
     toReact,
-    createReactElement,
     render,
+    createRootComponent,
   }
 }

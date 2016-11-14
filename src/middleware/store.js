@@ -17,7 +17,7 @@ export default ({ initialState }) => (recycle, adapter) => {
     }
   })
 
-  recycle.on('componentUpdated', (state, action, component) => {
+  recycle.on('componentUpdate', (state, action, component) => {
     if (action && action === actionRef) {
       return
     }
