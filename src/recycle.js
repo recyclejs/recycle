@@ -14,7 +14,7 @@ export default function ({ adapter }) {
     const key = (props) ? props.key : null
     const domNodes = {}
     const children = new Map()
-    const childActions = new Subject()
+    const childrenActions = new Subject()
     const outsideActions = new Subject()
     let ReactComponent
     let componentName
@@ -26,7 +26,7 @@ export default function ({ adapter }) {
 
     const componentSources = {
       DOM: { select: generateDOMSource(domNodes) },
-      childrenActions: childActions.switch().share(),
+      childrenActions: childrenActions.switch().share(),
       actions: new Subject(),
     }
 
@@ -76,7 +76,7 @@ export default function ({ adapter }) {
             }
           })
 
-          updateChildActions()
+          updateChildrenActions()
         }
 
         shouldComponentUpdate(nextProps, nextState) {
@@ -148,9 +148,9 @@ export default function ({ adapter }) {
       return createElement.apply(this, arguments)
     }
 
-    function updateChildActions() {
+    function updateChildrenActions() {
       if (parent) {
-        parent.updateChildActions()
+        parent.updateChildrenActions()
       }
 
       const newActions = Observable.merge(
@@ -160,7 +160,7 @@ export default function ({ adapter }) {
       )
 
       if (newActions) {
-        childActions.next(newActions)
+        childrenActions.next(newActions)
       }
     }
 
@@ -240,7 +240,7 @@ export default function ({ adapter }) {
       set,
       getSource,
       setSource,
-      updateChildActions,
+      updateChildrenActions,
       setState,
       getChildren,
       removeChild,
