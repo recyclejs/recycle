@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Subject } from 'rxjs/Subject'
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/merge'
 import 'rxjs/add/observable/fromEvent'
 import 'rxjs/add/observable/of'
