@@ -7,7 +7,7 @@ export default (config) => {
 
   const adapter = config.adapter
   const recycle = createRecycle({
-    adapter: config.adapter,
+    adapter: config.adapter
   })
 
   const middlewares = {}
@@ -21,11 +21,11 @@ export default (config) => {
     })
   }
 
-  function createRootComponent(constructor) {
+  function createRootComponent (constructor) {
     return recycle.createComponent(constructor)
   }
 
-  function render(constructor, props, target) {
+  function render (constructor, props, target) {
     if (!target) {
       target = props
       props = null
@@ -34,9 +34,9 @@ export default (config) => {
     return adapter.render(adapter.createElement(reactRootComponent, props), target)
   }
 
-  function toReact(constructor, jsx) {
+  function toReact (constructor, jsx) {
     return class extends adapter.BaseComponent {
-      render() {
+      render () {
         if (!jsx) {
           if (!recycle.getRootComponent()) {
             const reactRootComponent = createRootComponent(constructor).getReactComponent()
@@ -54,6 +54,6 @@ export default (config) => {
     getAllComponents: recycle.getAllComponents,
     toReact,
     render,
-    createRootComponent,
+    createRootComponent
   }
 }
