@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha test/*.js test/**/*.js  --compilers js:babel-register --watch",
-    "build": "babel src -d ./"
+    "build": "babel src -d ./",
+    "docs:prepare": "gitbook install",
+    "docs:watch": "npm run docs:prepare && gitbook serve",
+    "docs:build": "npm run docs:prepare && rm -rf _book && gitbook build"
   },
   "repository": {
     "type": "git",
@@ -30,6 +33,7 @@
     "eslint-plugin-import": "^1.16.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.6.0",
+    "gitbook-cli": "^2.3.0",
     "jsdomify": "^3.1.0",
     "mocha": "^3.1.2",
     "watchify": "^3.7.0"

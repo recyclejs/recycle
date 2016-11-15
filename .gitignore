@@ -3,6 +3,7 @@
 /recycle.js
 /adapter
 /middleware
+_book
 
 node_modules
 .DS_Store
