@@ -21,7 +21,7 @@ export default {
   findDOMNode: ReactDOM.findDOMNode,
   render: ReactDOM.render,
   Observable,
-  Subject,
+  Subject
 }
 
 export const jsx = React.createElement
@@ -29,5 +29,5 @@ export {
   React,
   ReactDOM,
   Observable,
-  Subject,
+  Subject
 }
