@@ -4,13 +4,13 @@ export default function ({ adapter }) {
     createElement,
     findDOMNode,
     Observable,
-    Subject,
+    Subject
   } = adapter
 
   const events = {}
   let rootComponent
 
-  function createComponent(constructor, props, parent) {
+  function createComponent (constructor, props, parent) {
     const key = (props) ? props.key : null
     const domNodes = {}
     const children = new Map()
@@ -30,14 +30,14 @@ export default function ({ adapter }) {
       actions: new Subject(),
     }
 
-    function getProp(propKey) {
+    function getProp (propKey) {
       if (!props) {
         return null
       }
       return props[propKey]
     }
 
-    function setConfig(ownProps) {
+    function setConfig (ownProps) {
       config = constructor(ownProps)
       if (typeof config === 'function') {
         config = { view: config }
@@ -46,21 +46,21 @@ export default function ({ adapter }) {
       componentName = config.displayName || constructor.name
     }
 
-    function getReactComponent() {
+    function getReactComponent () {
       if (ReactComponent) {
         return ReactComponent
       }
 
       class ReactClass extends BaseComponent {
-        constructor(ownProps) {
+        constructor (ownProps) {
           super(ownProps)
           this.state = {
-            recycleState: config.initialState,
+            recycleState: config.initialState
           }
           state = this.state.recycleState
         }
 
-        componentDidMount() {
+        componentDidMount () {
           if (config.actions) {
             Observable.merge(...forceArray(config.actions(componentSources, getProp)))
               .filter(action => action)
@@ -71,7 +71,7 @@ export default function ({ adapter }) {
             if (newVal.state) {
               this.setState({
                 recycleState: newVal.state,
-                lastAction: newVal.action,
+                lastAction: newVal.action
               })
             }
           })
@@ -79,25 +79,25 @@ export default function ({ adapter }) {
           updateChildrenActions()
         }
 
-        shouldComponentUpdate(nextProps, nextState) {
+        shouldComponentUpdate (nextProps, nextState) {
           if (config.shouldComponentUpdate) {
             return config.shouldComponentUpdate(nextProps, nextState.recycleState, this.props, this.state.recycleState)
           }
           return true
         }
 
-        componentWillUpdate() {
+        componentWillUpdate () {
           setConfig(this.props)
         }
 
-        componentDidUpdate() {
+        componentDidUpdate () {
           state = this.state.recycleState
           emit('componentUpdate', [this.state.recycleState, this.state.lastAction, thisComponent])
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
         }
 
-        componentWillUnmount() {
+        componentWillUnmount () {
           if (this.stateSubsription) {
             this.stateSubsription.unsubscribe()
           }
@@ -106,7 +106,7 @@ export default function ({ adapter }) {
           }
         }
 
-        render() {
+        render () {
           timesRendered++
           if (!config.view) return null
           return config.view(this.state.recycleState, this.props, jsxHandler)
@@ -119,7 +119,7 @@ export default function ({ adapter }) {
       return ReactComponent
     }
 
-    function jsxHandler() {
+    function jsxHandler () {
       if (typeof arguments['0'] === 'function') {
         const childConstructor = arguments['0']
         const childProps = arguments['1'] || {}
@@ -148,7 +148,7 @@ export default function ({ adapter }) {
       return createElement.apply(this, arguments)
     }
 
-    function updateChildrenActions() {
+    function updateChildrenActions () {
       if (parent) {
         parent.updateChildrenActions()
       }
@@ -164,7 +164,7 @@ export default function ({ adapter }) {
       }
     }
 
-    function getChildren() {
+    function getChildren () {
       const childrenArr = []
 
       for (const childrenConstructor of children.keys()) {
@@ -177,7 +177,7 @@ export default function ({ adapter }) {
       return childrenArr
     }
 
-    function getStateStream() {
+    function getStateStream () {
       const reducers = [
         componentSources.actions
           .do(a => emit('action', [a, thisComponent]))
@@ -191,7 +191,7 @@ export default function ({ adapter }) {
       return Observable.merge(...reducers)
         .merge(outsideActions.switch())
         .startWith({
-          state: config.initialState,
+          state: config.initialState
         })
         .scan((last, { reducer, action }) => (
           {
@@ -203,32 +203,32 @@ export default function ({ adapter }) {
         .share()
     }
 
-    function removeChild(component) {
+    function removeChild (component) {
       const components = children.get(component.getConstructor())
       delete components[component.getKey()]
       children.set(component.getConstructor(), components)
     }
 
-    function setState(newState, action) {
+    function setState (newState, action) {
       outsideActions.next(
         Observable.of(action)
           .reducer(() => newState)
       )
     }
 
-    function get(prop) {
+    function get (prop) {
       return config[prop]
     }
 
-    function set(prop, val) {
+    function set (prop, val) {
       config[prop] = val
     }
 
-    function getSource(sourceName) {
+    function getSource (sourceName) {
       return componentSources[sourceName]
     }
 
-    function setSource(sourceName, source) {
+    function setSource (sourceName, source) {
       if (componentSources[sourceName]) {
         throw new Error(`Could not set component source. '${sourceName}' is already defined.`)
       }
@@ -250,7 +250,7 @@ export default function ({ adapter }) {
       getName: () => componentName,
       getKey: () => key,
       getState: () => state,
-      getConstructor: () => constructor,
+      getConstructor: () => constructor
     }
 
     if (!parent) {
@@ -263,10 +263,10 @@ export default function ({ adapter }) {
     return thisComponent
   }
 
-  function generateDOMSource(domNodes) {
-    return function domSelector(selector) {
+  function generateDOMSource (domNodes) {
+    return function domSelector (selector) {
       return {
-        events: function getEvent(event) {
+        events: function getEvent (event) {
           if (!domNodes[selector]) {
             domNodes[selector] = {}
           }
@@ -281,7 +281,7 @@ export default function ({ adapter }) {
     }
   }
 
-  function updateDomStreams(domNodes, el) {
+  function updateDomStreams (domNodes, el) {
     Object.keys(domNodes).forEach((selector) => {
       Object.keys(domNodes[selector]).forEach((event) => {
         const domEl = el.querySelector(selector)
@@ -290,21 +290,21 @@ export default function ({ adapter }) {
     })
   }
 
-  function addListener(event, cb) {
+  function addListener (event, cb) {
     if (!events[event]) {
       events[event] = new Set()
     }
     events[event].add(cb)
   }
 
-  function removeListener(event, cb) {
+  function removeListener (event, cb) {
     if (!events[event]) {
       return
     }
     events[event].delete(cb)
   }
 
-  function emit(event, payload) {
+  function emit (event, payload) {
     if (events[event]) {
       for (const cb of events[event]) {
         if (Array.isArray(payload)) {
@@ -328,7 +328,7 @@ export default function ({ adapter }) {
   }
 }
 
-export function registerComponent(newComponent, children) {
+export function registerComponent (newComponent, children) {
   const constructor = newComponent.getConstructor()
   const key = newComponent.getKey()
   const name = newComponent.getName()
@@ -341,9 +341,9 @@ export function registerComponent(newComponent, children) {
   children.set(constructor, obj)
 }
 
-export function getAllComponents(rootComponent) {
+export function getAllComponents (rootComponent) {
   const components = []
-  function addInArray(component) {
+  function addInArray (component) {
     components.push(component)
 
     if (component.getChildren()) {
@@ -357,8 +357,8 @@ export function getAllComponents(rootComponent) {
   return components
 }
 
-export function getComponentStructure(rootComponent) {
-  function addInStructure(parent, component) {
+export function getComponentStructure (rootComponent) {
+  function addInStructure (parent, component) {
     const current = {
       component,
       name: component.getName(),
@@ -382,12 +382,12 @@ export function getComponentStructure(rootComponent) {
   return structure
 }
 
-export function createReactElement(createElementHandler, args, jsx) {
+export function createReactElement (createElementHandler, args, jsx) {
   const constructor = args['0']
   const props = args['1'] || {}
 
   const originalRender = constructor.prototype.render
-  constructor.prototype.render = function render() {
+  constructor.prototype.render = function render () {
     return originalRender.call(this, props._recycleRenderHandler)
   }
 
@@ -407,24 +407,24 @@ export function createReactElement(createElementHandler, args, jsx) {
   return createElementHandler.apply(this, newArgs)
 }
 
-export function isReactComponent(constructor) {
+export function isReactComponent (constructor) {
   if (constructor.prototype.render) {
     return true
   }
   return false
 }
 
-export function forceArray(arr) {
+export function forceArray (arr) {
   if (!Array.isArray(arr)) return [arr]
   return arr
 }
 
-export function applyRecycleObservable(Observable) {
-  Observable.prototype.reducer = function reducer(reducerFn) {
+export function applyRecycleObservable (Observable) {
+  Observable.prototype.reducer = function reducer (reducerFn) {
     return this.map(action => ({ reducer: reducerFn, action }))
   }
 
-  Observable.prototype.filterByType = function filterByType(type) {
+  Observable.prototype.filterByType = function filterByType (type) {
     return this.filter(action => action.type === type)
   }
 }

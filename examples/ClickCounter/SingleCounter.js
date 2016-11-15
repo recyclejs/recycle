@@ -44,7 +44,7 @@ export default function SingleCounterContainer(props) {
     },
 
     view: (state, props, jsx) => {
-      return <SingleCounter {...props} />
+      return <SingleCounter />
     },
   }
 }

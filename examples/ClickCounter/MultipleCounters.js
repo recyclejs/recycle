@@ -26,7 +26,9 @@ export default function MultipleCounters() {
       return (
         <div>
           <ul>
-            <li><SingleCounter key="1" test="123" /></li>
+            <li><SingleCounter key="1" /></li>
+            <li><SingleCounter key="2" /></li>
+            <li><SingleCounter key="3" /></li>
           </ul>
           <div className="message">
             Total child button clicks: {state.childButtonClicked}
