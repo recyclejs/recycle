@@ -11,13 +11,13 @@ const recycle = createRecycle({
   adapter: reactRxjs
 })
 
-const ExampleList = () => (state, props, jsx) => (
+const ExampleList = () => (jsx) => (
   <ul>
     <li><Link to='/clickcounter'>ClickCounter</Link></li>
   </ul>
 )
 
-const Routes = () => (state, props, jsx) => (
+const Routes = () => (jsx) => (
   <Router history={hashHistory} >
     <Route path='clickcounter' component={recycle.toReact(WrapMultipleCounters)} />
     <Route path='*' component={recycle.toReact(ExampleList)} />

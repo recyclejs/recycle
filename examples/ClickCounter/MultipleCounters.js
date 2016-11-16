@@ -22,12 +22,12 @@ export default function MultipleCounters () {
           })
       ]
     },
-    view: function view (state, props, jsx) {
+    view: function view (jsx, state, props) {
       return (
         <div>
-          <div><SingleCounter id='1' /></div>
-          <div><SingleCounter id='2' /></div>
-          <div><SingleCounter id='3' /></div>
+          <div><SingleCounter key='1' /></div>
+          <div><SingleCounter key='2' /></div>
+          <div><SingleCounter key='3' /></div>
           <div className='message'>
             Total child button clicks: {state.childButtonClicked}
           </div>

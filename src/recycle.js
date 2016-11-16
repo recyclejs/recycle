@@ -109,7 +109,7 @@ export default function ({ adapter }) {
         render () {
           timesRendered++
           if (!config.view) return null
-          return config.view(this.state.recycleState, this.props, jsxHandler)
+          return config.view(jsxHandler, this.state.recycleState, this.props)
         }
       }
 

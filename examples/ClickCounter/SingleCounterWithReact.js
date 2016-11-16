@@ -48,7 +48,7 @@ export default function SingleCounterWithReact () {
       ]
     },
 
-    view: function (state, props, jsx) {
+    view: function (jsx, state, props) {
       return (
         <div>
           <span>Times clicked: {state.timesClicked}</span>

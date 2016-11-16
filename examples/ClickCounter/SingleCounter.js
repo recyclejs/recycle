@@ -1,6 +1,6 @@
 import React from 'react'
 
-function SingleCounter () {
+export default function SingleCounter () {
   return {
     initialState: {
       timesClicked: 0
@@ -26,7 +26,7 @@ function SingleCounter () {
       ]
     },
 
-    view: function (state, props, jsx) {
+    view: function (jsx, state, props) {
       return (
         <div>
           <span>Times clicked: {state.timesClicked}</span>
@@ -37,7 +37,7 @@ function SingleCounter () {
   }
 }
 
-export default class Bla extends React.Component {
+class Bla extends React.Component {
 
   render (jsx) {
     // when used inside Recycle component
