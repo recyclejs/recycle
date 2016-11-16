@@ -128,7 +128,7 @@ export default function ({ adapter }) {
           return createReactElement(createElement, arguments, jsxHandler)
         }
 
-        const child = (children.has(childConstructor)) ? children.get(childConstructor)[childProps.key] : false
+        const child = getByConstructor(childConstructor, childProps.key)
 
         if (child) {
           if (timesRendered === 1) {
@@ -162,6 +162,10 @@ export default function ({ adapter }) {
       if (newActions) {
         childrenActions.next(newActions)
       }
+    }
+
+    function getByConstructor (constructor, key) {
+      return (children.has(constructor)) ? children.get(constructor)[key] : false
     }
 
     function getChildren () {
@@ -204,6 +208,10 @@ export default function ({ adapter }) {
     }
 
     function removeChild (component) {
+      if (!component) {
+        return
+      }
+
       const components = children.get(component.getConstructor())
       delete components[component.getKey()]
       children.set(component.getConstructor(), components)
@@ -246,6 +254,7 @@ export default function ({ adapter }) {
       removeChild,
       getReactComponent,
       jsxHandler,
+      getByConstructor,
       getActions: () => componentSources.actions,
       getName: () => componentName,
       getKey: () => key,
@@ -387,11 +396,13 @@ export function createReactElement (createElementHandler, args, jsx) {
   const props = args['1'] || {}
 
   const originalRender = constructor.prototype.render
-  constructor.prototype.render = function render () {
-    return originalRender.call(this, props._recycleRenderHandler)
-  }
+  constructor.prototype.getJsxHandler = function () {
+    return this
+  }.bind(jsx)
 
-  props._recycleRenderHandler = jsx
+  constructor.prototype.render = function render () {
+    return originalRender.call(this, this.getJsxHandler())
+  }
 
   const newArgs = []
   for (let i = 0; i < args.length || i < 2; i++) {

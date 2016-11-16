@@ -1,8 +1,7 @@
-var webpack = require('webpack');
-var path = require('path');
+var path = require('path')
 
-var BUILD_DIR = path.resolve(__dirname, '');
-var APP_DIR = path.resolve(__dirname, '');
+var BUILD_DIR = path.resolve(__dirname, '')
+var APP_DIR = path.resolve(__dirname, '')
 
 var config = {
   entry: APP_DIR + '/index.js',
@@ -19,6 +18,6 @@ var config = {
       }
     ]
   }
-};
+}
 
-module.exports = config;
+module.exports = config

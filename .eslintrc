@@ -1,3 +1,6 @@
 {
-  "extends": "standard"
+  "extends": ["standard", "standard-react"],
+  "rules": {
+    "react/react-in-jsx-scope": 0
+  }
 }

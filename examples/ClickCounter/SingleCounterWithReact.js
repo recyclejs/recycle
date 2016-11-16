@@ -1,53 +1,54 @@
 import React from 'react'
 
 class ReactCounter extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { timesClicked: 0 };
+  constructor (props) {
+    super(props)
+    this.state = { timesClicked: 0 }
+    this.handleClick = this.handleClick.bind(this)
   }
 
-  handleClick() {
+  handleClick () {
     this.setState(prevState => ({
-      timesClicked: prevState.timesClicked + 1,
-    }));
+      timesClicked: prevState.timesClicked + 1
+    }))
   }
 
-  render(jsx) {
+  render (jsx) {
     // when used inside Recycle component
-    // jsx handler will be passed in render method of react component
+    // jsx handler will be passed in render method of a react component
     return (
-      <span onClick={this.handleClick.bind(this)}>{this.state.timesClicked}</span>
-    );
+      <span onClick={this.handleClick}>{this.state.timesClicked}</span>
+    )
   }
 }
 
-export default function SingleCounterWithReact() {
+export default function SingleCounterWithReact () {
   return {
     initialState: {
-      timesClicked: 0,
+      timesClicked: 0
     },
 
-    actions: function actions(sources) {
-      const button = sources.DOM.select('button');
+    actions: function (sources) {
+      const button = sources.DOM.select('button')
 
       return [
         button.events('click')
-          .mapTo({ type: 'buttonClicked' }),
+          .mapTo({ type: 'buttonClicked' })
       ]
     },
 
-    reducers: function reducers(sources) {
+    reducers: function (sources) {
       return [
         sources.actions
           .filterByType('buttonClicked')
-          .reducer(function increment(state) {
-            state.timesClicked++;
+          .reducer(function (state) {
+            state.timesClicked++
             return state
-          }),
+          })
       ]
     },
 
-    view: function view(state, props, jsx) {
+    view: function (state, props, jsx) {
       return (
         <div>
           <span>Times clicked: {state.timesClicked}</span>
@@ -55,6 +56,6 @@ export default function SingleCounterWithReact() {
           <button>Click me</button>
         </div>
       )
-    },
+    }
   }
 }

@@ -49,11 +49,11 @@ export default ({ initialState }) => (recycle, adapter) => {
   */
 
   return {
-    name: 'store',
+    name: 'store'
   }
 }
 
-export function getByPath(parts, current) {
+export function getByPath (parts, current) {
   for (let i = 0; i < parts.length; ++i) {
     if (current[parts[i]] === undefined) {
       return undefined
@@ -63,7 +63,7 @@ export function getByPath(parts, current) {
   return current
 }
 
-export function setByPath(path, value, current) {
+export function setByPath (path, value, current) {
   path.forEach((i, index) => {
     if (index === path.length - 1) {
       current[i] = value
@@ -76,14 +76,14 @@ export function setByPath(path, value, current) {
   })
 }
 
-export function parsePath(path) {
+export function parsePath (path) {
   if (typeof path === 'string') {
     return objectpath.parse(path)
   }
   return path
 }
 
-export function shouldUpdate(sourcePath, targetPath) {
+export function shouldUpdate (sourcePath, targetPath) {
   if (!targetPath) {
     return false
   }

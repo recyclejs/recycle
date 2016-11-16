@@ -1,40 +1,38 @@
 import SingleCounter from './SingleCounter'
 
-export default function MultipleCounters() {
+export default function MultipleCounters () {
   return {
     initialState: {
-      childButtonClicked: 0,
+      childButtonClicked: 0
     },
-    actions: function actions(sources) {
+    actions: function actions (sources) {
       return [
         sources.childrenActions
           .filterByType('buttonClicked')
-          .mapTo({ type: 'childButtonClicked' }),
+          .mapTo({ type: 'childButtonClicked' })
       ]
     },
-    reducers: function reducers(sources) {
+    reducers: function reducers (sources) {
       return [
         sources.actions
           .filterByType('childButtonClicked')
-          .reducer(function increment(state) {
-            state.childButtonClicked++;
+          .reducer(function increment (state) {
+            state.childButtonClicked++
             return state
-          }),
+          })
       ]
     },
-    view: function view(state, props, jsx) {
+    view: function view (state, props, jsx) {
       return (
         <div>
-          <ul>
-            <li><SingleCounter key="1" /></li>
-            <li><SingleCounter key="2" /></li>
-            <li><SingleCounter key="3" /></li>
-          </ul>
-          <div className="message">
+          <div><SingleCounter id='1' /></div>
+          <div><SingleCounter id='2' /></div>
+          <div><SingleCounter id='3' /></div>
+          <div className='message'>
             Total child button clicks: {state.childButtonClicked}
           </div>
         </div>
       )
-    },
+    }
   }
 }

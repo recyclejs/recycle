@@ -34,17 +34,17 @@ export default (config) => {
     return adapter.render(adapter.createElement(reactRootComponent, props), target)
   }
 
-  function toReact (constructor, jsx) {
+  function toReact (constructor) {
     return class extends adapter.BaseComponent {
       render () {
-        if (!jsx) {
-          if (!recycle.getRootComponent()) {
-            const reactRootComponent = createRootComponent(constructor).getReactComponent()
-            return adapter.createElement(reactRootComponent, this.props)
-          }
-          jsx = recycle.getRootComponent().jsxHandler
+        if (!recycle.getRootComponent()) {
+          const reactRootComponent = createRootComponent(constructor).getReactComponent()
+          return adapter.createElement(reactRootComponent, this.props)
         }
-        return jsx(constructor, this.props)
+        const recycleComponent = recycle.getRootComponent().getByConstructor(constructor)
+        recycle.getRootComponent().removeChild(recycleComponent)
+        const jsx = recycle.getRootComponent().jsxHandler
+        return jsx(constructor, ...this.props)
       }
     }
   }
