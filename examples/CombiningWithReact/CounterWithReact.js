@@ -1,26 +1,4 @@
-import React from 'react'
-
-class ReactCounter extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = { timesClicked: 0 }
-    this.handleClick = this.handleClick.bind(this)
-  }
-
-  handleClick () {
-    this.setState(prevState => ({
-      timesClicked: prevState.timesClicked + 1
-    }))
-  }
-
-  render (jsx) {
-    // when used inside Recycle component
-    // jsx handler will be passed in render method of a react component
-    return (
-      <span onClick={this.handleClick}>{this.state.timesClicked}</span>
-    )
-  }
-}
+import ReactCounter from './ReactComponent'
 
 export default function SingleCounterWithReact () {
   return {
@@ -51,9 +29,8 @@ export default function SingleCounterWithReact () {
     view: function (jsx, state, props) {
       return (
         <div>
-          <span>Times clicked: {state.timesClicked}</span>
+          <div>Times clicked on Recycle component: {state.timesClicked} <button>Click me</button></div>
           <div>Times clicked on React component: <ReactCounter /></div>
-          <button>Click me</button>
         </div>
       )
     }

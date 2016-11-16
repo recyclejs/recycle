@@ -43,6 +43,7 @@ export default (config) => {
         }
         const recycleComponent = recycle.getRootComponent().getByConstructor(constructor)
         recycle.getRootComponent().removeChild(recycleComponent)
+
         const jsx = recycle.getRootComponent().jsxHandler
         return jsx(constructor, ...this.props)
       }

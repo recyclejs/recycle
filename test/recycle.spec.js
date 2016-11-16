@@ -1,8 +1,4 @@
 /* global describe before after it document */
-/* eslint import/no-extraneous-dependencies: "off" */
-/* eslint react/prefer-es6-class: "off" */
-/* eslint react/no-multi-comp: "off" */
-/* eslint func-names: "off" */
 
 import { assert } from 'chai'
 import jsdomify from 'jsdomify'
@@ -16,7 +12,7 @@ import Recycle, {
   createReactElement,
   isReactComponent,
   forceArray,
-  applyRecycleObservable,
+  applyRecycleObservable
 } from '../src/recycle'
 
 describe('recycle.spec.js', function () {
@@ -43,9 +39,9 @@ describe('recycle.spec.js', function () {
   describe('isReactComponent', () => {
     it('should check if component is created with react', function () {
       const reactComponent = React.createClass({
-        render() {
+        render () {
           return null
-        },
+        }
       })
 
       assert(isReactComponent(reactComponent), 'not recognized as react component')
@@ -63,10 +59,10 @@ describe('recycle.spec.js', function () {
 
     it('should pass jsx as property in react render method', function (done) {
       const reactComponent = React.createClass({
-        render(jsx) {
+        render (jsx) {
           jsx()
           return null
-        },
+        }
       })
 
       const getArgs = function () {
@@ -125,4 +121,4 @@ describe('recycle.spec.js', function () {
       assert(components[0].getConstructor() === constructor, 'constructors doesnt match')
     })
   })
-});
+})

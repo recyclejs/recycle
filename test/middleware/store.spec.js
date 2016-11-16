@@ -1,13 +1,11 @@
-/* global describe before after it document */
-/* eslint import/no-extraneous-dependencies: "off" */
-/* eslint func-names: "off" */
+/* global describe it document */
 
 import { expect } from 'chai'
 import {
   getByPath,
   setByPath,
   shouldUpdate,
-  parsePath,
+  parsePath
 } from '../../src/middleware/store'
 
 describe('store.spec.js', function () {
@@ -18,9 +16,9 @@ describe('store.spec.js', function () {
         some: {
           prop: 2,
           obj: {
-            with: [{ array: true }],
-          },
-        },
+            with: [{ array: true }]
+          }
+        }
       }
 
       expect(getByPath(['prop'], source)).to.equal(1)
