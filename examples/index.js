@@ -3,11 +3,13 @@ import reactRxjs from '../src/adapter/react-rxjs'
 import { Router, Route, hashHistory, Link } from 'react-router'
 import ClickCounter from './ClickCounter/index'
 import ClickCounterReact from './CombiningWithReact/index'
+import TodoMVC from './TodoMVC/index'
 
 const ExampleList = () => (jsx) => (
   <ul>
     <li><Link to='/clickcounter'>Click Counter</Link></li>
     <li><Link to='/recyclereact'>Combining Recycle with React</Link></li>
+    <li><Link to='/todomvc'>TodoMVC</Link></li>
   </ul>
 )
 
@@ -26,6 +28,7 @@ const Routes = () => (jsx) => (
   <Router history={hashHistory} >
     <Route path='clickcounter' component={ClickCounter} />
     <Route path='recyclereact' component={ClickCounterReact} />
+    <Route path='todomvc' component={TodoMVC} />
     <Route path='*' component={recycle.toReact(ExampleList)} />
   </Router>
 )

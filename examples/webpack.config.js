@@ -15,6 +15,10 @@ var config = {
         test: /\.js?/,
         exclude: path.resolve(__dirname, '../node_modules'),
         loader: 'babel'
+      },
+      {
+        test: /\.css$/,
+        loader: 'style!css'
       }
     ]
   }
