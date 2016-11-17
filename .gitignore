@@ -10,4 +10,4 @@ _book
 node_modules
 .DS_Store
 npm-debug.log
-todo
+/todo
