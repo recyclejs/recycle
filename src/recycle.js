@@ -104,15 +104,19 @@ export default function ({ adapter }) {
           updateDomStreams(domNodes, el)
 
           if (config.componentDidUpdate) {
-            const DOM = {
+            const params = {
               select: (selector) => {
                 return el.querySelector(selector)
               },
               selectRef: (selector) => {
                 return findDOMNode(this.refs[selector])
-              }
+              },
+              props: this.props,
+              state: this.state.recycleState,
+              prevProps,
+              prevState: prevState.recycleState
             }
-            return config.componentDidUpdate(DOM, this.props, this.state.recycleState, prevProps, prevState.recycleState)
+            return config.componentDidUpdate(params)
           }
         }
 
