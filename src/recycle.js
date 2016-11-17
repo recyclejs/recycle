@@ -84,6 +84,10 @@ export default function ({ adapter }) {
           })
 
           updateChildrenActions()
+
+          if (config.componentDidMount) {
+            return config.componentDidMount()
+          }
         }
 
         shouldComponentUpdate (nextProps, nextState) {
@@ -123,6 +127,10 @@ export default function ({ adapter }) {
           }
           if (parent) {
             parent.removeChild(thisComponent)
+          }
+
+          if (config.componentWillUnmount) {
+            return config.componentWillUnmount()
           }
         }
 
