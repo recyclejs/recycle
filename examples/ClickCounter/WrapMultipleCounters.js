@@ -22,7 +22,7 @@ export default function WrapMultipleCounters () {
           })
       ]
     },
-    view: function (jsx, state, props) {
+    view: function (jsx, props, state) {
       return (
         <div>
           <ul>

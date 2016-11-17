@@ -26,7 +26,7 @@ export default function SingleCounter () {
       ]
     },
 
-    view: function (jsx, state, props) {
+    view: function (jsx, props, state) {
       return (
         <div>
           <span>Times clicked: {state.timesClicked}</span>
@@ -56,7 +56,7 @@ function SingleCounterContainer (props) {
       return sources.childrenActions
     },
 
-    view: (state, props, jsx) => {
+    view: (jsx, props, state) => {
       return <SingleCounter />
     }
   }

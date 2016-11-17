@@ -26,7 +26,7 @@ export default function SingleCounterWithReact () {
       ]
     },
 
-    view: function (jsx, state, props) {
+    view: function (jsx, props, state) {
       return (
         <div>
           <div>Times clicked on Recycle component: {state.timesClicked} <button>Click me</button></div>

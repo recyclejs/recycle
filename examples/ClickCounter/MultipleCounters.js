@@ -22,7 +22,7 @@ export default function MultipleCounters () {
           })
       ]
     },
-    view: function view (jsx, state, props) {
+    view: function view (jsx, props, state) {
       return (
         <div>
           <div><SingleCounter key='1' /></div>
