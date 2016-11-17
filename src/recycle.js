@@ -108,9 +108,6 @@ export default function ({ adapter }) {
               select: (selector) => {
                 return el.querySelector(selector)
               },
-              selectRef: (selector) => {
-                return findDOMNode(this.refs[selector])
-              },
               props: this.props,
               state: this.state.recycleState,
               prevProps,
@@ -308,7 +305,7 @@ export default function ({ adapter }) {
           }
 
           return domNodes[selector][event].switch().share()
-        },
+        }
       }
     }
   }
@@ -356,7 +353,7 @@ export default function ({ adapter }) {
     createComponent,
     getComponentStructure: () => getComponentStructure(rootComponent),
     getRootComponent: () => rootComponent,
-    getAllComponents: () => getAllComponents(rootComponent),
+    getAllComponents: () => getAllComponents(rootComponent)
   }
 }
 
@@ -394,7 +391,7 @@ export function getComponentStructure (rootComponent) {
     const current = {
       component,
       name: component.getName(),
-      children: [],
+      children: []
     }
     if (parent.children) {
       parent.children.push(current)

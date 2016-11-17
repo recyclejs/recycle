@@ -3,9 +3,8 @@
 /recycle.js
 /adapter
 /middleware
-examples/bundle.js
-examples/bundle.js.map
 _book
+__build__
 
 node_modules
 .DS_Store

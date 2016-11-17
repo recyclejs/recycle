@@ -41,9 +41,9 @@ export default function view (jsx, props, state) {
           <span>{' item' + (active !== 1 ? 's' : '') + ' left'}</span>
         </span>
         <ul className='filters'>
-          <li><a href='/' className={(state.filter === '') ? 'selected' : ''}>All</a></li>
-          <li><a href='/active' className={(state.filter === 'active') ? 'selected' : ''}>Active</a></li>
-          <li><a href='/completed' className={(state.filter === 'completed') ? 'selected' : ''}>Completed</a></li>
+          <li className='all'><a href='#' className={(state.filter === '') ? 'selected' : ''}>All</a></li>
+          <li className='active'><a href='#' className={(state.filter === 'active') ? 'selected' : ''}>Active</a></li>
+          <li className='completed'><a href='#' className={(state.filter === 'completed') ? 'selected' : ''}>Completed</a></li>
         </ul>
         {completed > 0 ? (
           <button className='clear-completed'>Clear completed ({completed}) </button>

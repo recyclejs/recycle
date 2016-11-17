@@ -1,4 +1,4 @@
-import {ENTER_KEY, ESC_KEY} from '../utils'
+import {ENTER_KEY, ESC_KEY} from '../../utils'
 
 export default function actions (sources) {
   const newTodoInput = sources.DOM.select('.new-todo')
@@ -44,6 +44,24 @@ export default function actions (sources) {
 
     clearCompleted
       .events('click')
-      .mapTo({ type: 'deleteCompleted' })
+      .mapTo({ type: 'deleteCompleted' }),
+
+    sources.DOM
+      .select('.filters .all')
+      .events('click')
+      .map(ev => ev.preventDefault())
+      .mapTo({ type: 'filter', payload: '' }),
+
+    sources.DOM
+      .select('.filters .active')
+      .events('click')
+      .map(ev => ev.preventDefault())
+      .mapTo({ type: 'filter', payload: 'active' }),
+
+    sources.DOM
+      .select('.filters .completed')
+      .events('click')
+      .map(ev => ev.preventDefault())
+      .mapTo({ type: 'filter', payload: 'completed' })
   ]
 }

@@ -1,13 +1,16 @@
 var path = require('path')
 
-var BUILD_DIR = path.resolve(__dirname, '')
 var APP_DIR = path.resolve(__dirname, '')
 
 var config = {
-  entry: APP_DIR + '/index.js',
+  entry: {
+    todomvc: APP_DIR + '/TodoMVC/index.js',
+    recyclereact: APP_DIR + '/CombiningWithReact/index.js',
+    clickcounter: APP_DIR + '/ClickCounter/index.js'
+  },
   output: {
-    path: BUILD_DIR,
-    filename: 'bundle.js'
+    path: APP_DIR + '/__build__',
+    filename: '[name].js'
   },
   module: {
     loaders: [

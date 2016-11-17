@@ -1,4 +1,4 @@
-import {ENTER_KEY, ESC_KEY} from '../utils'
+import {ENTER_KEY, ESC_KEY} from '../../utils'
 
 export default function actions (sources, getProp, getState) {
   const toggleCheckbox = sources.DOM.select('.toggle')
