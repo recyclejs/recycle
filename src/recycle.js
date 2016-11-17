@@ -27,14 +27,7 @@ export default function ({ adapter }) {
     const componentSources = {
       DOM: { select: generateDOMSource(domNodes) },
       childrenActions: childrenActions.switch().share(),
-      actions: new Subject(),
-    }
-
-    function getProp (propKey) {
-      if (!props) {
-        return null
-      }
-      return props[propKey]
+      actions: new Subject()
     }
 
     function setConfig (ownProps) {
@@ -61,16 +54,30 @@ export default function ({ adapter }) {
         }
 
         componentDidMount () {
+          const getProp = (propKey) => {
+            if (!this.props) {
+              return null
+            }
+            return this.props[propKey]
+          }
+
+          const getState = (stateKey) => {
+            if (!this.state.recycleState) {
+              return null
+            }
+            return this.state.recycleState[stateKey]
+          }
+
           if (config.actions) {
-            Observable.merge(...forceArray(config.actions(componentSources, getProp)))
+            Observable.merge(...forceArray(config.actions(componentSources, getProp, getState)))
               .filter(action => action)
               .subscribe(componentSources.actions)
           }
 
-          this.stateSubsription = getStateStream().subscribe((newVal) => {
+          this.stateSubsription = getStateStream(getProp).subscribe((newVal) => {
             if (newVal.state) {
               this.setState({
-                recycleState: newVal.state,
+                recycleState: Object.assign({}, newVal.state),
                 lastAction: newVal.action
               })
             }
@@ -90,11 +97,23 @@ export default function ({ adapter }) {
           setConfig(this.props)
         }
 
-        componentDidUpdate () {
+        componentDidUpdate (prevProps, prevState) {
           state = this.state.recycleState
           emit('componentUpdate', [this.state.recycleState, this.state.lastAction, thisComponent])
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
+
+          if (config.componentDidUpdate) {
+            const DOM = {
+              select: (selector) => {
+                return el.querySelector(selector)
+              },
+              selectRef: (selector) => {
+                return findDOMNode(this.refs[selector])
+              }
+            }
+            return config.componentDidUpdate(DOM, this.props, this.state.recycleState, prevProps, prevState.recycleState)
+          }
         }
 
         componentWillUnmount () {
@@ -109,7 +128,7 @@ export default function ({ adapter }) {
         render () {
           timesRendered++
           if (!config.view) return null
-          return config.view(jsxHandler, this.state.recycleState, this.props)
+          return config.view(jsxHandler, this.props, this.state.recycleState)
         }
       }
 
@@ -181,15 +200,15 @@ export default function ({ adapter }) {
       return childrenArr
     }
 
-    function getStateStream () {
+    function getStateStream (getProp) {
       const reducers = [
         componentSources.actions
           .do(a => emit('action', [a, thisComponent]))
-          .filter(() => false),
+          .filter(() => false)
       ]
 
       if (config.reducers) {
-        reducers.push(...forceArray(config.reducers(componentSources)))
+        reducers.push(...forceArray(config.reducers(componentSources, getProp)))
       }
 
       return Observable.merge(...reducers)
@@ -201,7 +220,7 @@ export default function ({ adapter }) {
           {
             state: reducer(last.state, action),
             reducer,
-            action,
+            action
           }
         ))
         .share()
