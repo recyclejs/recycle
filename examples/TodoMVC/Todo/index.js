@@ -2,7 +2,7 @@ import actions from './actions'
 import view, {componentDidUpdate} from './view'
 import reducers from './reducers'
 
-function Todo () {
+export default function Todo () {
   return {
     initialState: {
       editing: false,
@@ -14,5 +14,3 @@ function Todo () {
     componentDidUpdate
   }
 }
-
-export default Todo

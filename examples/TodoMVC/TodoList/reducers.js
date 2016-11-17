@@ -1,42 +1,25 @@
 export default function reducers (sources) {
   return [
-    // if recievied action type is 'editTodo'
-    // apply a editTodo reducer which generates a new state
-    // with new title for a todo (found by id)
     sources.actions
       .filterByType('editTodo')
       .reducer(editTodo),
 
-    // if recievied action type is 'toggleTodo'
-    // apply a toggleTodo reducer which generates a new state
-    // where todo (found by id) has completed = !previousCompleted
     sources.actions
       .filterByType('toggleTodo')
       .reducer(toggleTodo),
 
-    // if recievied action type is 'toggleAll'
-    // apply a reducer which generates a new state
-    // where all todos have the same completed flag
     sources.actions
       .filterByType('toggleAll')
       .reducer(toggleAll),
 
-    // if recievied action type is 'deleteTodo'
-    // apply a reducer which generates a new state
-    // where todo (found by id) is removed from state.list
     sources.actions
       .filterByType('deleteTodo')
       .reducer(deleteTodo),
 
-    // if recievied action type is 'deleteCompleted'
-    // apply a reducer which generates a new state
-    // where all cmopleted todos are removed from state.list
     sources.actions
       .filterByType('deleteCompleted')
       .reducer(deleteCompleted),
 
-    // if recievied action type is 'insertTodo'
-    // apply a insertTodo reducer
     sources.actions
       .filterByType('insertTodo')
       .reducer(insertTodo),

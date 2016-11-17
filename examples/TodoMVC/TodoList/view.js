@@ -1,6 +1,6 @@
 import Todo from '../Todo'
 
-function view (jsx, props, state) {
+export default function view (jsx, props, state) {
   let completed = state.list.filter(todo => todo.completed).length
   let active = state.list.length - completed
 
@@ -52,5 +52,3 @@ function view (jsx, props, state) {
     </div>
   )
 }
-
-export default view

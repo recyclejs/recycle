@@ -1,4 +1,4 @@
-function reducers (sources, getProp) {
+export default function reducers (sources, getProp) {
   return [
     sources.actions
       .filterByType('startEdit')
@@ -29,5 +29,3 @@ function reducers (sources, getProp) {
       })
   ]
 }
-
-export default reducers

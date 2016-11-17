@@ -1,6 +1,6 @@
 import {ENTER_KEY, ESC_KEY} from '../utils'
 
-function actions (sources, getProp, getState) {
+export default function actions (sources, getProp, getState) {
   const toggleCheckbox = sources.DOM.select('.toggle')
   const destroyIcon = sources.DOM.select('.destroy')
   const editInput = sources.DOM.select('.edit')
@@ -43,5 +43,3 @@ function actions (sources, getProp, getState) {
       .map(() => ({ type: 'inputVal', value: getProp('title') }))
   ]
 }
-
-export default actions

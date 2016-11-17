@@ -1,6 +1,6 @@
 import {ENTER_KEY, ESC_KEY} from '../utils'
 
-function actions (sources) {
+export default function actions (sources) {
   const newTodoInput = sources.DOM.select('.new-todo')
   const toggleAll = sources.DOM.select('.toggle-all')
   const clearCompleted = sources.DOM.select('.clear-completed')
@@ -47,5 +47,3 @@ function actions (sources) {
       .mapTo({ type: 'deleteCompleted' })
   ]
 }
-
-export default actions

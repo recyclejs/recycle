@@ -2,7 +2,7 @@ import actions from './actions'
 import view from './view'
 import reducers from './reducers'
 
-function TodoList () {
+export default function TodoList () {
   return {
     initialState: {
       inputVal: '',
@@ -14,5 +14,3 @@ function TodoList () {
     view
   }
 }
-
-export default TodoList
