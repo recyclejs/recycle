@@ -4,11 +4,6 @@ export default ({ initialState }) => (recycle, adapter) => {
   const store = initialState || {}
   const actionRef = () => {}
 
-  recycle.on('componentWillUpdate', component => {
-    const storePath = parsePath(component.get('storePath'))
-    component.set('storePath', storePath)
-  })
-
   recycle.on('componentInit', (component) => {
     const storePath = parsePath(component.get('storePath'))
 
@@ -19,6 +14,11 @@ export default ({ initialState }) => (recycle, adapter) => {
       }
       component.set('initialState', getByPath(storePath, store))
     }
+  })
+
+  recycle.on('componentWillUpdate', component => {
+    const storePath = parsePath(component.get('storePath'))
+    component.set('storePath', storePath)
   })
 
   recycle.on('componentUpdate', (state, action, component) => {
@@ -59,10 +59,9 @@ export default ({ initialState }) => (recycle, adapter) => {
 
 export function getByPath (parts, current) {
   for (let i = 0; i < parts.length; ++i) {
-    if (current[parts[i]] === undefined) {
-      return undefined
+    if (parts[i] !== '') {
+      current = current[parts[i]]
     }
-    current = current[parts[i]]
   }
   return current
 }

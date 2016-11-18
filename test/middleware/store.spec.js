@@ -21,6 +21,7 @@ describe('store.spec.js', function () {
         }
       }
 
+      expect(getByPath([''], source)).to.deep.equal(source)
       expect(getByPath(['prop'], source)).to.equal(1)
       expect(getByPath(['some', 'prop'], source)).to.equal(2)
       expect(getByPath(['some', 'obj', 'with'], source)).to.deep.equal([{ array: true }])
