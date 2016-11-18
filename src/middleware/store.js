@@ -4,9 +4,13 @@ export default ({ initialState }) => (recycle, adapter) => {
   const store = initialState || {}
   const actionRef = () => {}
 
-  recycle.on('componentInit', (component) => {
+  recycle.on('componentWillUpdate', component => {
     const storePath = parsePath(component.get('storePath'))
     component.set('storePath', storePath)
+  })
+
+  recycle.on('componentInit', (component) => {
+    const storePath = parsePath(component.get('storePath'))
 
     if (storePath) {
       if (component.get('initialState')) {

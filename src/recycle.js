@@ -76,8 +76,13 @@ export default function ({ adapter }) {
 
           this.stateSubsription = getStateStream(getProp).subscribe((newVal) => {
             if (newVal.state) {
+              let newState = {...newVal.state}
+              if (Array.isArray(newVal.state)) {
+                newState = [...newVal.state]
+              }
+
               this.setState({
-                recycleState: Object.assign({}, newVal.state),
+                recycleState: newState,
                 lastAction: newVal.action
               })
             }
@@ -99,6 +104,7 @@ export default function ({ adapter }) {
 
         componentWillUpdate () {
           setConfig(this.props)
+          emit('componentWillUpdate', thisComponent)
         }
 
         componentDidUpdate (prevProps, prevState) {
