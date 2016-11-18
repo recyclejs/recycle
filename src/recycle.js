@@ -47,6 +47,9 @@ export default function ({ adapter }) {
       class ReactClass extends BaseComponent {
         constructor (ownProps) {
           super(ownProps)
+          if (config.initialState && typeof config.initialState !== 'object') {
+            throw new Error('Component state must be an object or an array')
+          }
           this.state = {
             recycleState: config.initialState
           }
@@ -76,6 +79,9 @@ export default function ({ adapter }) {
 
           this.stateSubsription = getStateStream(getProp).subscribe((newVal) => {
             if (newVal.state) {
+              if (newVal.state && typeof newVal.state !== 'object') {
+                throw new Error('Component state must be an object or an array')
+              }
               let newState = {...newVal.state}
               if (Array.isArray(newVal.state)) {
                 newState = [...newVal.state]
@@ -102,7 +108,7 @@ export default function ({ adapter }) {
           return true
         }
 
-        componentWillUpdate () {
+        componentWillUpdate (nextProps, nextState) {
           setConfig(this.props)
           emit('componentWillUpdate', thisComponent)
         }
