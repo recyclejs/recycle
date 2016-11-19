@@ -100,6 +100,9 @@ export default function ({ adapter }) {
 
           updateChildrenActions()
 
+          const el = findDOMNode(this)
+          updateDomStreams(domNodes, el)
+
           if (config.componentDidMount) {
             return config.componentDidMount()
           }
