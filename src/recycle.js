@@ -15,28 +15,23 @@ export default function ({ adapter }) {
     const domNodes = {}
     const children = new Map()
     const childrenActions = new Subject()
-    const outsideActions = new Subject()
+    const injectedState = new Subject()
     let ReactComponent
     let componentName
     let timesRendered = 0
     let state = null
     let config
 
-    setConfig(props)
+    config = constructor(props)
+    if (typeof config === 'function') {
+      config = { view: config }
+    }
+    componentName = config.displayName || constructor.name
 
     const componentSources = {
       DOM: { select: generateDOMSource(domNodes) },
       childrenActions: childrenActions.switch().share(),
       actions: new Subject()
-    }
-
-    function setConfig (ownProps) {
-      config = constructor(ownProps)
-      if (typeof config === 'function') {
-        config = { view: config }
-      }
-      props = ownProps
-      componentName = config.displayName || constructor.name
     }
 
     function getReactComponent () {
