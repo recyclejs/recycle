@@ -6,7 +6,7 @@ export default function SingleCounter () {
       timesClicked: 0
     },
 
-    actions: function (sources) {
+    actions (sources) {
       const button = sources.DOM.select('button')
 
       return [
@@ -15,7 +15,7 @@ export default function SingleCounter () {
       ]
     },
 
-    reducers: function (sources) {
+    reducers (sources) {
       return [
         sources.actions
           .filterByType('buttonClicked')
@@ -26,7 +26,7 @@ export default function SingleCounter () {
       ]
     },
 
-    view: function (jsx, props, state) {
+    view (jsx, props, state) {
       return (
         <div>
           <span>Times clicked: {state.timesClicked}</span>

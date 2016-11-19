@@ -6,7 +6,7 @@ export default function SingleCounterWithReact () {
       timesClicked: 0
     },
 
-    actions: function (sources) {
+    actions (sources) {
       const button = sources.DOM.select('button')
 
       return [
@@ -15,7 +15,7 @@ export default function SingleCounterWithReact () {
       ]
     },
 
-    reducers: function (sources) {
+    reducers (sources) {
       return [
         sources.actions
           .filterByType('buttonClicked')
@@ -26,7 +26,7 @@ export default function SingleCounterWithReact () {
       ]
     },
 
-    view: function (jsx, props, state) {
+    view (jsx, props, state) {
       return (
         <div>
           <div>Times clicked on Recycle component: {state.timesClicked} <button>Click me</button></div>

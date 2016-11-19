@@ -1,4 +1,4 @@
-import {ENTER_KEY, ESC_KEY} from '../../utils'
+import { ENTER_KEY, ESC_KEY } from '../../utils'
 
 export default function actions (sources) {
   const newTodoInput = sources.DOM.select('.new-todo')

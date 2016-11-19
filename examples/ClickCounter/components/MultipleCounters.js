@@ -5,14 +5,16 @@ export default function MultipleCounters () {
     initialState: {
       childButtonClicked: 0
     },
-    actions: function actions (sources) {
+
+    actions (sources) {
       return [
         sources.childrenActions
           .filterByType('buttonClicked')
           .mapTo({ type: 'childButtonClicked' })
       ]
     },
-    reducers: function reducers (sources) {
+
+    reducers (sources) {
       return [
         sources.actions
           .filterByType('childButtonClicked')
@@ -22,7 +24,8 @@ export default function MultipleCounters () {
           })
       ]
     },
-    view: function view (jsx, props, state) {
+
+    view (jsx, props, state) {
       return (
         <div>
           <div><SingleCounter key='1' /></div>

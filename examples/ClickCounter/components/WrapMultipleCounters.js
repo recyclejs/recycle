@@ -5,14 +5,16 @@ export default function WrapMultipleCounters () {
     initialState: {
       multiplechildButtonClicked: 0
     },
-    actions: function (sources) {
+
+    actions (sources) {
       return [
         sources.childrenActions
           .filterByType('childButtonClicked')
           .mapTo({ type: 'multipleChildButtonClicked' })
       ]
     },
-    reducers: function (sources) {
+
+    reducers (sources) {
       return [
         sources.actions
           .filterByType('multipleChildButtonClicked')
@@ -22,7 +24,8 @@ export default function WrapMultipleCounters () {
           })
       ]
     },
-    view: function (jsx, props, state) {
+
+    view (jsx, props, state) {
       return (
         <div>
           <ul>
