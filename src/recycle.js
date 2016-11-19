@@ -72,21 +72,30 @@ export default function ({ adapter }) {
               .subscribe(componentSources.actions)
           }
 
-          this.stateSubsription = getStateStream(getProp).subscribe((newVal) => {
-            if (newVal.state) {
-              if (newVal.state && typeof newVal.state !== 'object') {
-                throw new Error('Component state must be an object or an array')
-              }
-              let newState = {...newVal.state}
-              if (Array.isArray(newVal.state)) {
-                newState = [...newVal.state]
-              }
+          this.stateSubsription = getStateStream(getProp).merge(injectedState).subscribe((newVal) => {
+            const newState = newVal.state
+            const newAction = newVal.action
 
-              this.setState({
-                recycleState: newState,
-                lastAction: newVal.action
-              })
+            if (newState === false) {
+              emit('componentStateFalse', thisComponent)
+              return
             }
+            if (typeof newState !== 'object' || Array.isArray(newState)) {
+              let lastActionErr = ''
+              if (typeof newAction === 'object') {
+                lastActionErr = ` Last recieved action: '${JSON.stringify(newAction.type)}'.`
+              }
+              let componentNameErr = ''
+              if (componentName) {
+                componentNameErr = ` Check reducers of ${componentName} component.`
+              }
+              const stateStr = JSON.stringify(newState)
+              throw new Error(`Component state must be an object or false, recieved ${stateStr}.${componentNameErr}${lastActionErr}`)
+            }
+
+            this.setState({
+              recycleState: {...newState}
+            })
           })
 
           updateChildrenActions()
@@ -228,17 +237,18 @@ export default function ({ adapter }) {
       }
 
       return Observable.merge(...reducers)
-        .merge(outsideActions.switch())
         .startWith({
           state: config.initialState
         })
-        .scan((last, { reducer, action }) => (
-          {
-            state: reducer(last.state, action),
+        .scan((last, { reducer, action }) => {
+          const newState = reducer(last.state, action)
+          emit('newState', [thisComponent, newState])
+          return {
+            state: newState,
             reducer,
             action
           }
-        ))
+        })
         .share()
     }
 
@@ -253,10 +263,9 @@ export default function ({ adapter }) {
     }
 
     function setState (newState, action) {
-      outsideActions.next(
-        Observable.of(action)
-          .reducer(() => newState)
-      )
+      injectedState.next({
+        state: newState
+      })
     }
 
     function get (prop) {
