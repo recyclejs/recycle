@@ -4,6 +4,7 @@ import { expect } from 'chai'
 import {
   getByPath,
   setByPath,
+  deleteByPath,
   shouldUpdate,
   parsePath
 } from '../../src/middleware/store'
@@ -27,6 +28,26 @@ describe('store.spec.js', function () {
       expect(getByPath(['some', 'obj', 'with'], source)).to.deep.equal([{ array: true }])
       expect(getByPath(['some', 'obj', 'with', 0], source)).to.deep.equal({ array: true })
       expect(getByPath(['some', 'obj', 'with', 0, 'array'], source)).to.equal(true)
+    })
+  })
+
+  describe('deleteByPath', () => {
+    it('should delete property by path', function () {
+      const source = {
+        prop: 1,
+        some: {
+          prop: 2,
+          obj: {
+            with: [{ first: true }, { second: true }]
+          }
+        }
+      }
+      deleteByPath(['some', 'obj', 'with'], source)
+      expect(source).to.deep.equal({ prop: 1, some: { prop: 2, obj: { } } })
+      deleteByPath(['some', 'obj'], source)
+      expect(source).to.deep.equal({ prop: 1, some: { prop: 2 } })
+      deleteByPath(['some'], source)
+      expect(source).to.deep.equal({ prop: 1 })
     })
   })
 
