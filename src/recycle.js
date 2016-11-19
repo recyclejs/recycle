@@ -104,13 +104,13 @@ export default function ({ adapter }) {
         }
 
         componentWillUpdate (nextProps, nextState) {
-          setConfig(this.props)
-          emit('componentWillUpdate', thisComponent)
+          props = this.props
+          emit('componentWillUpdate', [thisComponent, nextProps, nextState.recycleState])
         }
 
         componentDidUpdate (prevProps, prevState) {
           state = this.state.recycleState
-          emit('componentUpdate', [this.state.recycleState, this.state.lastAction, thisComponent])
+          emit('componentUpdate', thisComponent)
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
 
