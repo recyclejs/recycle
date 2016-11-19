@@ -306,6 +306,7 @@ export default function ({ adapter }) {
       getName: () => componentName,
       getKey: () => key,
       getState: () => state,
+      getProps: () => props,
       getConstructor: () => constructor
     }
 
