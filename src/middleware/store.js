@@ -23,31 +23,19 @@ export default ({ initialState }) => (recycle, adapter) => {
   recycle.on('newState', (component, state) => {
     const storePath = component.get('storePath')
     if (storePath) {
-      setByPath(storePath, state, store)
+      if (state === false) {
+        deleteByPath(component.get('storePath'), store)
+      } else {
+        setByPath(storePath, state, store)
+      }
       storeVer++
       component.set('storeVer', storeVer)
+      updateComponents(storePath)
     }
   })
 
-  recycle.on('componentUpdate', component => {
-    const storePath = component.get('storePath')
-    if (storePath) {
-      updateComponents(component, storePath)
-    }
-  })
-
-  recycle.on('componentStateFalse', component => {
-    const storePath = component.get('storePath')
-    if (storePath) {
-      deleteByPath(component.get('storePath'), store)
-      storeVer++
-      updateComponents(component, storePath)
-    }
-  })
-
-  function updateComponents (refComponent, storePath) {
+  function updateComponents (storePath) {
     recycle.getAllComponents()
-      .filter(c => c !== refComponent)
       .filter(c => c.get('storeVer') !== storeVer)
       .filter(c => shouldUpdate(storePath, c.get('storePath')))
       .map(c => {

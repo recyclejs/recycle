@@ -76,10 +76,6 @@ export default function ({ adapter }) {
             const newState = newVal.state
             const newAction = newVal.action
 
-            if (newState === false) {
-              emit('componentStateFalse', thisComponent)
-              return
-            }
             if (typeof newState !== 'object' || Array.isArray(newState)) {
               let lastActionErr = ''
               if (typeof newAction === 'object') {
@@ -244,8 +240,11 @@ export default function ({ adapter }) {
           state: config.initialState
         })
         .scan((last, { reducer, action }) => {
-          const newState = reducer(last.state, action)
-          emit('newState', [thisComponent, newState])
+          let newState = reducer({...last.state}, action)
+          emit('newState', [thisComponent, newState, action])
+          if (newState === false) {
+            newState = last.state
+          }
           return {
             state: newState,
             reducer,
