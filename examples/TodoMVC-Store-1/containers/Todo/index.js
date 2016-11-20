@@ -1,19 +1,19 @@
-import { destroy, setTitle, toggleTodo } from './reducers'
+import { deleteTodo, editTodo, toggleTodo } from './reducers'
 import Todo from '../../components/Todo/index'
 
 export default function TodoContainer (props) {
   return {
-    storePath: `todos.list[${props.id}]`,
+    storePath: `todos`,
 
     reducers (sources) {
       return [
         sources.childrenActions
           .filterByType('destroy')
-          .reducer(destroy),
+          .reducer(deleteTodo),
 
         sources.childrenActions
           .filterByType('titleChanged')
-          .reducer(setTitle),
+          .reducer(editTodo),
 
         sources.childrenActions
           .filterByType('toggle')
@@ -22,7 +22,11 @@ export default function TodoContainer (props) {
     },
 
     view (jsx, props, state) {
-      return <Todo title={state.title} completed={state.completed} />
+      const todo = state.list.find(todo => todo.id === props.id)
+      if (!todo) {
+        return null
+      }
+      return <Todo title={todo.title} id={todo.id} completed={todo.completed} />
     }
   }
 }

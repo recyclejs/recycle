@@ -1,8 +1,8 @@
-export function destroy (state) {
+export function deleteTodo (state) {
   return false
 }
 
-export function setTitle (state, action) {
+export function editTodo (state, action) {
   state.title = action.payload
   return state
 }

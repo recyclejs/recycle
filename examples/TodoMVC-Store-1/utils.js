@@ -14,15 +14,15 @@ export function arrToObj (arr, key = 'id') {
 }
 
 export function updateLocalStorage (store) {
-  localStorage.setItem('todos-recycle', JSON.stringify(store.todos.list))
+  localStorage.setItem('todos-recycle-1', JSON.stringify(store.todos.list))
 }
 
 export function getFromLocalStorage () {
-  let saved = localStorage.getItem('todos-recycle')
+  let saved = localStorage.getItem('todos-recycle-1')
   try {
-    saved = JSON.parse(saved) || {}
+    saved = JSON.parse(saved) || []
   } catch (e) {
-    saved = {}
+    saved = []
     console.error(e)
   }
   return saved

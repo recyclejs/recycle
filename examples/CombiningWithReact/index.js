@@ -1,7 +1,6 @@
 import createRecycle from '../../src/index'
-import reactRxjs from '../../src/adapter/react-rxjs'
+import adapter from '../../src/adapter/react-rxjs'
 import CounterWithReact from './components/CounterWithReact'
 
-const recycle = createRecycle({ adapter: reactRxjs })
-
+const recycle = createRecycle({ adapter })
 recycle.render(CounterWithReact, document.getElementById('app'))
