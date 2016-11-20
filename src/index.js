@@ -10,13 +10,13 @@ export default (config) => {
     adapter: config.adapter
   })
 
-  const middlewares = {}
-  recycle.getMiddleware = name => middlewares[name]
+  const plugins = {}
+  recycle.getPlugin = name => plugins[name]
 
-  if (config.middleware) {
-    config.middleware.map((m) => {
+  if (config.plugins) {
+    config.plugins.map((m) => {
       const instance = m(recycle, adapter)
-      middlewares[instance.name] = instance
+      plugins[instance.name] = instance
       return false
     })
   }

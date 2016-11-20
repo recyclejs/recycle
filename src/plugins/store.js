@@ -1,6 +1,6 @@
 import objectpath from 'objectpath'
 
-export default ({ initialState }) => (recycle, adapter) => {
+export default ({ initialState, onUpdate }) => (recycle, adapter) => {
   const store = initialState || {}
   let storeVer = 0
 
@@ -32,6 +32,9 @@ export default ({ initialState }) => (recycle, adapter) => {
         setByPath(storePath, state, store)
         storeVer++
         component.set('storeVer', storeVer)
+      }
+      if (onUpdate) {
+        onUpdate(store)
       }
     }
   })
