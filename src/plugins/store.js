@@ -56,23 +56,6 @@ export default ({ initialState, onUpdate }) => (recycle, adapter) => {
       })
   }
 
-  /*
-  concept for a remote state
-
-  recycle.on('componentInit', (component) => {
-    const remoteResponse = new adapter.Subject()
-    component.setSource('remoteResponse', remoteResponse)
-  })
-
-  recycle.on('action', (action, component) => {
-    if (action.something === 'should send to remote') {
-      getStoreFromRemote(action, component.get('storePath'), function done(remoteState) {
-        component.getSource('remoteResponse').next(remoteState)
-      })
-    }
-  })
-  */
-
   return {
     name: 'store'
   }

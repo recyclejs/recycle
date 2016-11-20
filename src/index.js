@@ -16,7 +16,8 @@ export default (config) => {
   if (config.plugins) {
     config.plugins.map((m) => {
       const instance = m(recycle, adapter)
-      plugins[instance.name] = instance
+      const name = (instance && instance.name) ? instance.name : 'plugin-' + Math.random()
+      plugins[name] = instance
       return false
     })
   }
