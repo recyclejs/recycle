@@ -21,40 +21,25 @@ export default (config) => {
     })
   }
 
-  function createRootComponent (constructor) {
-    return recycle.createComponent(constructor)
-  }
-
   function render (constructor, props, target) {
     if (!target) {
       target = props
       props = null
     }
-    const reactRootComponent = createRootComponent(constructor).getReactComponent()
-    return adapter.render(adapter.createElement(reactRootComponent, props), target)
+    return adapter.render(adapter.createElement(toReact(constructor), props), target)
   }
 
   function toReact (constructor) {
-    return class extends adapter.BaseComponent {
-      render () {
-        if (!recycle.getRootComponent()) {
-          const reactRootComponent = createRootComponent(constructor).getReactComponent()
-          return adapter.createElement(reactRootComponent, this.props)
-        }
-        const recycleComponent = recycle.getRootComponent().getByConstructor(constructor)
-        recycle.getRootComponent().removeChild(recycleComponent)
-
-        const jsx = recycle.getRootComponent().jsxHandler
-        return jsx(constructor, ...this.props)
-      }
+    if (recycle.getRootComponent()) {
+      throw new Error('Root component already exists. toReact can be used once per recyle instance.')
     }
+    return recycle.createComponent(constructor).getReactComponent()
   }
 
   return {
     getComponentStructure: recycle.getComponentStructure,
     getAllComponents: recycle.getAllComponents,
     toReact,
-    render,
-    createRootComponent
+    render
   }
 }
