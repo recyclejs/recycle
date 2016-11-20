@@ -21,8 +21,8 @@ export default function view (jsx, props, state) {
         <ul className='todo-list'>
           {
             state.list
-              .filter(todoProps => !(state.filter === 'active' && todoProps.completed))
-              .filter(todoProps => !(state.filter === 'completed' && !todoProps.completed))
+              .filter(todoProps => !(props.route.filter === 'active' && todoProps.completed))
+              .filter(todoProps => !(props.route.filter === 'completed' && !todoProps.completed))
               .map(props => (
                 <Todo
                   id={props.id}
@@ -41,9 +41,9 @@ export default function view (jsx, props, state) {
           <span>{' item' + (active !== 1 ? 's' : '') + ' left'}</span>
         </span>
         <ul className='filters'>
-          <li className='all'><a href='#' className={(state.filter === '') ? 'selected' : ''}>All</a></li>
-          <li className='active'><a href='#' className={(state.filter === 'active') ? 'selected' : ''}>Active</a></li>
-          <li className='completed'><a href='#' className={(state.filter === 'completed') ? 'selected' : ''}>Completed</a></li>
+          <li><a href='#/' className={(props.route.filter === '') ? 'selected' : ''}>All</a></li>
+          <li><a href='#/active' className={(props.route.filter === 'active') ? 'selected' : ''}>Active</a></li>
+          <li><a href='#/completed' className={(props.route.filter === 'completed') ? 'selected' : ''}>Completed</a></li>
         </ul>
         {completed > 0 ? (
           <button className='clear-completed'>Clear completed ({completed}) </button>

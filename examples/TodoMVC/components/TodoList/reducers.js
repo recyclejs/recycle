@@ -26,11 +26,7 @@ export default function reducers (sources) {
 
     sources.actions
       .filterByType('inputVal')
-      .reducer(inputVal),
-
-    sources.actions
-      .filterByType('filter')
-      .reducer(filter)
+      .reducer(inputVal)
   ]
 }
 
@@ -92,12 +88,6 @@ export function deleteCompleted (state, action) {
 
 export function inputVal (state, action) {
   state.inputVal = action.payload
-
-  return state
-}
-
-export function filter (state, action) {
-  state.filter = action.payload
 
   return state
 }

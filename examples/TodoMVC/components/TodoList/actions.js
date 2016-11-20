@@ -44,24 +44,6 @@ export default function actions (sources) {
 
     clearCompleted
       .events('click')
-      .mapTo({ type: 'deleteCompleted' }),
-
-    sources.DOM
-      .select('.filters .all')
-      .events('click')
-      .map(ev => ev.preventDefault())
-      .mapTo({ type: 'filter', payload: '' }),
-
-    sources.DOM
-      .select('.filters .active')
-      .events('click')
-      .map(ev => ev.preventDefault())
-      .mapTo({ type: 'filter', payload: 'active' }),
-
-    sources.DOM
-      .select('.filters .completed')
-      .events('click')
-      .map(ev => ev.preventDefault())
-      .mapTo({ type: 'filter', payload: 'completed' })
+      .mapTo({ type: 'deleteCompleted' })
   ]
 }
