@@ -25,11 +25,20 @@ export default ({ initialState }) => (recycle, adapter) => {
     if (storePath) {
       if (state === false) {
         deleteByPath(component.get('storePath'), store)
+        storeVer++
+        component.set('storeVer', storeVer)
+        updateComponents(storePath)
       } else {
         setByPath(storePath, state, store)
+        storeVer++
+        component.set('storeVer', storeVer)
       }
-      storeVer++
-      component.set('storeVer', storeVer)
+    }
+  })
+
+  recycle.on('componentUpdate', component => {
+    const storePath = component.get('storePath')
+    if (storePath) {
       updateComponents(storePath)
     }
   })
