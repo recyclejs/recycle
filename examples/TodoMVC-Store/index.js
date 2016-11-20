@@ -1,22 +1,24 @@
 import 'todomvc-common/base.css'
 import 'todomvc-app-css/index.css'
 import createRecycle from '../../src/index'
-import reactRxjs, { ReactDOM, jsx } from '../../src/adapter/react-rxjs'
-import createStore from '../../src/middleware/store'
-import TodoList from './containers/TodoList/index'
+import adapter, { ReactDOM, jsx } from '../../src/adapter/react-rxjs'
+import createStore from '../../src/plugins/store'
 import { Router, Route, hashHistory } from 'react-router'
-
-const store = createStore({
-  initialState: {
-    todos: {
-      list: {}
-    }
-  }
-})
+import TodoList from './containers/TodoList/index'
+import { updateLocalStorage, getFromLocalStorage } from './utils'
 
 const recycle = createRecycle({
-  adapter: reactRxjs,
-  middleware: [store]
+  adapter,
+  plugins: [
+    createStore({
+      initialState: {
+        todos: {
+          list: getFromLocalStorage()
+        }
+      },
+      onUpdate: updateLocalStorage
+    })
+  ]
 })
 
 const TodoListReact = recycle.toReact(TodoList)
