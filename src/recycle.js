@@ -236,14 +236,11 @@ export default function ({ adapter }) {
       }
 
       return Observable.merge(...reducers)
-        .startWith({
-          state: config.initialState
-        })
-        .scan((last, { reducer, action }) => {
-          let newState = reducer({...last.state}, action)
+        .map(({ reducer, action }) => {
+          let newState = reducer({...state}, action)
           emit('newState', [thisComponent, newState, action])
           if (newState === false) {
-            newState = last.state
+            newState = {...state}
           }
           return {
             state: newState,
