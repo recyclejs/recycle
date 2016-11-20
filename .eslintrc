@@ -1,7 +1,11 @@
 {
   "extends": ["standard", "standard-react"],
+  "settings": {
+    "react": {
+      "pragma": "jsx" 
+    }
+  },
   "rules": {
-    "react/react-in-jsx-scope": 0,
     "react/prop-types": 0
   }
 }
