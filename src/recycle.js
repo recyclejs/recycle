@@ -43,7 +43,7 @@ export default function ({ adapter }) {
         constructor (ownProps) {
           super(ownProps)
           if (config.initialState && typeof config.initialState !== 'object') {
-            throw new Error('Component state must be an object or an array')
+            throw new Error('Component state must be an object')
           }
           this.state = {
             recycleState: config.initialState
