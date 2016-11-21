@@ -1,7 +1,5 @@
-/* global describe before after it document */
+/* global expect describe it document */
 
-import { assert } from 'chai'
-import jsdomify from 'jsdomify'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import reactAdapter from '../src/adapter/react-rxjs'
@@ -28,11 +26,9 @@ describe('recycle.spec.js', function () {
 
       registerComponent(component1, savedChildren)
 
-      assert(savedChildren.get(constructor1).key1 !== false, 'component should have key')
-      assert.throws(
-        () => registerComponent(component2, savedChildren),
-        'Could not register recycle component \'constructor1\'. Key \'key1\' is already in use.'
-      )
+      expect(savedChildren.get(constructor1).key1).not.toBe(false)
+      expect(() => registerComponent(component2, savedChildren))
+        .toThrow('Could not register recycle component \'constructor1\'. Key \'key1\' is already in use.')
     })
   })
 
@@ -44,19 +40,11 @@ describe('recycle.spec.js', function () {
         }
       })
 
-      assert(isReactComponent(reactComponent), 'not recognized as react component')
+      expect(isReactComponent(reactComponent)).toBe(true)
     })
   })
 
   describe('createReactElement', () => {
-    before(function () {
-      jsdomify.create()
-    })
-
-    after(function () {
-      jsdomify.destroy()
-    })
-
     it('should pass jsx as property in react render method', function (done) {
       const reactComponent = React.createClass({
         render (jsx) {
@@ -83,9 +71,9 @@ describe('recycle.spec.js', function () {
   describe('forceArray', () => {
     it('should always return an array', () => {
       const a = [1, 2, 3]
-      assert(forceArray(a) === a, 'arrays not equal')
+      expect(forceArray(a)).toBe(a)
       const b = 'notarr'
-      assert.deepEqual(forceArray(b), [b])
+      expect(forceArray(b)).toEqual([b])
     })
   })
 
@@ -94,8 +82,8 @@ describe('recycle.spec.js', function () {
 
     it('should add reducer and filterByType filters', () => {
       applyRecycleObservable(Observable)
-      assert(typeof Observable.prototype.reducer === 'function', 'Observable.reducer not a function')
-      assert(typeof Observable.prototype.filterByType === 'function', 'Observable.filterByType not a function')
+      expect(typeof Observable.prototype.reducer).toBe('function')
+      expect(typeof Observable.prototype.filterByType).toBe('function')
     })
   })
 
@@ -105,8 +93,8 @@ describe('recycle.spec.js', function () {
       const rootComponent = recycle.createComponent(() => ({}))
       const tree = getComponentStructure(rootComponent)
 
-      assert(typeof tree.component === 'object', 'tree.component not an object')
-      assert(Array.isArray(tree.children), 'tree.children not an array')
+      expect(typeof tree.component).toBe('object')
+      expect(Array.isArray(tree.children)).toBe(true)
     })
   })
 
@@ -117,8 +105,8 @@ describe('recycle.spec.js', function () {
       const rootComponent = recycle.createComponent(constructor)
       const components = getAllComponents(rootComponent)
 
-      assert(Array.isArray(components), 'returned components not an array')
-      assert(components[0].getConstructor() === constructor, 'constructors doesnt match')
+      expect(Array.isArray(components)).toBe(true)
+      expect(components[0].getConstructor()).toBe(constructor)
     })
   })
 })

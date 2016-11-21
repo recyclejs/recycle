@@ -1,24 +1,12 @@
-/* global describe before after it document */
-import {expect} from 'chai'
-import jsdomify from 'jsdomify'
+/* global describe expect it document */
 import createRecycle from '../../../src/index'
-import reactAdapter from '../../../src/adapter/react-rxjs'
-import SingleCounter from '../../../examples/ClickCounter/SingleCounter'
+import adapter from '../../../src/adapter/react-rxjs'
+import SingleCounter from '../../../examples/ClickCounter/components/SingleCounter'
 
 describe('SingleCounter example', function () {
-  before(function () {
-    jsdomify.create()
-  })
-
-  after(function () {
-    jsdomify.destroy()
-  })
-
   it('should change state on button click', function () {
     let el = document.createElement('div')
-    let recycle = createRecycle({
-      adapter: reactAdapter
-    })
+    let recycle = createRecycle({ adapter })
 
     recycle.render(SingleCounter, el)
 
@@ -30,6 +18,6 @@ describe('SingleCounter example', function () {
     buttonEl.dispatchEvent(evt)
 
     let structure = recycle.getComponentStructure()
-    expect(structure.children[0].component.getState().timesClicked).to.equal(2)
+    expect(structure.component.getState().timesClicked).toBe(2)
   })
 })

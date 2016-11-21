@@ -12,7 +12,7 @@ export default function actions (sources, getProp, getState) {
       .map(() => ({ type: 'destroy', id: getProp('id') })),
 
     toggleCheckbox
-      .events('click')
+      .events('change')
       .map(() => ({ type: 'toggle', id: getProp('id') })),
 
     editInput

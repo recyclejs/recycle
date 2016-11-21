@@ -1,24 +1,12 @@
-/* global describe before after it document */
-import {expect} from 'chai'
-import jsdomify from 'jsdomify'
+/* global describe expect it document */
 import createRecycle from '../../../src/index'
-import reactAdapter from '../../../src/adapter/react-rxjs'
-import CounterWithReact from '../../../examples/CombiningWithReact/CounterWithReact'
+import adapter from '../../../src/adapter/react-rxjs'
+import CounterWithReact from '../../../examples/CombiningWithReact/components/CounterWithReact'
 
 describe('CounterWithReact example', function () {
-  before(function () {
-    jsdomify.create()
-  })
-
-  after(function () {
-    jsdomify.destroy()
-  })
-
   it('should change state on button click', function () {
     let el = document.createElement('div')
-    let recycle = createRecycle({
-      adapter: reactAdapter
-    })
+    let recycle = createRecycle({ adapter })
     var renderedComponent = recycle.render(CounterWithReact, el)
 
     let buttonEl = el.querySelector('button')
@@ -28,6 +16,6 @@ describe('CounterWithReact example', function () {
     buttonEl.dispatchEvent(evt)
     buttonEl.dispatchEvent(evt)
 
-    expect(renderedComponent.state.recycleState.timesClicked).to.equal(2)
+    expect(renderedComponent.state.recycleState.timesClicked).toBe(2)
   })
 })

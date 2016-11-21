@@ -1,24 +1,12 @@
-/* global describe before after it document */
-import {expect} from 'chai'
-import jsdomify from 'jsdomify'
+/* global describe expect it document */
 import createRecycle from '../../../src/index'
-import reactAdapter from '../../../src/adapter/react-rxjs'
-import WrapMultipleCounters from '../../../examples/ClickCounter/WrapMultipleCounters'
+import adapter from '../../../src/adapter/react-rxjs'
+import WrapMultipleCounters from '../../../examples/ClickCounter/components/WrapMultipleCounters'
 
 describe('WrapMultipleCounters example', function () {
-  before(function () {
-    jsdomify.create()
-  })
-
-  after(function () {
-    jsdomify.destroy()
-  })
-
   it('should change state on button click', function () {
     let el = document.createElement('div')
-    let recycle = createRecycle({
-      adapter: reactAdapter
-    })
+    let recycle = createRecycle({ adapter })
     var renderedComponent = recycle.render(WrapMultipleCounters, el)
 
     let buttonEl = el.querySelector('button')
@@ -28,6 +16,6 @@ describe('WrapMultipleCounters example', function () {
     buttonEl.dispatchEvent(evt)
     buttonEl.dispatchEvent(evt)
 
-    expect(renderedComponent.state.recycleState.multiplechildButtonClicked).to.equal(2)
+    expect(renderedComponent.state.recycleState.multiplechildButtonClicked).toBe(2)
   })
 })
