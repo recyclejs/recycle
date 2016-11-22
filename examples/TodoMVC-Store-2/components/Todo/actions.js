@@ -1,6 +1,7 @@
 import {ENTER_KEY, ESC_KEY} from '../../utils'
+import 'rxjs/add/operator/withLatestFrom'
 
-export default function actions (sources, getProp, getState) {
+export default function actions (sources) {
   const toggleCheckbox = sources.DOM.select('.toggle')
   const destroyIcon = sources.DOM.select('.destroy')
   const editInput = sources.DOM.select('.edit')
@@ -19,7 +20,8 @@ export default function actions (sources, getProp, getState) {
       .events('keyup')
       .filter(ev => ev.keyCode === ENTER_KEY)
       .merge(editInput.events('blur', true))
-      .map(() => ({ type: 'titleChanged', payload: getState('inputVal') })),
+      .latestFrom(sources.state)
+      .map(state => ({ type: 'titleChanged', payload: state.inputVal })),
 
     todoLabel
       .events('dblclick')
@@ -27,7 +29,7 @@ export default function actions (sources, getProp, getState) {
 
     editInput
       .events('input')
-      .map(ev => ({ type: 'inputVal', value: ev.target.value })),
+      .map(e => ({ type: 'inputVal', value: e.target.value })),
 
     editInput
       .events('keyup')
@@ -36,10 +38,12 @@ export default function actions (sources, getProp, getState) {
 
     sources.actions
       .filterByType('cancelEdit')
-      .mapTo({ type: 'inputVal', value: getProp('title') }),
+      .latestFrom(sources.props)
+      .map(props => ({ type: 'inputVal', value: props.title })),
 
     sources.actions
       .filterByType('startEdit')
-      .mapTo({ type: 'inputVal', value: getProp('title') })
+      .latestFrom(sources.props)
+      .map(props => ({ type: 'inputVal', value: props.title }))
   ]
 }

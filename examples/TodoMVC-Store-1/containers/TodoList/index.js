@@ -1,5 +1,4 @@
 import { toggleAll, deleteCompleted, insertTodo } from './reducers'
-import { objToArr } from '../../utils'
 import TodoList from '../../components/TodoList/index'
 
 export default function TodoListContainer () {

@@ -3,7 +3,7 @@ import Todo from '../../components/Todo/index'
 
 export default function TodoContainer (props) {
   return {
-    storePath: `todos.list[${props.id}]`,
+    storePath: `todos.list.${props.id}`,
 
     reducers (sources) {
       return [

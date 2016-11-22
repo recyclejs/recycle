@@ -1,6 +1,6 @@
 import {ENTER_KEY, ESC_KEY} from '../../utils'
 
-export default function actions (sources, getProp, getState) {
+export default function actions (sources) {
   const toggleCheckbox = sources.DOM.select('.toggle')
   const destroyIcon = sources.DOM.select('.destroy')
   const editInput = sources.DOM.select('.edit')
@@ -9,21 +9,23 @@ export default function actions (sources, getProp, getState) {
   return [
     destroyIcon
       .events('click')
-      .map(() => ({ type: 'destroy', id: getProp('id') })),
+      .latestFrom(sources.props)
+      .map(props => ({ type: 'destroy', id: props.id })),
 
     toggleCheckbox
       .events('change')
-      .map(() => ({ type: 'toggle', id: getProp('id') })),
+      .latestFrom(sources.props)
+      .map(props => ({ type: 'toggle', id: props.id })),
 
     editInput
       .events('keyup')
       .filter(ev => ev.keyCode === ENTER_KEY)
-      .merge(editInput.events('blur', true))
-      .map(() => ({ type: 'titleChanged', id: getProp('id'), title: getState('inputVal') })),
+      .latestFrom(sources.props, sources.state)
+      .map(({props, state}) => ({ type: 'titleChanged', id: props.id, title: state.inputVal })),
 
     todoLabel
       .events('dblclick')
-      .map(() => ({ type: 'startEdit', id: getProp('id') })),
+      .map(props => ({ type: 'startEdit', id: props.id })),
 
     editInput
       .events('input')
@@ -36,10 +38,12 @@ export default function actions (sources, getProp, getState) {
 
     sources.actions
       .filterByType('cancelEdit')
-      .map(() => ({ type: 'inputVal', value: getProp('title') })),
+      .latestFrom(sources.props)
+      .map(props => ({ type: 'inputVal', value: props.title })),
 
     sources.actions
       .filterByType('startEdit')
-      .map(() => ({ type: 'inputVal', value: getProp('title') }))
+      .latestFrom(sources.props)
+      .map(props => ({ type: 'inputVal', value: props.title }))
   ]
 }

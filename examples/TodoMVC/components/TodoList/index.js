@@ -6,7 +6,6 @@ export default function TodoList () {
   return {
     initialState: {
       inputVal: '',
-      filter: '', // wether to show completed, active or all todos
       list: []    // list of todo items
     },
     actions,

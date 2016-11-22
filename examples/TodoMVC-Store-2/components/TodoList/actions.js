@@ -8,16 +8,16 @@ export default function actions (sources) {
   return [
     toggleAll
       .events('click')
-      .mapTo({ type: 'toggleAll' }),
+      .map(() => ({ type: 'toggleAll' })),
 
     clearCompleted
       .events('click')
-      .mapTo({ type: 'deleteCompleted' }),
+      .map(() => ({ type: 'deleteCompleted' })),
 
     newTodoInput
       .events('keydown')
       .filter(e => e.keyCode === ESC_KEY)
-      .mapTo({ type: 'inputVal', payload: '' }),
+      .map(() => ({ type: 'inputVal', payload: '' })),
 
     newTodoInput
       .events('keydown')
@@ -33,6 +33,6 @@ export default function actions (sources) {
 
     sources.actions
       .filterByType('insertTodo')
-      .mapTo({ type: 'inputVal', payload: '' })
+      .map(() => ({ type: 'inputVal', payload: '' }))
   ]
 }

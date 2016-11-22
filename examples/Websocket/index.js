@@ -10,7 +10,7 @@ function WebSocketEcho () {
       status: ''
     },
 
-    actions (sources, getProp, getState) {
+    actions (sources) {
       const input = sources.DOM.select('input')
 
       return [
@@ -21,7 +21,8 @@ function WebSocketEcho () {
         input
           .events('keydown')
           .filter(e => e.keyCode === 13)
-          .map(e => ({ type: 'send', payload: getState('inputVal') }))
+          .latestFrom(sources.state)
+          .map(state => ({ type: 'send', payload: state.inputVal }))
       ]
     },
 
