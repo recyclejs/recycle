@@ -16,6 +16,8 @@ export default function ({ adapter }) {
     const children = new Map()
     const childrenActions = new Subject()
     const injectedState = new Subject()
+    const propsReference = new Subject()
+    const stateReference = new Subject()
     let ReactComponent
     let componentName
     let timesRendered = 0
@@ -31,7 +33,14 @@ export default function ({ adapter }) {
     const componentSources = {
       DOM: { select: generateDOMSource(domNodes) },
       childrenActions: childrenActions.switch().share(),
-      actions: new Subject()
+      actions: new Subject(),
+      props: propsReference.share(),
+      state: stateReference.share()
+    }
+
+    function updateStatePropsReference () {
+      stateReference.next({...state})
+      propsReference.next({...props})
     }
 
     function getReactComponent () {
@@ -52,27 +61,13 @@ export default function ({ adapter }) {
         }
 
         componentDidMount () {
-          const getProp = (propKey) => {
-            if (!this.props) {
-              return null
-            }
-            return this.props[propKey]
-          }
-
-          const getState = (stateKey) => {
-            if (!this.state.recycleState) {
-              return null
-            }
-            return this.state.recycleState[stateKey]
-          }
-
           if (config.actions) {
-            Observable.merge(...forceArray(config.actions(componentSources, getProp, getState)))
+            Observable.merge(...forceArray(config.actions(componentSources)))
               .filter(action => action)
               .subscribe(componentSources.actions)
           }
-
-          this.stateSubsription = getStateStream(getProp).merge(injectedState).subscribe((newVal) => {
+          updateStatePropsReference()
+          this.stateSubsription = getStateStream().merge(injectedState).subscribe((newVal) => {
             const newState = newVal.state
             const newAction = newVal.action
 
@@ -111,13 +106,11 @@ export default function ({ adapter }) {
           return true
         }
 
-        componentWillUpdate (nextProps, nextState) {
-          props = this.props
-          emit('componentWillUpdate', [thisComponent, nextProps, nextState.recycleState])
-        }
-
         componentDidUpdate (prevProps, prevState) {
+          props = this.props
           state = this.state.recycleState
+          updateStatePropsReference()
+
           emit('componentUpdate', thisComponent)
           const el = findDOMNode(this)
           updateDomStreams(domNodes, el)
@@ -224,7 +217,7 @@ export default function ({ adapter }) {
       return childrenArr
     }
 
-    function getStateStream (getProp) {
+    function getStateStream () {
       const reducers = [
         componentSources.actions
           .do(a => emit('action', [a, thisComponent]))
@@ -232,7 +225,7 @@ export default function ({ adapter }) {
       ]
 
       if (config.reducers) {
-        reducers.push(...forceArray(config.reducers(componentSources, getProp)))
+        reducers.push(...forceArray(config.reducers(componentSources)))
       }
 
       return Observable.merge(...reducers)
@@ -481,5 +474,12 @@ export function applyRecycleObservable (Observable) {
 
   Observable.prototype.filterByType = function filterByType (type) {
     return this.filter(action => action.type === type)
+  }
+
+  Observable.prototype.latestFrom = function latestFrom (sourceFirst, sourceSecond) {
+    if (sourceSecond) {
+      return this.latestFrom(sourceFirst).withLatestFrom(sourceSecond, (props, state) => ({props, state}))
+    }
+    return this.withLatestFrom(sourceFirst, (first, second) => second)
   }
 }
