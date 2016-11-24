@@ -192,7 +192,10 @@ export default function ({ adapter }) {
       const newActions = Observable.merge(
         ...forceArray(getChildren())
           .filter(component => component.getActions())
-          .map(component => component.getActions())
+          .map(component => component.getActions().map(a => {
+            a.childConstructor = component.getConstructor()
+            return a
+          }))
       )
 
       if (newActions) {
