@@ -15,7 +15,7 @@ export default function actions (sources) {
     toggleCheckbox
       .events('change')
       .latestFrom(sources.props)
-      .map(props => ({ type: 'toggle', id: props.id })),
+      .action(props => ({ type: 'toggle', id: props.id })),
 
     editInput
       .events('keyup')
