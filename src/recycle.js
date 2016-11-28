@@ -51,8 +51,9 @@ export default function ({ adapter }) {
       class ReactClass extends BaseComponent {
         constructor (ownProps) {
           super(ownProps)
-          if (config.initialState && typeof config.initialState !== 'object') {
-            throw new Error('Component state must be an object')
+          if (config.initialState && (typeof config.initialState !== 'object' || Array.isArray(config.initialState))) {
+            const stateStr = JSON.stringify(config.initialState)
+            throw new Error(`Component state must be an object, got: '${stateStr}'`)
           }
           this.state = {
             recycleState: config.initialState
@@ -81,7 +82,7 @@ export default function ({ adapter }) {
                 componentNameErr = ` Check reducers of ${componentName} component.`
               }
               const stateStr = JSON.stringify(newState)
-              throw new Error(`Component state must be an object or false, recieved ${stateStr}.${componentNameErr}${lastActionErr}`)
+              throw new Error(`Component state must be an object, got: '${stateStr}'.${componentNameErr}${lastActionErr}`)
             }
 
             this.setState({

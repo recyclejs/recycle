@@ -22,6 +22,8 @@ export default {
   Subject
 }
 
+export const jsx = React.createElement
+
 export {
   React,
   ReactDOM,

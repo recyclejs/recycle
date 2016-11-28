@@ -11,6 +11,10 @@ export default ({ initialState, onUpdate }) => (recycle, adapter) => {
       storePath = parsePath(storePath)
       component.set('storePath', storePath)
       const storeState = getByPath(storePath, store)
+      if (typeof storeState !== 'object' || Array.isArray(storeState)) {
+        const stateStr = JSON.stringify(storeState)
+        throw new Error(`Component state must be an object, got: '${stateStr}'`)
+      }
 
       if (component.get('initialState')) {
         const pathStr = storePath.join('.')
