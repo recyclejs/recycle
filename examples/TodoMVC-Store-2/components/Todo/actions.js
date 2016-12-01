@@ -1,5 +1,4 @@
 import {ENTER_KEY, ESC_KEY} from '../../utils'
-import 'rxjs/add/operator/withLatestFrom'
 
 export default function actions (sources) {
   const toggleCheckbox = sources.DOM.select('.toggle')
@@ -20,7 +19,7 @@ export default function actions (sources) {
       .events('keyup')
       .filter(ev => ev.keyCode === ENTER_KEY)
       .merge(editInput.events('blur', true))
-      .latestFrom(sources.state)
+      .mapToLatest(sources.state)
       .map(state => ({ type: 'titleChanged', payload: state.inputVal })),
 
     todoLabel
@@ -38,12 +37,12 @@ export default function actions (sources) {
 
     sources.actions
       .filterByType('cancelEdit')
-      .latestFrom(sources.props)
+      .mapToLatest(sources.props)
       .map(props => ({ type: 'inputVal', value: props.title })),
 
     sources.actions
       .filterByType('startEdit')
-      .latestFrom(sources.props)
+      .mapToLatest(sources.props)
       .map(props => ({ type: 'inputVal', value: props.title }))
   ]
 }

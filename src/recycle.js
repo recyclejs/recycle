@@ -484,9 +484,9 @@ export function applyRecycleObservable (Observable) {
     return this.filter(action => action.childConstructor === constructor)
   }
 
-  Observable.prototype.latestFrom = function latestFrom (sourceFirst, sourceSecond) {
+  Observable.prototype.mapToLatest = function mapToLatest (sourceFirst, sourceSecond) {
     if (sourceSecond) {
-      return this.latestFrom(sourceFirst).withLatestFrom(sourceSecond, (props, state) => ({props, state}))
+      return this.mapToLatest(sourceFirst).withLatestFrom(sourceSecond, (props, state) => ({props, state}))
     }
     return this.withLatestFrom(sourceFirst, (first, second) => second)
   }

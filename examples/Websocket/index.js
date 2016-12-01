@@ -21,7 +21,7 @@ function WebSocketEcho () {
         input
           .events('keydown')
           .filter(e => e.keyCode === 13)
-          .latestFrom(sources.state)
+          .mapToLatest(sources.state)
           .map(state => ({ type: 'send', payload: state.inputVal }))
       ]
     },
