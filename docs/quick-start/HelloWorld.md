@@ -1,5 +1,5 @@
-## Getting Started
-The following guide assumes you have some sort of ES2015 build set up using babel 
+## Hello World
+The following guide assumes you have some sort of build set up using babel 
 and/or bundler tool like webpack or browserify.
 
 ### Installation
@@ -38,7 +38,7 @@ For Babel 6:
 ### Creating a Recycle Instance
 Let's start by creating a Recycle instance using `createRecycle`. 
 
-Its required parameter is a `adapter` for which you can use "React and RxJS" bindings:
+Its required parameter is an `adapter` for which you can use a default one (with React and RxJS):
 
 ```javascript
 import createRecycle from 'recyclejs'
@@ -49,10 +49,9 @@ const recycle = createRecycle({
   plugins: []
 })
 ```
-Note: if you wish to use existing React and/or RxJS dependencies, you can define your own adapter. Check the source code of [react-rxjs adapter](https://github.com/recyclejs/recycle/blob/master/src/adapter/react-rxjs.js).
 
-### Hello World Component
-All components in Recycle are functions which are returning object with `view`, `actions` and `reducers`.
+### Component View
+All components in Recycle are functions which are returning an object with `view`, `actions` and `reducers`.
 But for a simple "Hello World" example, it is sufficient to define just a `view`:
 
 ```javascript

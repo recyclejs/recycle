@@ -1,5 +1,5 @@
-## Click Counter
-In this example we are going to create a simple stateful component with one button 
+## Stateful Component
+In this example, we are going to create a simple stateful component with a button 
 and a message indicating how many times that button has been clicked.
 
 ### View
@@ -17,9 +17,9 @@ function view (jsx, props, state) {
 ```
 
 ### Actions
-In Recycle all actions are defined separately, keeping the view "clean" (without `onClick`, `keyUp` and similar event handlers).
+In Recycle all actions are defined separately, keeping the view "clean" (without `onClick`, `keyUp` or similar event handlers).
 
-Since we need to listen for click events on a button element, we can use `sources.DOM` for selectig a DOM element and return an action `{ type: 'buttonClicked' }` every time that button is clicked:
+Since we need to listen for click events on a button element, we can use `sources.DOM` for selecting a DOM element and return an action `{ type: 'buttonClicked' }` every time that button is clicked:
 
 ```javascript
 function actions (sources) {
@@ -64,7 +64,7 @@ function ClickCounter () {
 }
 ```
 
-or if you prefer writing all in a single function:
+or if you prefer writing it all in a single function:
 
 ```javascript
 function SingleCounter () {
@@ -103,5 +103,4 @@ function SingleCounter () {
     }
   }
 }
-
 ```
