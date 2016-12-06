@@ -1,10 +1,12 @@
 {
   "name": "recyclejs",
-  "version": "0.5.0",
+  "version": "0.5.2",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch",
+    "prepublish": "npm test && npm run build",
+    "test:watch": "jest --watch",
+    "test": "jest",
     "build": "babel src -d ./",
     "docs:prepare": "gitbook install",
     "docs:watch": "npm run docs:prepare && gitbook serve",
