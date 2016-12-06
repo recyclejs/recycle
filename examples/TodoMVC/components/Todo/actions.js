@@ -17,19 +17,20 @@ export default function actions (sources) {
       .mapToLatest(sources.props)
       .map(props => ({ type: 'toggle', id: props.id })),
 
-    editInput
-      .events('keyup')
-      .filter(ev => ev.keyCode === ENTER_KEY)
-      .mapToLatest(sources.props, sources.state)
-      .map(({props, state}) => ({ type: 'titleChanged', id: props.id, title: state.inputVal })),
-
     todoLabel
       .events('dblclick')
-      .map(props => ({ type: 'startEdit', id: props.id })),
+      .mapTo({ type: 'startEdit' }),
 
     editInput
       .events('input')
       .map(ev => ({ type: 'inputVal', value: ev.target.value })),
+
+    editInput
+      .events('keyup')
+      .filter(ev => ev.keyCode === ENTER_KEY)
+      .merge(editInput.events('blur', true))
+      .mapToLatest(sources.props, sources.state)
+      .map(({props, state}) => ({ type: 'titleChanged', id: props.id, title: state.inputVal })),
 
     editInput
       .events('keyup')

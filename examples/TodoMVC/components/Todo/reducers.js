@@ -1,4 +1,4 @@
-export default function reducers (sources, getProp) {
+export default function reducers (sources) {
   return [
     sources.actions
       .filterByType('startEdit')

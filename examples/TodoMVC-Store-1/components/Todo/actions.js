@@ -15,7 +15,15 @@ export default function actions (sources) {
     toggleCheckbox
       .events('change')
       .mapToLatest(sources.props)
-      .action(props => ({ type: 'toggle', id: props.id })),
+      .map(props => ({ type: 'toggle', id: props.id })),
+
+    todoLabel
+      .events('dblclick')
+      .mapTo({ type: 'startEdit' }),
+
+    editInput
+      .events('input')
+      .map(ev => ({ type: 'inputVal', value: ev.target.value })),
 
     editInput
       .events('keyup')
@@ -23,15 +31,6 @@ export default function actions (sources) {
       .merge(editInput.events('blur', true))
       .mapToLatest(sources.props, sources.state)
       .map(({props, state}) => ({ type: 'titleChanged', id: props.id, title: state.inputVal })),
-
-    todoLabel
-      .events('dblclick')
-      .mapToLatest(sources.props)
-      .map(props => ({ type: 'startEdit', id: props.id })),
-
-    editInput
-      .events('input')
-      .map(ev => ({ type: 'inputVal', value: ev.target.value })),
 
     editInput
       .events('keyup')
