@@ -1,4 +1,6 @@
 .git
 src
 test
+_book
+docs
 examples
