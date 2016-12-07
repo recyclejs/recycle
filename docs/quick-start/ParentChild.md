@@ -6,7 +6,6 @@ function view (jsx) {
   return (
     <div>
       <div><ClickCounter /></div>
-      </div>
     </div>
   )
 }
