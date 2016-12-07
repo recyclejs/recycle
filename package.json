@@ -1,7 +1,7 @@
 {
   "name": "recyclejs",
   "version": "0.5.3",
-  "description": "",
+  "description": "A functional and reactive JavaScript framework for creating components where View is a visual representation of the state which can be changed by reducers reacting to actions",
   "main": "index.js",
   "scripts": {
     "prepublish": "npm test && npm run build",
@@ -22,7 +22,7 @@
   "bugs": {
     "url": "https://github.com/recyclejs/recycle/issues"
   },
-  "homepage": "https://github.com/recyclejs/recycle#readme",
+  "homepage": "https://recycle.js.org",
   "devDependencies": {
     "babel-cli": "^6.18.0",
     "babel-plugin-syntax-jsx": "^6.18.0",
