@@ -4,7 +4,6 @@
 /adapter
 /plugins
 _book
-__build__
 
 node_modules
 .DS_Store
