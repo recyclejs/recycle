@@ -4,12 +4,12 @@ export default function WebSocketPlugin (recycle, adapter) {
   const response$ = new adapter.Subject()
   const status$ = new adapter.Subject()
 
-  const websocket = new WebSocket('ws://echo.websocket.org/')
+  const websocket = new WebSocket('wss://echo.websocket.org/')
   websocket.onclose = function (evt) {
     status$.next('Connection closed.')
   }
   websocket.onopen = function (evt) {
-    status$.next('Connected to ws://echo.websocket.org')
+    status$.next('Connected to wss://echo.websocket.org')
   }
   websocket.onmessage = function (evt) {
     response$.next(evt.data)

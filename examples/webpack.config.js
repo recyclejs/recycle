@@ -13,7 +13,7 @@ var config = {
     autocomplete: APP_DIR + '/Autocomplete/index.js'
   },
   output: {
-    path: APP_DIR + '/__build__',
+    path: APP_DIR + '/bundles',
     filename: '[name].js'
   },
   module: {
