@@ -22,22 +22,22 @@ npm install --save recyclejs
 ## Documentation
 
 ### Quick Start
-  * [Hello World](/docs/quick-start/HelloWorld.md)
-  * [Stateful Component](/docs/quick-start/StatefulComponent.md)
-  * [Parent-Child Relationship](/docs/quick-start/ParentChild.md)
-  * [Using React Components](/docs/quick-start/UsingReactComponents.md)
+  * [Hello World](https://recycle.js.org/docs/quick-start/HelloWorld.md)
+  * [Stateful Component](https://recycle.js.org/docs/quick-start/StatefulComponent.md)
+  * [Parent-Child Relationship](https://recycle.js.org/docs/quick-start/ParentChild.md)
+  * [Using React Components](https://recycle.js.org/docs/quick-start/UsingReactComponents.md)
 
 ### Advanced Examples
-  * [Autocomplete](/docs/advanced-examples/Autocomplete.md)
-  * [WebSocket Echo](/docs/advanced-examples/WebsocketEcho.md)
-  * [TodoMVC](/docs/advanced-examples/TodoMVC.md)
-    * [Without Store](/docs/advanced-examples/todomvc/TodoMVCNoPlugin.md)
-    * [With Store](/docs/advanced-examples/todomvc/TodoMVCStore.md)
-    * [Isolated Reducers](/docs/advanced-examples/todomvc/TodoMVCStoreIsolated.md)
+  * [Autocomplete](https://recycle.js.org/docs/advanced-examples/Autocomplete.md)
+  * [WebSocket Echo](https://recycle.js.org/docs/advanced-examples/WebsocketEcho.md)
+  * [TodoMVC](https://recycle.js.org/docs/advanced-examples/TodoMVC.md)
+    * [Without Store](https://recycle.js.org/docs/advanced-examples/todomvc/TodoMVCNoPlugin.md)
+    * [With Store](https://recycle.js.org/docs/advanced-examples/todomvc/TodoMVCStore.md)
+    * [Isolated Reducers](https://recycle.js.org/docs/advanced-examples/todomvc/TodoMVCStoreIsolated.md)
 
 ### API Reference
-  * [adapter](/docs/api-reference/adapter.md)
-  * [createRecycle](/docs/api-reference/createRecycle.md)
-  * [Component](/docs/api-reference/Component.md)
-  * [Recycle RxJS Operators](/docs/api-reference/recycleRxjsOperators.md)
-  * [Plugins](/docs/api-reference/Plugins.md)
+  * [adapter](https://recycle.js.org/docs/api-reference/adapter.md)
+  * [createRecycle](https://recycle.js.org/docs/api-reference/createRecycle.md)
+  * [Component](https://recycle.js.org/docs/api-reference/Component.md)
+  * [Recycle RxJS Operators](https://recycle.js.org/docs/api-reference/recycleRxjsOperators.md)
+  * [Plugins](https://recycle.js.org/docs/api-reference/Plugins.md)
