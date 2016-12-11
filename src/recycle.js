@@ -194,7 +194,7 @@ export default function ({ adapter }) {
         ...forceArray(getChildren())
           .filter(component => component.getActions())
           .map(component => component.getActions().map(a => {
-            a.childConstructor = component.getConstructor()
+            a.childComponent = component.getConstructor()
             return a
           }))
       )
@@ -480,8 +480,8 @@ export function applyRecycleObservable (Observable) {
     return this.filter(action => action.type === type)
   }
 
-  Observable.prototype.filterByConstructor = function filterByConstructor (constructor) {
-    return this.filter(action => action.childConstructor === constructor)
+  Observable.prototype.filterByComponent = function filterByComponent (constructor) {
+    return this.filter(action => action.childComponent === constructor)
   }
 
   Observable.prototype.mapToLatest = function mapToLatest (sourceFirst, sourceSecond) {
