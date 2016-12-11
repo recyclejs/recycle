@@ -1,6 +1,6 @@
 {
   "name": "recyclejs",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "A functional and reactive JavaScript framework for creating components where View is a visual representation of the state which can be changed by reducers reacting to actions",
   "main": "index.js",
   "scripts": {
