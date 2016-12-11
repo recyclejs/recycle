@@ -9,8 +9,31 @@ Requirements:
 1. Canceling all previous requests as the new one arrives
 1. Handling errors
 
-With a help of RxJS operators like `debounceTime` and `Observable.ajax`, 
-all of this can be done by creating a single action:
+### View
+The component will consist of an input field, 
+list of results and div element for displaying errors:
+
+```javascript
+function view (jsx, props, state) {
+  return (
+    <div>
+      <div>Find GitHub login: <input type='text' /></div>
+      <ul>
+        {state.suggestions.map((item, i) => <li key={i}>{item.login}</li>)}
+      </ul>
+      {state.error ? (
+        <div className='autocomplete-error'>
+          Error fetching autocomplete results: {state.error}
+        </div>
+      ) : ''}
+    </div>
+  )
+}
+```
+
+### Actions
+Using RxJS operators like `debounceTime` and `Observable.ajax`, 
+all async operations can be declared in a single action:
 
 ```javascript
 function actions (sources) {
@@ -30,6 +53,7 @@ function actions (sources) {
 ```
 This action will dispatch `autocompleteFetched` with retrieved usernames, or `autocompleteError` with an error message. 
 
+### Reducers
 We can now use these actions for updating our state: 
 
 ```javascript
@@ -50,26 +74,6 @@ function reducers (sources) {
         return state
       })
   ]
-}
-```
-
-Lastly, we need to define a component view:
-
-```javascript
-function view (jsx, props, state) {
-  return (
-    <div>
-      <div>Find GitHub login: <input type='text' /></div>
-      <ul>
-        {state.suggestions.map((item, i) => <li key={i}>{item.login}</li>)}
-      </ul>
-      {state.error ? (
-        <div className='autocomplete-error'>
-          Error fetching autocomplete results: {state.error}
-        </div>
-      ) : ''}
-    </div>
-  )
 }
 ```
 
