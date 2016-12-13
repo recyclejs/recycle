@@ -1,7 +1,6 @@
 {
   "presets": ["es2015"],
   "plugins": [
-    "syntax-jsx",
     ["transform-react-jsx", {"pragma": "jsx"}],
     "transform-object-rest-spread"
   ]
