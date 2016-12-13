@@ -27,14 +27,14 @@ export default (config) => {
       target = props
       props = null
     }
-    return adapter.render(adapter.createElement(toReact(Component), props), target)
+    return adapter.render(adapter.createElement(toReact(Component, props), props), target)
   }
 
-  function toReact (Component) {
+  function toReact (Component, props) {
     if (recycle.getRootComponent()) {
       throw new Error('Root component already exists. toReact can be used once per recyle instance.')
     }
-    return recycle.createComponent(Component).getReactComponent()
+    return recycle.createComponent(Component, props).getReactComponent()
   }
 
   return {
