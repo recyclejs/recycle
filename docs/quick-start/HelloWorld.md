@@ -1,15 +1,28 @@
 ## Hello World
+
+### HelloWorld Repository
+The easiest way to get started with Recycle is to use a [Hello World repository](https://github.com/recyclejs/HelloWorld).
+
+It is a simple setup using `babel`, `webpack` and `webpack-dev-server`:
+
+```bash
+git clone https://github.com/recyclejs/HelloWorld.git
+npm install
+npm start
+``` 
+When finished, open http://localhost:8080 to view it in the browser.
+
+### Manual Installation
 The following guide assumes you have some sort of build set up using babel 
 and/or bundler tool like webpack or browserify.
 
-### Installation
 First, make sure you've installed Recycle:
 
 ```bash
 npm i recyclejs --save
 ```
 
-### JSX pragma
+#### JSX pragma
 By default, Recycle uses React and can be used with JSX. But in order to use it, you need
 to pass a `pragma` option in your babel configuration.
 
@@ -35,7 +48,7 @@ For Babel 6:
 }
 ```
 
-### Creating a Recycle Instance
+#### Creating a Recycle Instance
 Let's start by creating a Recycle instance using `createRecycle`. 
 
 Its required parameter is an `adapter` for which you can use a default one (with React and RxJS):
@@ -50,7 +63,7 @@ const recycle = createRecycle({
 })
 ```
 
-### Component View
+#### Component View
 All components in Recycle are functions which are returning an object with `view`, `actions` and `reducers`.
 But for a simple "Hello World" example, it is sufficient to define just a `view`:
 
@@ -76,7 +89,7 @@ function HelloWorld() {
 }
 ```
 
-### Rendering
+#### Rendering
 The last step is to render our component to the DOM which can be done with `recycle.render`:
 
 ```javascript
