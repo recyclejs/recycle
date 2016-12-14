@@ -335,7 +335,9 @@ export default function ({ adapter }) {
     Object.keys(domNodes).forEach((selector) => {
       Object.keys(domNodes[selector]).forEach((event) => {
         const domEl = el.querySelector(selector)
-        domNodes[selector][event].next(Observable.fromEvent(domEl, event))
+        if (domEl) {
+          domNodes[selector][event].next(Observable.fromEvent(domEl, event))
+        }
       })
     })
   }
