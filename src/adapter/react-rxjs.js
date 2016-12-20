@@ -16,6 +16,7 @@ import 'rxjs/add/operator/merge'
 export default {
   BaseComponent: React.Component,
   createElement: React.createElement,
+  React,
   findDOMNode: ReactDOM.findDOMNode,
   render: ReactDOM.render,
   Observable,

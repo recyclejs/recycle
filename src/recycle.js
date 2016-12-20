@@ -2,6 +2,7 @@ export default function ({ adapter }) {
   const {
     BaseComponent,
     createElement,
+    React,
     findDOMNode,
     Observable,
     Subject
@@ -146,7 +147,12 @@ export default function ({ adapter }) {
         render () {
           timesRendered++
           if (!config.view) return null
-          return config.view(jsxHandler, this.props, this.state.recycleState)
+
+          let before = React.createElement
+          React.createElement = jsxHandler
+          let toReturn = config.view(jsxHandler, this.props, this.state.recycleState)
+          React.createElement = before
+          return toReturn
         }
       }
 
