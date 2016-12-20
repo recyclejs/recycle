@@ -1,4 +1,5 @@
 import ReactCounter from './ReactComponent'
+import React from 'react'
 
 export default function SingleCounterWithReact () {
   return {

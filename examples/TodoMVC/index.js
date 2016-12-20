@@ -4,6 +4,7 @@ import createRecycle from '../../src/index'
 import adapter, { ReactDOM, jsx } from '../../src/adapter/react-rxjs'
 import TodoList from './components/TodoList/index'
 import { Router, Route, hashHistory } from 'react-router'
+import React from 'react'
 
 const recycle = createRecycle({ adapter })
 const TodoListReact = recycle.toReact(TodoList)

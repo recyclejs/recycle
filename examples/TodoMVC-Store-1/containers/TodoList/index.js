@@ -1,5 +1,6 @@
 import { toggleAll, deleteCompleted, insertTodo } from './reducers'
 import TodoList from '../../components/TodoList/index'
+import React from 'react'
 
 export default function TodoListContainer () {
   return {

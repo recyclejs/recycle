@@ -4,6 +4,7 @@ import 'rxjs/add/observable/dom/ajax'
 import 'rxjs/add/operator/debounceTime'
 import 'rxjs/add/operator/switchMap'
 import 'rxjs/add/operator/catch'
+import React from 'react'
 
 function Autocomplete () {
   return {

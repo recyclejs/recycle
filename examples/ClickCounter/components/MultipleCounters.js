@@ -1,3 +1,4 @@
+import React from 'react'
 import SingleCounter from './SingleCounter'
 
 export default function MultipleCounters () {

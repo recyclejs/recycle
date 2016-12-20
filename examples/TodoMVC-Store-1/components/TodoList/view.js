@@ -1,4 +1,5 @@
 import Todo from '../../containers/Todo/index'
+import React from 'react'
 
 export default function view (jsx, props, state) {
   let completed = props.todos.filter(todo => todo.completed).length

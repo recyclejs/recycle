@@ -1,3 +1,4 @@
+import React from 'react'
 import 'todomvc-common/base.css'
 import 'todomvc-app-css/index.css'
 import createRecycle from '../../src/index'

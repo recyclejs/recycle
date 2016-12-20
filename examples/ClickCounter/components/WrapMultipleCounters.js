@@ -1,4 +1,5 @@
 import MultipleCounters from './MultipleCounters'
+import React from 'react'
 
 export default function WrapMultipleCounters () {
   return {

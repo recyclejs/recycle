@@ -1,6 +1,7 @@
 import createRecycle from '../../src/index'
 import adapter from '../../src/adapter/react-rxjs'
 import WebSocketPlugin from './websocket-plugin'
+import React from 'react'
 
 function WebSocketEcho () {
   return {

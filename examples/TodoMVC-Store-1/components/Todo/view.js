@@ -1,4 +1,5 @@
 import classNames from 'classnames'
+import React from 'react'
 
 export default function view (jsx, props, state) {
   return (
