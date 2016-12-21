@@ -69,7 +69,7 @@ function TodoContainer (props) {
       ]
     },
 
-    view (jsx, props, state) {
+    view (props, state) {
       return <Todo title={state.title} completed={state.completed} />
     }
   }

@@ -1,106 +1,49 @@
 ## Hello World
-
-### HelloWorld Repository
-The easiest way to get started with Recycle is to use a [Hello World repository](https://github.com/recyclejs/HelloWorld).
-
-It is a simple setup using `babel`, `webpack` and `webpack-dev-server`:
+The easiest way to get started with Recycle is to use [Create React App](https://github.com/facebookincubator/create-react-app)
 
 ```bash
-git clone https://github.com/recyclejs/HelloWorld.git
-npm install
-npm start
-``` 
-When finished, open http://localhost:8080 to view it in the browser.
+npm install -g create-react-app
 
-### Manual Installation
-The following guide assumes you have some sort of build set up using babel 
-and/or bundler tool like webpack or browserify.
+create-react-app my-app
+cd my-app/
+```
 
-First, make sure you've installed Recycle:
+When you application is initialized you can install Recycle:
 
 ```bash
-npm i recyclejs --save
+npm install --save recyclejs
 ```
 
-#### JSX pragma
-By default, Recycle uses React and can be used with JSX. But in order to use it, you need
-to pass a `pragma` option in your babel configuration.
-
-Either by adding a comment in files where Recycle views are defined (useful if using Recycle in existing React app)
+Create a new file, for example: `src/HelloWorld.js`:
 
 ```javascript
-/** @jsx jsx */
-```   
+import React from 'react';
 
-or by defining it globally in your `.babelrc` configuration file:
-
-For Babel 5 and prior.
-```JSON
-{ "jsxPragma": "jsx" }
-```
-
-For Babel 6:
-```JSON
-{
-  "plugins": [
-    ["transform-react-jsx", {"pragma": "jsx"}]
-  ]
-}
-```
-
-#### Creating a Recycle Instance
-Let's start by creating a Recycle instance using `createRecycle`. 
-
-Its required parameter is an `adapter` for which you can use a default one (with React and RxJS):
-
-```javascript
-import createRecycle from 'recyclejs'
-import reactRxjs from 'recyclejs/adapter/react-rxjs'
-
-const recycle = createRecycle({ 
-  adapter: reactRxjs,
-  plugins: []
-})
-```
-
-#### Component View
-All components in Recycle are functions which are returning an object with `view`, `actions` and `reducers`.
-But for a simple "Hello World" example, it is sufficient to define just a `view`:
-
-```javascript
 function HelloWorld() {
   return {
-    view (jsx) {
-      <div>Hello World!</div>
+    view() {
+      return (
+        <div className="App">
+          <h2>Hello World</h2>
+        </div>
+      )
     }
   }
 }
+
+export default HelloWorld;
 ```
 
-The reason why `jsx` parameter is defined as first argument of the view function is because a transpiled version by babel actually looks like this: 
+and import it in `index.js`:
 
 ```javascript
-function HelloWorld() {
-  return {
-    view (jsx) {
-      jsx('div', null, 'Hello World!')
-    }
-  }
-}
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Recycle from 'recyclejs';
+import HelloWorld from './HelloWorld'
+
+ReactDOM.render(
+  <Recycle root={HelloWorld} />,
+  document.getElementById('root')
+);
 ```
-
-#### Rendering
-The last step is to render our component to the DOM which can be done with `recycle.render`:
-
-```javascript
-recycle.render(HelloWorld, document.getElementById('app'))
-```
-
-or by converting a Recycle component into a React component and rendering it with `ReactDOM`:
-
-```javascript
-const HelloWorldReact = recycle.toReact(HelloWorld)
-
-ReactDOM.render(HelloWorldReact, document.getElementById('app'))
-```
-

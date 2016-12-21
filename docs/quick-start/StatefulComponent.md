@@ -6,7 +6,9 @@ and a message indicating how many times that button has been clicked.
 We can start by defining a view:
 
 ```javascript
-function view (jsx, props, state) {
+import React from 'react'
+
+function view (props, state) {
   return (
     <div>
       <span>Times clicked: {state.timesClicked}</span>
@@ -17,9 +19,11 @@ function view (jsx, props, state) {
 ```
 
 ### Actions
-In Recycle all actions are defined separately, keeping the view "clean" (without `onClick`, `keyUp` or similar event handlers).
+In Recycle all actions are defined separately, 
+keeping the view "clean" (without `onClick`, `keyUp` or similar event handlers).
 
-Since we need to listen for click events on a button element, we can use `sources.DOM` for selecting a DOM element and return an action `{ type: 'buttonClicked' }` every time that button is clicked:
+Since we need to listen for click events on a button element, 
+we can use `sources.DOM` for selecting a DOM element and return an action `{ type: 'buttonClicked' }` every time that button is clicked:
 
 ```javascript
 function actions (sources) {
@@ -30,6 +34,8 @@ function actions (sources) {
       .mapTo({ type: 'buttonClicked' })
   ]
 }
+
+export default actions
 ```
 
 ### Reducers
@@ -46,12 +52,18 @@ function reducers (sources) {
       })
   ]
 }
+
+export default reducers
 ```
 
 ### Defining a Recycle component
 We now have all the ingredients for defining our component: 
 
 ```javascript
+import view from './view'
+import actions from './actions'
+import reducers from './reducers'
+
 function ClickCounter () {
   return {
     initialState: {
@@ -62,11 +74,15 @@ function ClickCounter () {
     view
   }
 }
+
+export default ClickCounter
 ```
 
 or if you prefer writing it all in a single function:
 
 ```javascript
+import React from 'react'
+
 function SingleCounter () {
   return {
     initialState: {
@@ -93,7 +109,7 @@ function SingleCounter () {
       ]
     },
 
-    view(jsx, props, state) {
+    view(props, state) {
       return (
         <div>
           <span>Times clicked: {state.timesClicked}</span>

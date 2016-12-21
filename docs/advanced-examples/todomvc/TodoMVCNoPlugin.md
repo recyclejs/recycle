@@ -29,7 +29,7 @@ initialState: {
 Props and state are all the data we need for defining a Todo component view:
 
 ```javascript
-function view (jsx, props, state) {
+function view (props, state) {
   return (
     <li className={'todoRoot ' + classNames({ completed: props.completed, editing: state.editing })}>
       <div className='view'>
@@ -196,7 +196,7 @@ initialState: {
 To keep this guide as simple as possible, we will focus only on the header and the main section of a view:
 
 ```javascript
-function view (jsx, props, state) {
+function view (props, state) {
   return (
     <header className='header'>
       <h1>todos</h1>

@@ -5,7 +5,7 @@ In Recycle, a component is a function which returns an object with the following
 function RecycleComponent () {
   return {
     initialState: {},
-    view: function(jsx, props, state) { ... },
+    view: function(props, state) { ... },
     actions: function({DOM, childrenActions, actions, props, state, (?fromPlugin)}) { ... },
     reducers: function({DOM, childrenActions, actions, props, state, (?fromPlugin)}) { ... },
     componentDidMount: function() { ... },
@@ -17,6 +17,28 @@ function RecycleComponent () {
   }
 }
 ```
+### Initialization Component
+Recycle components can not be used in React directly, 
+which is why `Recycle` initialization component is used:
+
+##### Arguments
+1. `root`: Recycle root component 
+1. `props`: component state 
+1. `plugins`: list of plugins
+
+##### Example
+```javascript
+<Recycle root={RecycleComponent} />
+``` 
+
+Or if defined separately:
+
+```javascript
+const ReactComponent = Recycle({
+  root: RecycleComponent
+})
+```
+
 ### initialState
 Component initial state
 
@@ -32,9 +54,9 @@ initialState: {
 Function returning a component view, usually written in JSX
 
 ##### Arguments
-1. `jsx`: jsxHandler (equivalent of `React.createElement`)
 1. `props`: component props
 1. `state`: component state 
+1. `jsx`: jsxHandler (equivalent of `React.createElement`)
 
 ##### Example
 ```javascript

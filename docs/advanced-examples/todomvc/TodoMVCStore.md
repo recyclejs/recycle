@@ -22,11 +22,10 @@ In Recycle, this can be done by using Store plugin.
 Store is created using `createStore`:
 
 ```javascript
-import createRecycle from 'recyclejs'
-import adapter from 'recyclejs/adapter/react-rxjs'
+import Recycle from 'recyclejs'
 import createStore from 'recyclejs/plugins/store'
 
-const store = createStore({
+const storePlugin = createStore({
   initialState: {
     todos: {
       list: [] 
@@ -35,14 +34,12 @@ const store = createStore({
 })
 ```
 
-which is then passed as a plugin in `createRecycle` function:
+which is then passed as a plugin in `Recycle` function:
 
 ```javascript
-const recycle = createRecycle({
-  adapter,
-  plugins: [
-    store
-  ]
+const TodoListReact = Recycle({
+  root: TodoList,
+  plugins: [storePlugin]
 })
 ```
 
@@ -156,8 +153,9 @@ We are using presentational *TodoList* component as a child and `sources.childre
 for defining reducers which would update the store:  
 
 ```javascript
+import React from 'react'
 import { toggleAll, deleteCompleted, insertTodo } from './reducers'
-import TodoList from '../../components/TodoList/index'
+import TodoList from '../../components/TodoList'
 
 function TodoListContainer () {
   return {
@@ -179,7 +177,7 @@ function TodoListContainer () {
       ]
     },
 
-    view (jsx, props, state) {
+    view (props, state) {
       return <TodoList todos={state.list} filter={props.route.filter} />
     }
   }
@@ -198,6 +196,7 @@ so we can use the one from the [previous example](https://github.com/recyclejs/r
 so we can define `storePath` of a *Todo* container to be the same as for *TodoList* and all reducers that were modifying state of a single todo item (`deleteTodo`, `editTodo`, `toggleTodo`) can now be transferred from *TodoList* to a *Todo* container:
 
 ```javascript
+import React from 'react'
 import { deleteTodo, editTodo, toggleTodo } from './reducers'
 import Todo from '../../components/Todo/index'
 
@@ -221,7 +220,7 @@ function TodoContainer (props) {
       ]
     },
 
-    view (jsx, props, state) {
+    view (props, state) {
       const todo = state.list.find(todo => todo.id === props.id)
       if (!todo) {
         return null

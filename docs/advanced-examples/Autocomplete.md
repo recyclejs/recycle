@@ -14,7 +14,7 @@ The component will consist of an input field,
 list of results and div element for displaying errors:
 
 ```javascript
-function view (jsx, props, state) {
+function view (props, state) {
   return (
     <div>
       <div>Find GitHub login: <input type='text' /></div>

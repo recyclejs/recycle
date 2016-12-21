@@ -31,7 +31,7 @@ Our component is again just a combination of actions, reducers and view.
 
 ### View
 ```javascript
-function view (jsx, props, state) {
+function view (props, state) {
   return (
     <div>
       <h2>Websocket Echo Test</h2>
@@ -93,21 +93,16 @@ function reducers (sources) {
 ```
 ## Plugin Implementation
 
-Plugins are applied in `createRecycle` function:
+Plugins are provided in `Recycle` component:
 
 ```javascript
-const recycle = createRecycle({
-  adapter: adapter,
-  plugins: [
-    WebSocketPlugin
-  ]
-})
+<Recycle root={WebSocketEcho} plugins={[WebSocketPlugin]} />
 ``` 
 
  and its core implementation is as follows:
 
 ```javascript
-function WebSocketPlugin (recycle, adapter) {
+function WebSocketPlugin (recycle) {
 
   ...
 
@@ -125,16 +120,19 @@ function WebSocketPlugin (recycle, adapter) {
 ``` 
 
 That is all of the Recycle API you need for creating a plugin which provides additional sources to a component. 
-As you can see, we are listening to all components created in recycle instance (in this example only one component) and adding sources as observables - one for receiving WebSocket responses, 
+As you can see, we are listening to all components created in recycle instance (in this example only one component) 
+and adding sources as observables - one for receiving WebSocket responses, 
 the other for displaying connection status if a connection is lost. 
 
 The rest of the implementation logic has to do with RxJS for creating Observables and WebSocket API:
 
 ```javascript
-function WebSocketPlugin (recycle, adapter) {
+import { Subject } from 'rxjs/Subject'
 
-  const response$ = new adapter.Subject()
-  const status$ = new adapter.Subject()
+function WebSocketPlugin (recycle) {
+
+  const response$ = new Subject()
+  const status$ = new Subject()
 
   const websocket = new WebSocket('ws://echo.websocket.org/')
   websocket.onclose = function (evt) {

@@ -3,17 +3,20 @@
 As shown in [WebSocket Echo example](/docs/advanced-examples/WebsocketEcho.md),
 extended functionality for Recycle apps can be provided with plugins.
 
-They can be enabled in `createRecycle` function:
+They can be enabled in `Recycle` component:
 
 ```javascript
-const recycle = createRecycle({
-  adapter: adapter,
-  plugins: [
-    Plugin1,
-    Plugin2
-  ]
-})
+<Recycle root={TodoList} plugins={[Plugin1, Plugin2]} />
 ``` 
+
+Or if defined separately:
+
+```javascript
+const TodoListReact = Recycle({
+  root: TodoList,
+  plugins: [Plugin1, Plugin2]
+})
+```
 
 Every Recycle plugin is a function that receives two arguments:
  * `recycle` *(Object)*: recycle instance
@@ -23,7 +26,6 @@ Every Recycle plugin is a function that receives two arguments:
   * `getAllComponents` *(Function)*: function which returns list of all components
   * `getComponentStructure` *(Function)*: function which returns a tree of all components
   * `getRootComponent` *(Function)*: function which returns a root component
- * `adapter` *(Object)*: adapter instance (documented [here](adapter.md))
 
 ### Recycle Events
 Using `recycle.on(event, cb)`, following events can be used:
