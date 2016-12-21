@@ -1,8 +1,7 @@
 /* global expect describe it document */
-
+import Rx from 'rxjs/Rx'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import reactAdapter from '../src/adapter/react-rxjs'
 import Recycle, {
   registerComponent,
   getAllComponents,
@@ -13,10 +12,17 @@ import Recycle, {
   applyRecycleObservable
 } from '../src/recycle'
 
+const adapter = {
+  React,
+  findDOMNode: ReactDOM.findDOMNode,
+  Observable: Rx.Observable,
+  Subject: Rx.Subject
+}
+
 describe('recycle.spec.js', function () {
   describe('registerComponent', () => {
     it('should add new component in map', function () {
-      const recycle = Recycle({ adapter: reactAdapter })
+      const recycle = Recycle(adapter)
       const savedChildren = new Map()
       const constructor1 = function () { return {} }
 
@@ -44,30 +50,6 @@ describe('recycle.spec.js', function () {
     })
   })
 
-  describe('createReactElement', () => {
-    it('should pass jsx as property in react render method', function (done) {
-      const reactComponent = React.createClass({
-        render (jsx) {
-          jsx()
-          return null
-        }
-      })
-
-      const getArgs = function () {
-        return arguments
-      }
-
-      const jsx = function () {
-        done()
-      }
-
-      ReactDOM.render(
-        createReactElement(React.createElement, getArgs(reactComponent), jsx),
-        document.createElement('div')
-      )
-    })
-  })
-
   describe('forceArray', () => {
     it('should always return an array', () => {
       const a = [1, 2, 3]
@@ -78,18 +60,16 @@ describe('recycle.spec.js', function () {
   })
 
   describe('applyRecycleObservable', () => {
-    const Observable = reactAdapter.Observable
-
     it('should add reducer and filterByType filters', () => {
-      applyRecycleObservable(Observable)
-      expect(typeof Observable.prototype.reducer).toBe('function')
-      expect(typeof Observable.prototype.filterByType).toBe('function')
+      applyRecycleObservable(Rx.Observable)
+      expect(typeof Rx.Observable.prototype.reducer).toBe('function')
+      expect(typeof Rx.Observable.prototype.filterByType).toBe('function')
     })
   })
 
   describe('getComponentStructure', () => {
     it('should return component structure tree', () => {
-      const recycle = Recycle({ adapter: reactAdapter })
+      const recycle = Recycle(adapter)
       const rootComponent = recycle.createComponent(() => ({}))
       const tree = getComponentStructure(rootComponent)
 
@@ -100,7 +80,7 @@ describe('recycle.spec.js', function () {
 
   describe('getAllComponents', () => {
     it('should return component structure tree', () => {
-      const recycle = Recycle({ adapter: reactAdapter })
+      const recycle = Recycle(adapter)
       const constructor = () => ({})
       const rootComponent = recycle.createComponent(constructor)
       const components = getAllComponents(rootComponent)
