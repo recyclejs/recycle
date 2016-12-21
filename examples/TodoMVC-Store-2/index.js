@@ -1,15 +1,16 @@
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Rx from 'rxjs/Rx'
 import 'todomvc-common/base.css'
 import 'todomvc-app-css/index.css'
 import createRecycle from '../../src/index'
-import adapter, { ReactDOM, jsx } from '../../src/adapter/react-rxjs'
 import createStore from '../../src/plugins/store'
 import { Router, Route, hashHistory } from 'react-router'
 import TodoList from './containers/TodoList/index'
 import { updateLocalStorage, getFromLocalStorage } from './utils'
-import React from 'react'
 
 const recycle = createRecycle({
-  adapter,
+  adapter: [React, ReactDOM, Rx],
   plugins: [
     createStore({
       initialState: {

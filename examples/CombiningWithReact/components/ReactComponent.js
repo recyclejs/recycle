@@ -13,9 +13,7 @@ export default class ReactCounter extends React.Component {
     }))
   }
 
-  render (jsx) {
-    // when used inside Recycle component
-    // jsx handler will be passed in render method of a react component
+  render () {
     return (
       <span>
         {this.state.timesClicked}

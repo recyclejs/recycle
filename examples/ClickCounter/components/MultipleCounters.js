@@ -26,7 +26,7 @@ export default function MultipleCounters () {
       ]
     },
 
-    view (jsx, props, state) {
+    view (props, state) {
       return (
         <div>
           <div><SingleCounter key='1' /></div>

@@ -22,7 +22,7 @@ export default function TodoContainer (props) {
       ]
     },
 
-    view (jsx, props, state) {
+    view (props, state) {
       const todo = state.list.find(todo => todo.id === props.id)
       if (!todo) {
         return null

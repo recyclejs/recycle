@@ -26,7 +26,7 @@ export default function WrapMultipleCounters () {
       ]
     },
 
-    view (jsx, props, state) {
+    view (props, state) {
       return (
         <div>
           <ul>

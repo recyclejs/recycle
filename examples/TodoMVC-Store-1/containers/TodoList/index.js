@@ -22,7 +22,7 @@ export default function TodoListContainer () {
       ]
     },
 
-    view (jsx, props, state) {
+    view (props, state) {
       return <TodoList todos={state.list} filter={props.route.filter} />
     }
   }

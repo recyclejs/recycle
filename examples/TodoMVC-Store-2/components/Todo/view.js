@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 
-export default function view (jsx, props, state) {
+export default function view (props, state) {
   return (
     <li className={'todoRoot ' + classNames({ completed: props.completed, editing: state.editing })}>
       <div className='view'>

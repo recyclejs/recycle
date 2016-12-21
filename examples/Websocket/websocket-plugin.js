@@ -1,8 +1,8 @@
 /* global WebSocket */
 
 export default function WebSocketPlugin (recycle, adapter) {
-  const response$ = new adapter.Subject()
-  const status$ = new adapter.Subject()
+  const response$ = new adapter[2].Subject()
+  const status$ = new adapter[2].Subject()
 
   const websocket = new WebSocket('wss://echo.websocket.org/')
   websocket.onclose = function (evt) {

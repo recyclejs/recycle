@@ -1,7 +1,7 @@
 import React from 'react'
 import Todo from '../Todo'
 
-export default function view (jsx, props, state) {
+export default function view (props, state) {
   let completed = state.list.filter(todo => todo.completed).length
   let active = state.list.length - completed
 

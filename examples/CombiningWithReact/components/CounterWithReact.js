@@ -1,5 +1,5 @@
-import ReactCounter from './ReactComponent'
 import React from 'react'
+import ReactCounter from './ReactComponent'
 
 export default function SingleCounterWithReact () {
   return {
@@ -27,7 +27,7 @@ export default function SingleCounterWithReact () {
       ]
     },
 
-    view (jsx, props, state) {
+    view (props, state) {
       return (
         <div>
           <div>Times clicked on Recycle component: {state.timesClicked} <button>Click me</button></div>
