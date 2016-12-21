@@ -1,14 +1,12 @@
-export default function ({ adapter }) {
-  const {
-    BaseComponent,
-    createElement,
+export default function ({
     React,
     findDOMNode,
     Observable,
     Subject
-  } = adapter
-
+  }) {
   const events = {}
+  let createElement = React.createElement
+  let BaseComponent = React.Component
   let rootComponent
 
   function createComponent (constructor, props, parent) {
@@ -150,7 +148,7 @@ export default function ({ adapter }) {
 
           let before = React.createElement
           React.createElement = jsxHandler
-          let toReturn = config.view(jsxHandler, this.props, this.state.recycleState)
+          let toReturn = config.view(this.props, this.state.recycleState, jsxHandler)
           React.createElement = before
           return toReturn
         }
