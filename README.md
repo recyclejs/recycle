@@ -9,6 +9,7 @@ where View is a visual representation of the state which can be changed by reduc
 [![npm downloads](https://img.shields.io/npm/dm/recyclejs.svg?style=flat-square)](https://www.npmjs.com/package/recyclejs)
 
 ## Key Features
+* It's tiny - Recycle itself has 3.5KB gzipped
 * View is a "clean" representation of the state (without `onClick`, `keyUp` or similar event handlers which leads to a better separation of concerns)
 * Functional - all components can be defined without the use of classes
 * Reactive - async operations are handled with Observables ([RxJS](https://github.com/ReactiveX/rxjs))

@@ -47,3 +47,8 @@ ReactDOM.render(
   document.getElementById('root')
 );
 ```
+
+You can now run your app:
+```bash
+npm start
+```
