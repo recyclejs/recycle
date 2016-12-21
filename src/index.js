@@ -1,14 +1,23 @@
+import React from 'react'
+import { findDOMNode } from 'react-dom'
+import { Subject } from 'rxjs/Subject'
+import { Observable } from 'rxjs/Observable'
+import 'rxjs/add/observable/merge'
+import 'rxjs/add/observable/fromEvent'
+import 'rxjs/add/operator/withLatestFrom'
+import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/mapTo'
+import 'rxjs/add/operator/do'
+import 'rxjs/add/operator/share'
+import 'rxjs/add/operator/switch'
+import 'rxjs/add/operator/filter'
+import 'rxjs/add/operator/merge'
 import createRecycle from './recycle'
 
-export default (config) => {
-  if (!config || !config.adapter) {
-    throw new Error('Missing adapter property for creating Recycle instance')
+export default (props, publicContext, updateQueue) => {
+  if (!props || !props.root) {
+    throw new Error('Missing root component for initializing Recycle')
   }
-
-  const React = config.adapter[0]
-  const {findDOMNode} = config.adapter[1]
-  const reactRender = config.adapter[1].render
-  const {Observable, Subject} = config.adapter[2]
 
   const recycle = createRecycle({
     React,
@@ -17,37 +26,40 @@ export default (config) => {
     Subject
   })
 
+  if (props.plugins) {
+    applyPlugins(recycle, props.plugins)
+  }
+
+  // if Recycle was called as react component
+  // return React element
+  if (updateQueue && updateQueue.isMounted) {
+    return React.createElement(toReact.call(recycle, props.root, props.props), props.props)
+  }
+
+  // if Recycle was called idependently
+  // return React component
+  return toReact.call(recycle, props.root, props.props)
+}
+
+function toReact (Component, props) {
+  if (this.getRootComponent()) {
+    throw new Error('Root component already exists. toReact can be used once per recyle instance.')
+  }
+  return this.createComponent(Component, props).getReactComponent()
+}
+
+function applyPlugins (recycle, pluginsArr) {
+  if (!Array.isArray(pluginsArr)) {
+    throw new Error('Plugins must be defined in an array.')
+  }
+
   const plugins = {}
   recycle.getPlugin = name => plugins[name]
 
-  if (config.plugins) {
-    config.plugins.map((m) => {
-      const instance = m(recycle, config.adapter)
-      const name = (instance && instance.name) ? instance.name : 'plugin-' + Math.random()
-      plugins[name] = instance
-      return false
-    })
-  }
-
-  function render (Component, props, target) {
-    if (!target) {
-      target = props
-      props = null
-    }
-    return reactRender(React.createElement(toReact(Component, props), props), target)
-  }
-
-  function toReact (Component, props) {
-    if (recycle.getRootComponent()) {
-      throw new Error('Root component already exists. toReact can be used once per recyle instance.')
-    }
-    return recycle.createComponent(Component, props).getReactComponent()
-  }
-
-  return {
-    getComponentStructure: recycle.getComponentStructure,
-    getAllComponents: recycle.getAllComponents,
-    toReact,
-    render
-  }
+  pluginsArr.map((m) => {
+    const instance = m(recycle)
+    const name = (instance && instance.name) ? instance.name : 'plugin-' + Math.random()
+    plugins[name] = instance
+    return false
+  })
 }

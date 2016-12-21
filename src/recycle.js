@@ -438,18 +438,9 @@ export function getComponentStructure (rootComponent) {
   return structure
 }
 
-export function createReactElement (createElementHandler, args, jsx) {
+export function createReactElement (createElementHandler, args) {
   const constructor = args['0']
   const props = args['1'] || {}
-
-  const originalRender = constructor.prototype.render
-  constructor.prototype.getJsxHandler = function () {
-    return this
-  }.bind(jsx)
-
-  constructor.prototype.render = function render () {
-    return originalRender.call(this, this.getJsxHandler())
-  }
 
   const newArgs = []
   for (let i = 0; i < args.length || i < 2; i++) {
