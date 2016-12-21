@@ -1,8 +1,9 @@
 /* global WebSocket */
+import { Subject } from 'rxjs/Subject'
 
-export default function WebSocketPlugin (recycle, adapter) {
-  const response$ = new adapter[2].Subject()
-  const status$ = new adapter[2].Subject()
+export default function WebSocketPlugin (recycle) {
+  const response$ = new Subject()
+  const status$ = new Subject()
 
   const websocket = new WebSocket('wss://echo.websocket.org/')
   websocket.onclose = function (evt) {

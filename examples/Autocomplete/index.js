@@ -1,7 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Rx from 'rxjs/Rx'
-import createRecycle from '../../src/index'
+import Recycle from '../../src/index'
+import { Observable } from 'rxjs/Observable'
+import 'rxjs/add/observable/dom/ajax'
+import 'rxjs/add/operator/debounceTime'
+import 'rxjs/add/operator/switchMap'
+import 'rxjs/add/operator/catch'
 
 function Autocomplete () {
   return {
@@ -17,7 +21,7 @@ function Autocomplete () {
           .map(e => e.target.value)
           .filter(val => val.length > 2)
           .switchMap(val =>
-            Rx.Observable.ajax('https://api.github.com/search/users?q=' + val)
+            Observable.ajax('https://api.github.com/search/users?q=' + val)
               .map(res => ({ type: 'autocompleteFetched', payload: res.response.items.slice(0, 10) }))
               .catch(err => [{ type: 'autocompleteError', payload: err.message }])
           )
@@ -61,8 +65,6 @@ function Autocomplete () {
   }
 }
 
-const recycle = createRecycle({
-  adapter: [React, ReactDOM, Rx]
-})
-
-recycle.render(Autocomplete, document.getElementById('app'))
+ReactDOM.render((
+  <Recycle root={Autocomplete} />
+), document.getElementById('app'))

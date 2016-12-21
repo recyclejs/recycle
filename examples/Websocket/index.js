@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Rx from 'rxjs/Rx'
-import createRecycle from '../../src/index'
+import Recycle from '../../src/index'
 import WebSocketPlugin from './websocket-plugin'
 
 function WebSocketEcho () {
@@ -65,11 +64,7 @@ function WebSocketEcho () {
   }
 }
 
-const recycle = createRecycle({
-  adapter: [React, ReactDOM, Rx],
-  plugins: [
-    WebSocketPlugin
-  ]
-})
+ReactDOM.render((
+  <Recycle root={WebSocketEcho} plugins={[WebSocketPlugin]} />
+), document.getElementById('app'))
 
-recycle.render(WebSocketEcho, document.getElementById('app'))

@@ -1,16 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Rx from 'rxjs/Rx'
+import { Router, Route, hashHistory } from 'react-router'
 import 'todomvc-common/base.css'
 import 'todomvc-app-css/index.css'
-import createRecycle from '../../src/index'
-import { Router, Route, hashHistory } from 'react-router'
+import Recycle from '../../src/index'
 import TodoList from './components/TodoList/index'
 
-const recycle = createRecycle({
-  adapter: [React, ReactDOM, Rx]
+const TodoListReact = Recycle({
+  root: TodoList
 })
-const TodoListReact = recycle.toReact(TodoList)
 
 ReactDOM.render((
   <Router history={hashHistory}>

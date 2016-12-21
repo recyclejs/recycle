@@ -1,29 +1,26 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Rx from 'rxjs/Rx'
+import { Router, Route, hashHistory } from 'react-router'
 import 'todomvc-common/base.css'
 import 'todomvc-app-css/index.css'
-import createRecycle from '../../src/index'
+import Recycle from '../../src/index'
 import createStore from '../../src/plugins/store'
-import { Router, Route, hashHistory } from 'react-router'
 import TodoList from './containers/TodoList/index'
 import { updateLocalStorage, getFromLocalStorage } from './utils'
 
-const recycle = createRecycle({
-  adapter: [React, ReactDOM, Rx],
-  plugins: [
-    createStore({
-      initialState: {
-        todos: {
-          list: getFromLocalStorage()
-        }
-      },
-      onUpdate: updateLocalStorage
-    })
-  ]
+const storePlugin = createStore({
+  initialState: {
+    todos: {
+      list: getFromLocalStorage()
+    }
+  },
+  onUpdate: updateLocalStorage
 })
 
-const TodoListReact = recycle.toReact(TodoList)
+const TodoListReact = Recycle({
+  root: TodoList,
+  plugins: [storePlugin]
+})
 
 ReactDOM.render((
   <Router history={hashHistory}>
