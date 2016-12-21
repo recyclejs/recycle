@@ -1,22 +1,69 @@
 # Recycle
 
-A functional and reactive JavaScript framework for creating components where View is a visual representation of the state which can be changed by reducers reacting to actions.
+Recycle is a functional and reactive library for [React](https://facebook.github.io/react).
+
+With Recycle you can create your components using [FRP paradigm](https://en.wikipedia.org/wiki/Functional_reactive_programming), 
+where View is a visual representation of the state which can be changed by reducers reacting to actions.
 
 [![npm version](https://img.shields.io/npm/v/recyclejs.svg?style=flat-square)](https://www.npmjs.com/package/recyclejs)
 [![npm downloads](https://img.shields.io/npm/dm/recyclejs.svg?style=flat-square)](https://www.npmjs.com/package/recyclejs)
 
 ## Key Features
-* View is a "clean" representation of the state (without `onClick`, `keyUp` or similar event handlers)
-* Fully compatible with React (Recycle in React app or React in Recycle app)
-* Functional - components can be defined with only pure functions
-* Reactive - async operations are handled with Observables (RxJS by default)
+* View is a "clean" representation of the state (without `onClick`, `keyUp` or similar event handlers which leads to a better separation of concerns)
+* Functional - all components can be defined without the use of classes
+* Reactive - async operations are handled with Observables ([RxJS](https://github.com/ReactiveX/rxjs))
 * Declarative - components are defined in a [declarative manner](https://medium.freecodecamp.com/imperative-vs-declarative-programming-283e96bf8aea#.py5l5or52), using actions and reducers
-* Built-in state managment plugin
-* If compatible, React and RxJS can easily be replaced with another library
 
 ## Installation
 ```bash
 npm install --save recyclejs
+```
+
+## Usage
+```javascript
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Recycle from 'recyclejs'
+
+function SingleCounter () {
+  return {
+    initialState: {
+      timesClicked: 0
+    },
+
+    actions (sources) {
+      return [
+        sources.DOM.select('button')
+          .events('click')
+          .mapTo({ type: 'buttonClicked' })
+      ]
+    },
+
+    reducers (sources) {
+      return [
+        sources.actions
+          .filterByType('buttonClicked')
+          .reducer(function (state) {
+            state.timesClicked++
+            return state
+          })
+      ]
+    },
+
+    view (props, state) {
+      return (
+        <div>
+          <span>Times clicked: {state.timesClicked}</span>
+          <button>Click me</button>
+        </div>
+      )
+    }
+  }
+}
+
+ReactDOM.render((
+  <Recycle root={SingleCounter} />
+), document.getElementById('app'))
 ```
 
 ## Documentation
@@ -25,7 +72,7 @@ npm install --save recyclejs
   * [Hello World](https://recycle.js.org/docs/quick-start/HelloWorld.html)
   * [Stateful Component](https://recycle.js.org/docs/quick-start/StatefulComponent.html)
   * [Parent-Child Relationship](https://recycle.js.org/docs/quick-start/ParentChild.html)
-  * [Using React Components](https://recycle.js.org/docs/quick-start/UsingReactComponents.html)
+  * [Usage with React](https://recycle.js.org/docs/quick-start/UsingReactComponents.html)
 
 ### Advanced Examples
   * [Autocomplete](https://recycle.js.org/docs/advanced-examples/Autocomplete.html)
@@ -36,8 +83,6 @@ npm install --save recyclejs
     * [Isolated Reducers](https://recycle.js.org/docs/advanced-examples/todomvc/TodoMVCStoreIsolated.html)
 
 ### API Reference
-  * [adapter](https://recycle.js.org/docs/api-reference/adapter.html)
-  * [createRecycle](https://recycle.js.org/docs/api-reference/createRecycle.html)
   * [Component](https://recycle.js.org/docs/api-reference/Component.html)
   * [Recycle RxJS Operators](https://recycle.js.org/docs/api-reference/recycleRxjsOperators.html)
   * [Plugins](https://recycle.js.org/docs/api-reference/Plugins.html)

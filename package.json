@@ -1,7 +1,7 @@
 {
   "name": "recyclejs",
   "version": "0.6.0",
-  "description": "A functional and reactive JavaScript framework for creating components where View is a visual representation of the state which can be changed by reducers reacting to actions",
+  "description": "A functional and reactive library for React",
   "main": "index.js",
   "scripts": {
     "prepublish": "npm test && npm run build",
@@ -43,12 +43,12 @@
     "react-router": "^3.0.0",
     "style-loader": "^0.13.1",
     "todomvc-app-css": "^2.0.6",
-    "todomvc-common": "^1.0.3",
-    "react": "^15.4.1",
-    "react-dom": "^15.4.1",
-    "rxjs": "^5.0.1"
+    "todomvc-common": "^1.0.3"
   },
   "dependencies": {
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1",
+    "rxjs": "^5.0.1",
     "objectpath": "^1.2.1"
   }
 }
