@@ -1,6 +1,7 @@
 # Table of contents
 
 * [Read Me](/README.md)
+* [Motivation](/docs/Motivation.md)
 * [Quick Start](/docs/quick-start/README.md)
   * [Hello World](/docs/quick-start/HelloWorld.md)
   * [Stateful Component](/docs/quick-start/StatefulComponent.md)

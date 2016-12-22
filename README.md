@@ -33,8 +33,11 @@ function SingleCounter () {
     },
 
     actions (sources) {
+      // selecting elements are isolated to component
+      const button = sources.DOM.select('button')
+
       return [
-        sources.DOM.select('button')
+        button
           .events('click')
           .mapTo({ type: 'buttonClicked' })
       ]
@@ -68,6 +71,8 @@ ReactDOM.render((
 ```
 
 ## Documentation
+
+### [Motivation](https://recycle.js.org/docs/Motivation.html)
 
 ### Quick Start
   * [Hello World](https://recycle.js.org/docs/quick-start/HelloWorld.html)
