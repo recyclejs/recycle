@@ -33,7 +33,7 @@ function SingleCounter () {
     },
 
     actions (sources) {
-      // selecting elements are isolated to component
+      // selecting element is isolated only to current component
       const button = sources.DOM.select('button')
 
       return [
