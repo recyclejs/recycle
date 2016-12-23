@@ -14,6 +14,7 @@
     * [Without Store](/docs/advanced-examples/todomvc/TodoMVCNoPlugin.md)
     * [With Store](/docs/advanced-examples/todomvc/TodoMVCStore.md)
     * [Isolated Reducers](/docs/advanced-examples/todomvc/TodoMVCStoreIsolated.md)
+    * [Redux](/docs/advanced-examples/todomvc/TodoMVCRedux.md)
 * [API Reference](/docs/api-reference/README.md)
   * [Component](/docs/api-reference/Component.md)
   * [Recycle RxJS Operators](/docs/api-reference/recycleRxjsOperators.md)

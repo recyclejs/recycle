@@ -87,6 +87,7 @@ ReactDOM.render((
     * [Without Store](https://recycle.js.org/docs/advanced-examples/todomvc/TodoMVCNoPlugin.html)
     * [With Store](https://recycle.js.org/docs/advanced-examples/todomvc/TodoMVCStore.html)
     * [Isolated Reducers](https://recycle.js.org/docs/advanced-examples/todomvc/TodoMVCStoreIsolated.html)
+    * [Redux](https://recycle.js.org/docs/advanced-examples/todomvc/TodoMVCRedux.html)
 
 ### API Reference
   * [Component](https://recycle.js.org/docs/api-reference/Component.html)
