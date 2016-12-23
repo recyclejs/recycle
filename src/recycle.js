@@ -130,6 +130,8 @@ export default function ({
         }
 
         componentWillUnmount () {
+          emit('componentWillUnmount', thisComponent)
+
           if (this.stateSubsription) {
             this.stateSubsription.unsubscribe()
           }
