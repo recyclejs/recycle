@@ -64,15 +64,15 @@
 
 	var _index2 = _interopRequireDefault(_index);
 
-	var _store = __webpack_require__(320);
+	var _store = __webpack_require__(349);
 
 	var _store2 = _interopRequireDefault(_store);
 
-	var _index3 = __webpack_require__(336);
+	var _index3 = __webpack_require__(365);
 
 	var _index4 = _interopRequireDefault(_index3);
 
-	var _utils = __webpack_require__(338);
+	var _utils = __webpack_require__(367);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24628,6 +24628,8 @@
 	        }, {
 	          key: 'componentWillUnmount',
 	          value: function componentWillUnmount() {
+	            emit('componentWillUnmount', thisComponent);
+
 	            if (this.stateSubsription) {
 	              this.stateSubsription.unsubscribe();
 	            }
@@ -30458,7 +30460,36 @@
 /***/ },
 /* 318 */,
 /* 319 */,
-/* 320 */
+/* 320 */,
+/* 321 */,
+/* 322 */,
+/* 323 */,
+/* 324 */,
+/* 325 */,
+/* 326 */,
+/* 327 */,
+/* 328 */,
+/* 329 */,
+/* 330 */,
+/* 331 */,
+/* 332 */,
+/* 333 */,
+/* 334 */,
+/* 335 */,
+/* 336 */,
+/* 337 */,
+/* 338 */,
+/* 339 */,
+/* 340 */,
+/* 341 */,
+/* 342 */,
+/* 343 */,
+/* 344 */,
+/* 345 */,
+/* 346 */,
+/* 347 */,
+/* 348 */,
+/* 349 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30475,7 +30506,7 @@
 	exports.setByPath = setByPath;
 	exports.shouldUpdate = shouldUpdate;
 
-	var _objectpath = __webpack_require__(321);
+	var _objectpath = __webpack_require__(350);
 
 	var _objectpath2 = _interopRequireDefault(_objectpath);
 
@@ -30601,14 +30632,14 @@
 	}
 
 /***/ },
-/* 321 */
+/* 350 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(322).ObjectPath;
+	module.exports = __webpack_require__(351).ObjectPath;
 
 
 /***/ },
-/* 322 */
+/* 351 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -30716,20 +30747,20 @@
 	}();
 
 /***/ },
-/* 323 */,
-/* 324 */,
-/* 325 */,
-/* 326 */,
-/* 327 */,
-/* 328 */,
-/* 329 */,
-/* 330 */,
-/* 331 */,
-/* 332 */,
-/* 333 */,
-/* 334 */,
-/* 335 */,
-/* 336 */
+/* 352 */,
+/* 353 */,
+/* 354 */,
+/* 355 */,
+/* 356 */,
+/* 357 */,
+/* 358 */,
+/* 359 */,
+/* 360 */,
+/* 361 */,
+/* 362 */,
+/* 363 */,
+/* 364 */,
+/* 365 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30739,11 +30770,11 @@
 	});
 	exports.default = TodoListContainer;
 
-	var _reducers = __webpack_require__(337);
+	var _reducers = __webpack_require__(366);
 
-	var _utils = __webpack_require__(338);
+	var _utils = __webpack_require__(367);
 
-	var _index = __webpack_require__(339);
+	var _index = __webpack_require__(368);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -30767,7 +30798,7 @@
 	}
 
 /***/ },
-/* 337 */
+/* 366 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30779,7 +30810,7 @@
 	exports.toggleAll = toggleAll;
 	exports.deleteCompleted = deleteCompleted;
 
-	var _utils = __webpack_require__(338);
+	var _utils = __webpack_require__(367);
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -30823,7 +30854,7 @@
 	}
 
 /***/ },
-/* 338 */
+/* 367 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -30874,7 +30905,7 @@
 	}
 
 /***/ },
-/* 339 */
+/* 368 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30884,15 +30915,15 @@
 	});
 	exports.default = TodoList;
 
-	var _actions = __webpack_require__(340);
+	var _actions = __webpack_require__(369);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _view = __webpack_require__(341);
+	var _view = __webpack_require__(370);
 
 	var _view2 = _interopRequireDefault(_view);
 
-	var _reducers = __webpack_require__(348);
+	var _reducers = __webpack_require__(377);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -30910,7 +30941,7 @@
 	}
 
 /***/ },
-/* 340 */
+/* 369 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30920,7 +30951,7 @@
 	});
 	exports.default = actions;
 
-	var _utils = __webpack_require__(338);
+	var _utils = __webpack_require__(367);
 
 	function actions(sources) {
 	  var newTodoInput = sources.DOM.select('.new-todo');
@@ -30953,7 +30984,7 @@
 	}
 
 /***/ },
-/* 341 */
+/* 370 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30963,7 +30994,7 @@
 	});
 	exports.default = view;
 
-	var _index = __webpack_require__(342);
+	var _index = __webpack_require__(371);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -31078,7 +31109,7 @@
 	}
 
 /***/ },
-/* 342 */
+/* 371 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31088,9 +31119,9 @@
 	});
 	exports.default = TodoContainer;
 
-	var _reducers = __webpack_require__(343);
+	var _reducers = __webpack_require__(372);
 
-	var _index = __webpack_require__(344);
+	var _index = __webpack_require__(373);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -31114,7 +31145,7 @@
 	}
 
 /***/ },
-/* 343 */
+/* 372 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -31140,7 +31171,7 @@
 	}
 
 /***/ },
-/* 344 */
+/* 373 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31150,15 +31181,15 @@
 	});
 	exports.default = Todo;
 
-	var _actions = __webpack_require__(345);
+	var _actions = __webpack_require__(374);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _view = __webpack_require__(346);
+	var _view = __webpack_require__(375);
 
 	var _view2 = _interopRequireDefault(_view);
 
-	var _reducers = __webpack_require__(347);
+	var _reducers = __webpack_require__(376);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -31178,7 +31209,7 @@
 	}
 
 /***/ },
-/* 345 */
+/* 374 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31188,7 +31219,7 @@
 	});
 	exports.default = actions;
 
-	var _utils = __webpack_require__(338);
+	var _utils = __webpack_require__(367);
 
 	function actions(sources) {
 	  var toggleCheckbox = sources.DOM.select('.toggle');
@@ -31212,7 +31243,7 @@
 	}
 
 /***/ },
-/* 346 */
+/* 375 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31265,7 +31296,7 @@
 	}
 
 /***/ },
-/* 347 */
+/* 376 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31291,7 +31322,7 @@
 	}
 
 /***/ },
-/* 348 */
+/* 377 */
 /***/ function(module, exports) {
 
 	'use strict';

@@ -64,15 +64,15 @@
 
 	var _index2 = _interopRequireDefault(_index);
 
-	var _store = __webpack_require__(320);
+	var _store = __webpack_require__(349);
 
 	var _store2 = _interopRequireDefault(_store);
 
-	var _index3 = __webpack_require__(323);
+	var _index3 = __webpack_require__(352);
 
 	var _index4 = _interopRequireDefault(_index3);
 
-	var _utils = __webpack_require__(327);
+	var _utils = __webpack_require__(356);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24628,6 +24628,8 @@
 	        }, {
 	          key: 'componentWillUnmount',
 	          value: function componentWillUnmount() {
+	            emit('componentWillUnmount', thisComponent);
+
 	            if (this.stateSubsription) {
 	              this.stateSubsription.unsubscribe();
 	            }
@@ -30458,7 +30460,36 @@
 /***/ },
 /* 318 */,
 /* 319 */,
-/* 320 */
+/* 320 */,
+/* 321 */,
+/* 322 */,
+/* 323 */,
+/* 324 */,
+/* 325 */,
+/* 326 */,
+/* 327 */,
+/* 328 */,
+/* 329 */,
+/* 330 */,
+/* 331 */,
+/* 332 */,
+/* 333 */,
+/* 334 */,
+/* 335 */,
+/* 336 */,
+/* 337 */,
+/* 338 */,
+/* 339 */,
+/* 340 */,
+/* 341 */,
+/* 342 */,
+/* 343 */,
+/* 344 */,
+/* 345 */,
+/* 346 */,
+/* 347 */,
+/* 348 */,
+/* 349 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30475,7 +30506,7 @@
 	exports.setByPath = setByPath;
 	exports.shouldUpdate = shouldUpdate;
 
-	var _objectpath = __webpack_require__(321);
+	var _objectpath = __webpack_require__(350);
 
 	var _objectpath2 = _interopRequireDefault(_objectpath);
 
@@ -30601,14 +30632,14 @@
 	}
 
 /***/ },
-/* 321 */
+/* 350 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(322).ObjectPath;
+	module.exports = __webpack_require__(351).ObjectPath;
 
 
 /***/ },
-/* 322 */
+/* 351 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -30716,7 +30747,7 @@
 	}();
 
 /***/ },
-/* 323 */
+/* 352 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30726,9 +30757,9 @@
 	});
 	exports.default = TodoListContainer;
 
-	var _reducers = __webpack_require__(324);
+	var _reducers = __webpack_require__(353);
 
-	var _index = __webpack_require__(325);
+	var _index = __webpack_require__(354);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -30752,7 +30783,7 @@
 	}
 
 /***/ },
-/* 324 */
+/* 353 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -30798,7 +30829,7 @@
 	}
 
 /***/ },
-/* 325 */
+/* 354 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30808,15 +30839,15 @@
 	});
 	exports.default = TodoList;
 
-	var _actions = __webpack_require__(326);
+	var _actions = __webpack_require__(355);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _view = __webpack_require__(328);
+	var _view = __webpack_require__(357);
 
 	var _view2 = _interopRequireDefault(_view);
 
-	var _reducers = __webpack_require__(335);
+	var _reducers = __webpack_require__(364);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -30834,7 +30865,7 @@
 	}
 
 /***/ },
-/* 326 */
+/* 355 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30844,7 +30875,7 @@
 	});
 	exports.default = actions;
 
-	var _utils = __webpack_require__(327);
+	var _utils = __webpack_require__(356);
 
 	function actions(sources) {
 	  var newTodoInput = sources.DOM.select('.new-todo');
@@ -30869,7 +30900,7 @@
 	}
 
 /***/ },
-/* 327 */
+/* 356 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -30900,7 +30931,7 @@
 	}
 
 /***/ },
-/* 328 */
+/* 357 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30910,7 +30941,7 @@
 	});
 	exports.default = view;
 
-	var _index = __webpack_require__(329);
+	var _index = __webpack_require__(358);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -31025,7 +31056,7 @@
 	}
 
 /***/ },
-/* 329 */
+/* 358 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31035,9 +31066,9 @@
 	});
 	exports.default = TodoContainer;
 
-	var _reducers = __webpack_require__(330);
+	var _reducers = __webpack_require__(359);
 
-	var _index = __webpack_require__(331);
+	var _index = __webpack_require__(360);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -31067,7 +31098,7 @@
 	}
 
 /***/ },
-/* 330 */
+/* 359 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -31105,7 +31136,7 @@
 	}
 
 /***/ },
-/* 331 */
+/* 360 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31115,15 +31146,15 @@
 	});
 	exports.default = Todo;
 
-	var _actions = __webpack_require__(332);
+	var _actions = __webpack_require__(361);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _view = __webpack_require__(333);
+	var _view = __webpack_require__(362);
 
 	var _view2 = _interopRequireDefault(_view);
 
-	var _reducers = __webpack_require__(334);
+	var _reducers = __webpack_require__(363);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -31143,7 +31174,7 @@
 	}
 
 /***/ },
-/* 332 */
+/* 361 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31153,7 +31184,7 @@
 	});
 	exports.default = actions;
 
-	var _utils = __webpack_require__(327);
+	var _utils = __webpack_require__(356);
 
 	function actions(sources) {
 	  var toggleCheckbox = sources.DOM.select('.toggle');
@@ -31185,7 +31216,7 @@
 	}
 
 /***/ },
-/* 333 */
+/* 362 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31238,7 +31269,7 @@
 	}
 
 /***/ },
-/* 334 */
+/* 363 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31264,7 +31295,7 @@
 	}
 
 /***/ },
-/* 335 */
+/* 364 */
 /***/ function(module, exports) {
 
 	'use strict';

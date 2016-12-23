@@ -24596,6 +24596,8 @@
 	        }, {
 	          key: 'componentWillUnmount',
 	          value: function componentWillUnmount() {
+	            emit('componentWillUnmount', thisComponent);
+
 	            if (this.stateSubsription) {
 	              this.stateSubsription.unsubscribe();
 	            }
