@@ -68,15 +68,15 @@
 
 	var _TodoList2 = _interopRequireDefault(_TodoList);
 
-	var _redux = __webpack_require__(326);
+	var _redux = __webpack_require__(331);
 
 	var _redux2 = _interopRequireDefault(_redux);
 
 	var _utils = __webpack_require__(323);
 
-	var _redux3 = __webpack_require__(327);
+	var _redux3 = __webpack_require__(332);
 
-	var _todos = __webpack_require__(348);
+	var _todos = __webpack_require__(353);
 
 	var _todos2 = _interopRequireDefault(_todos);
 
@@ -30488,7 +30488,7 @@
 	function TodoListContainer() {
 	  return {
 	    dispatch: function dispatch(childrenActions) {
-	      return childrenActions;
+	      return [childrenActions.filterByType('toggleAll'), childrenActions.filterByType('deleteCompleted'), childrenActions.filterByType('insertTodo')];
 	    },
 	    view: function view(props, state) {
 	      return _react2.default.createElement(_index2.default, { todos: state.list, filter: props.route.filter });
@@ -30515,7 +30515,7 @@
 
 	var _view2 = _interopRequireDefault(_view);
 
-	var _reducers = __webpack_require__(325);
+	var _reducers = __webpack_require__(330);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -30609,7 +30609,7 @@
 	});
 	exports.default = view;
 
-	var _Todo = __webpack_require__(379);
+	var _Todo = __webpack_require__(325);
 
 	var _Todo2 = _interopRequireDefault(_Todo);
 
@@ -30725,6 +30725,209 @@
 
 /***/ },
 /* 325 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = TodoContainer;
+
+	var _index = __webpack_require__(326);
+
+	var _index2 = _interopRequireDefault(_index);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function TodoContainer(props) {
+	  return {
+	    dispatch: function dispatch(childrenActions) {
+	      return [childrenActions.filterByType('toggle').map(function (action) {
+	        return { type: 'toggleTodo', id: action.id };
+	      }), childrenActions.filterByType('destroy').map(function (action) {
+	        return { type: 'deleteTodo', id: action.id };
+	      }), childrenActions.filterByType('titleChanged').map(function (action) {
+	        return { type: 'editTodo', id: action.id, title: action.title };
+	      })];
+	    },
+	    view: function view(props, state) {
+	      var todo = state.list.find(function (todo) {
+	        return todo.id === props.id;
+	      });
+	      if (!todo) {
+	        return null;
+	      }
+	      return _react2.default.createElement(_index2.default, { title: todo.title, id: todo.id, completed: todo.completed });
+	    }
+	  };
+	}
+
+/***/ },
+/* 326 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = Todo;
+
+	var _actions = __webpack_require__(327);
+
+	var _actions2 = _interopRequireDefault(_actions);
+
+	var _view = __webpack_require__(328);
+
+	var _view2 = _interopRequireDefault(_view);
+
+	var _reducers = __webpack_require__(329);
+
+	var _reducers2 = _interopRequireDefault(_reducers);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function Todo() {
+	  return {
+	    initialState: {
+	      editing: false,
+	      inputVal: ''
+	    },
+	    actions: _actions2.default,
+	    reducers: _reducers2.default,
+	    view: _view2.default,
+	    componentDidUpdate: _view.componentDidUpdate
+	  };
+	}
+
+/***/ },
+/* 327 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = actions;
+
+	var _utils = __webpack_require__(323);
+
+	function actions(sources) {
+	  var toggleCheckbox = sources.DOM.select('.toggle');
+	  var destroyIcon = sources.DOM.select('.destroy');
+	  var editInput = sources.DOM.select('.edit');
+	  var todoLabel = sources.DOM.select('label');
+
+	  return [destroyIcon.events('click').mapToLatest(sources.props).map(function (props) {
+	    return { type: 'destroy', id: props.id };
+	  }), toggleCheckbox.events('change').mapToLatest(sources.props).map(function (props) {
+	    return { type: 'toggle', id: props.id };
+	  }), todoLabel.events('dblclick').mapTo({ type: 'startEdit' }), editInput.events('input').map(function (ev) {
+	    return { type: 'inputVal', value: ev.target.value };
+	  }), editInput.events('keyup').filter(function (ev) {
+	    return ev.keyCode === _utils.ENTER_KEY;
+	  }).merge(editInput.events('blur', true)).mapToLatest(sources.props, sources.state).map(function (_ref) {
+	    var props = _ref.props,
+	        state = _ref.state;
+	    return { type: 'titleChanged', id: props.id, title: state.inputVal };
+	  }), editInput.events('keyup').filter(function (ev) {
+	    return ev.keyCode === _utils.ESC_KEY;
+	  }).map(function () {
+	    return { type: 'cancelEdit' };
+	  }), sources.actions.filterByType('cancelEdit').mapToLatest(sources.props).map(function (props) {
+	    return { type: 'inputVal', value: props.title };
+	  }), sources.actions.filterByType('startEdit').mapToLatest(sources.props).map(function (props) {
+	    return { type: 'inputVal', value: props.title };
+	  })];
+	}
+
+/***/ },
+/* 328 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = view;
+	exports.componentDidUpdate = componentDidUpdate;
+
+	var _classnames = __webpack_require__(317);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function view(props, state) {
+	  return _react2.default.createElement(
+	    'li',
+	    { className: 'todoRoot ' + (0, _classnames2.default)({ completed: props.completed, editing: state.editing }) },
+	    _react2.default.createElement(
+	      'div',
+	      { className: 'view' },
+	      _react2.default.createElement('input', { className: 'toggle', type: 'checkbox', checked: props.completed }),
+	      _react2.default.createElement(
+	        'label',
+	        null,
+	        props.title
+	      ),
+	      _react2.default.createElement('button', { className: 'destroy' })
+	    ),
+	    _react2.default.createElement('input', { className: 'edit', type: 'text', value: state.inputVal })
+	  );
+	}
+
+	function componentDidUpdate(_ref) {
+	  var select = _ref.select,
+	      state = _ref.state,
+	      prevState = _ref.prevState;
+
+	  if (!prevState.editing && state.editing) {
+	    var node = select('input.edit');
+	    node.focus();
+	    node.select();
+	  }
+	}
+
+/***/ },
+/* 329 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.default = reducers;
+	function reducers(sources) {
+	  return [sources.actions.filterByType('startEdit').reducer(function (state) {
+	    state.editing = true;
+	    return state;
+	  }), sources.actions.filterByType('cancelEdit').reducer(function (state) {
+	    state.editing = false;
+	    return state;
+	  }), sources.actions.filterByType('titleChanged').reducer(function (state) {
+	    state.editing = false;
+	    return state;
+	  }), sources.actions.filterByType('inputVal').reducer(function (state, action) {
+	    state.inputVal = action.value;
+	    return state;
+	  })];
+	}
+
+/***/ },
+/* 330 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -30741,7 +30944,7 @@
 	}
 
 /***/ },
-/* 326 */
+/* 331 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30795,7 +30998,7 @@
 	}
 
 /***/ },
-/* 327 */
+/* 332 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -30803,27 +31006,27 @@
 	exports.__esModule = true;
 	exports.compose = exports.applyMiddleware = exports.bindActionCreators = exports.combineReducers = exports.createStore = undefined;
 
-	var _createStore = __webpack_require__(328);
+	var _createStore = __webpack_require__(333);
 
 	var _createStore2 = _interopRequireDefault(_createStore);
 
-	var _combineReducers = __webpack_require__(343);
+	var _combineReducers = __webpack_require__(348);
 
 	var _combineReducers2 = _interopRequireDefault(_combineReducers);
 
-	var _bindActionCreators = __webpack_require__(345);
+	var _bindActionCreators = __webpack_require__(350);
 
 	var _bindActionCreators2 = _interopRequireDefault(_bindActionCreators);
 
-	var _applyMiddleware = __webpack_require__(346);
+	var _applyMiddleware = __webpack_require__(351);
 
 	var _applyMiddleware2 = _interopRequireDefault(_applyMiddleware);
 
-	var _compose = __webpack_require__(347);
+	var _compose = __webpack_require__(352);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
-	var _warning = __webpack_require__(344);
+	var _warning = __webpack_require__(349);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -30847,7 +31050,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 328 */
+/* 333 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30856,11 +31059,11 @@
 	exports.ActionTypes = undefined;
 	exports['default'] = createStore;
 
-	var _isPlainObject = __webpack_require__(329);
+	var _isPlainObject = __webpack_require__(334);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _symbolObservable = __webpack_require__(339);
+	var _symbolObservable = __webpack_require__(344);
 
 	var _symbolObservable2 = _interopRequireDefault(_symbolObservable);
 
@@ -31113,12 +31316,12 @@
 	}
 
 /***/ },
-/* 329 */
+/* 334 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var baseGetTag = __webpack_require__(330),
-	    getPrototype = __webpack_require__(336),
-	    isObjectLike = __webpack_require__(338);
+	var baseGetTag = __webpack_require__(335),
+	    getPrototype = __webpack_require__(341),
+	    isObjectLike = __webpack_require__(343);
 
 	/** `Object#toString` result references. */
 	var objectTag = '[object Object]';
@@ -31181,12 +31384,12 @@
 
 
 /***/ },
-/* 330 */
+/* 335 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Symbol = __webpack_require__(331),
-	    getRawTag = __webpack_require__(334),
-	    objectToString = __webpack_require__(335);
+	var Symbol = __webpack_require__(336),
+	    getRawTag = __webpack_require__(339),
+	    objectToString = __webpack_require__(340);
 
 	/** `Object#toString` result references. */
 	var nullTag = '[object Null]',
@@ -31216,10 +31419,10 @@
 
 
 /***/ },
-/* 331 */
+/* 336 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var root = __webpack_require__(332);
+	var root = __webpack_require__(337);
 
 	/** Built-in value references. */
 	var Symbol = root.Symbol;
@@ -31228,10 +31431,10 @@
 
 
 /***/ },
-/* 332 */
+/* 337 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var freeGlobal = __webpack_require__(333);
+	var freeGlobal = __webpack_require__(338);
 
 	/** Detect free variable `self`. */
 	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
@@ -31243,7 +31446,7 @@
 
 
 /***/ },
-/* 333 */
+/* 338 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
@@ -31254,10 +31457,10 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 334 */
+/* 339 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Symbol = __webpack_require__(331);
+	var Symbol = __webpack_require__(336);
 
 	/** Used for built-in method references. */
 	var objectProto = Object.prototype;
@@ -31306,7 +31509,7 @@
 
 
 /***/ },
-/* 335 */
+/* 340 */
 /***/ function(module, exports) {
 
 	/** Used for built-in method references. */
@@ -31334,10 +31537,10 @@
 
 
 /***/ },
-/* 336 */
+/* 341 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var overArg = __webpack_require__(337);
+	var overArg = __webpack_require__(342);
 
 	/** Built-in value references. */
 	var getPrototype = overArg(Object.getPrototypeOf, Object);
@@ -31346,7 +31549,7 @@
 
 
 /***/ },
-/* 337 */
+/* 342 */
 /***/ function(module, exports) {
 
 	/**
@@ -31367,7 +31570,7 @@
 
 
 /***/ },
-/* 338 */
+/* 343 */
 /***/ function(module, exports) {
 
 	/**
@@ -31402,14 +31605,14 @@
 
 
 /***/ },
-/* 339 */
+/* 344 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(340);
+	module.exports = __webpack_require__(345);
 
 
 /***/ },
-/* 340 */
+/* 345 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global, module) {'use strict';
@@ -31418,7 +31621,7 @@
 	  value: true
 	});
 
-	var _ponyfill = __webpack_require__(342);
+	var _ponyfill = __webpack_require__(347);
 
 	var _ponyfill2 = _interopRequireDefault(_ponyfill);
 
@@ -31441,10 +31644,10 @@
 
 	var result = (0, _ponyfill2['default'])(root);
 	exports['default'] = result;
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(341)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(346)(module)))
 
 /***/ },
-/* 341 */
+/* 346 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -31460,7 +31663,7 @@
 
 
 /***/ },
-/* 342 */
+/* 347 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31488,7 +31691,7 @@
 	};
 
 /***/ },
-/* 343 */
+/* 348 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -31496,13 +31699,13 @@
 	exports.__esModule = true;
 	exports['default'] = combineReducers;
 
-	var _createStore = __webpack_require__(328);
+	var _createStore = __webpack_require__(333);
 
-	var _isPlainObject = __webpack_require__(329);
+	var _isPlainObject = __webpack_require__(334);
 
 	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-	var _warning = __webpack_require__(344);
+	var _warning = __webpack_require__(349);
 
 	var _warning2 = _interopRequireDefault(_warning);
 
@@ -31636,7 +31839,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 344 */
+/* 349 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31666,7 +31869,7 @@
 	}
 
 /***/ },
-/* 345 */
+/* 350 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31722,7 +31925,7 @@
 	}
 
 /***/ },
-/* 346 */
+/* 351 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31733,7 +31936,7 @@
 
 	exports['default'] = applyMiddleware;
 
-	var _compose = __webpack_require__(347);
+	var _compose = __webpack_require__(352);
 
 	var _compose2 = _interopRequireDefault(_compose);
 
@@ -31785,7 +31988,7 @@
 	}
 
 /***/ },
-/* 347 */
+/* 352 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -31828,7 +32031,7 @@
 	}
 
 /***/ },
-/* 348 */
+/* 353 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31917,239 +32120,6 @@
 	  todo.completed = !todo.completed;
 
 	  return state;
-	}
-
-/***/ },
-/* 349 */,
-/* 350 */,
-/* 351 */,
-/* 352 */,
-/* 353 */,
-/* 354 */,
-/* 355 */,
-/* 356 */,
-/* 357 */,
-/* 358 */,
-/* 359 */,
-/* 360 */,
-/* 361 */,
-/* 362 */,
-/* 363 */,
-/* 364 */,
-/* 365 */,
-/* 366 */,
-/* 367 */,
-/* 368 */,
-/* 369 */,
-/* 370 */,
-/* 371 */,
-/* 372 */,
-/* 373 */,
-/* 374 */,
-/* 375 */,
-/* 376 */,
-/* 377 */,
-/* 378 */,
-/* 379 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = TodoContainer;
-
-	var _index = __webpack_require__(380);
-
-	var _index2 = _interopRequireDefault(_index);
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function TodoContainer(props) {
-	  return {
-	    dispatch: function dispatch(childrenActions) {
-	      return [childrenActions.filterByType('toggle').map(function (action) {
-	        return { type: 'toggleTodo', id: action.id };
-	      }), childrenActions.filterByType('destroy').map(function (action) {
-	        return { type: 'deleteTodo', id: action.id };
-	      }), childrenActions.filterByType('titleChanged').map(function (action) {
-	        return { type: 'editTodo', id: action.id, title: action.title };
-	      })];
-	    },
-	    view: function view(props, state) {
-	      var todo = state.list.find(function (todo) {
-	        return todo.id === props.id;
-	      });
-	      if (!todo) {
-	        return null;
-	      }
-	      return _react2.default.createElement(_index2.default, { title: todo.title, id: todo.id, completed: todo.completed });
-	    }
-	  };
-	}
-
-/***/ },
-/* 380 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = Todo;
-
-	var _actions = __webpack_require__(381);
-
-	var _actions2 = _interopRequireDefault(_actions);
-
-	var _view = __webpack_require__(382);
-
-	var _view2 = _interopRequireDefault(_view);
-
-	var _reducers = __webpack_require__(383);
-
-	var _reducers2 = _interopRequireDefault(_reducers);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function Todo() {
-	  return {
-	    initialState: {
-	      editing: false,
-	      inputVal: ''
-	    },
-	    actions: _actions2.default,
-	    reducers: _reducers2.default,
-	    view: _view2.default,
-	    componentDidUpdate: _view.componentDidUpdate
-	  };
-	}
-
-/***/ },
-/* 381 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = actions;
-
-	var _utils = __webpack_require__(323);
-
-	function actions(sources) {
-	  var toggleCheckbox = sources.DOM.select('.toggle');
-	  var destroyIcon = sources.DOM.select('.destroy');
-	  var editInput = sources.DOM.select('.edit');
-	  var todoLabel = sources.DOM.select('label');
-
-	  return [destroyIcon.events('click').mapToLatest(sources.props).map(function (props) {
-	    return { type: 'destroy', id: props.id };
-	  }), toggleCheckbox.events('change').mapToLatest(sources.props).map(function (props) {
-	    return { type: 'toggle', id: props.id };
-	  }), todoLabel.events('dblclick').mapTo({ type: 'startEdit' }), editInput.events('input').map(function (ev) {
-	    return { type: 'inputVal', value: ev.target.value };
-	  }), editInput.events('keyup').filter(function (ev) {
-	    return ev.keyCode === _utils.ENTER_KEY;
-	  }).merge(editInput.events('blur', true)).mapToLatest(sources.props, sources.state).map(function (_ref) {
-	    var props = _ref.props,
-	        state = _ref.state;
-	    return { type: 'titleChanged', id: props.id, title: state.inputVal };
-	  }), editInput.events('keyup').filter(function (ev) {
-	    return ev.keyCode === _utils.ESC_KEY;
-	  }).map(function () {
-	    return { type: 'cancelEdit' };
-	  }), sources.actions.filterByType('cancelEdit').mapToLatest(sources.props).map(function (props) {
-	    return { type: 'inputVal', value: props.title };
-	  }), sources.actions.filterByType('startEdit').mapToLatest(sources.props).map(function (props) {
-	    return { type: 'inputVal', value: props.title };
-	  })];
-	}
-
-/***/ },
-/* 382 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = view;
-	exports.componentDidUpdate = componentDidUpdate;
-
-	var _classnames = __webpack_require__(317);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function view(props, state) {
-	  return _react2.default.createElement(
-	    'li',
-	    { className: 'todoRoot ' + (0, _classnames2.default)({ completed: props.completed, editing: state.editing }) },
-	    _react2.default.createElement(
-	      'div',
-	      { className: 'view' },
-	      _react2.default.createElement('input', { className: 'toggle', type: 'checkbox', checked: props.completed }),
-	      _react2.default.createElement(
-	        'label',
-	        null,
-	        props.title
-	      ),
-	      _react2.default.createElement('button', { className: 'destroy' })
-	    ),
-	    _react2.default.createElement('input', { className: 'edit', type: 'text', value: state.inputVal })
-	  );
-	}
-
-	function componentDidUpdate(_ref) {
-	  var select = _ref.select,
-	      state = _ref.state,
-	      prevState = _ref.prevState;
-
-	  if (!prevState.editing && state.editing) {
-	    var node = select('input.edit');
-	    node.focus();
-	    node.select();
-	  }
-	}
-
-/***/ },
-/* 383 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = reducers;
-	function reducers(sources) {
-	  return [sources.actions.filterByType('startEdit').reducer(function (state) {
-	    state.editing = true;
-	    return state;
-	  }), sources.actions.filterByType('cancelEdit').reducer(function (state) {
-	    state.editing = false;
-	    return state;
-	  }), sources.actions.filterByType('titleChanged').reducer(function (state) {
-	    state.editing = false;
-	    return state;
-	  }), sources.actions.filterByType('inputVal').reducer(function (state, action) {
-	    state.inputVal = action.value;
-	    return state;
-	  })];
 	}
 
 /***/ }

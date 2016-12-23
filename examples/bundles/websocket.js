@@ -58,7 +58,7 @@
 
 	var _index2 = _interopRequireDefault(_index);
 
-	var _websocketPlugin = __webpack_require__(378);
+	var _websocketPlugin = __webpack_require__(383);
 
 	var _websocketPlugin2 = _interopRequireDefault(_websocketPlugin);
 
@@ -25265,7 +25265,12 @@
 /* 375 */,
 /* 376 */,
 /* 377 */,
-/* 378 */
+/* 378 */,
+/* 379 */,
+/* 380 */,
+/* 381 */,
+/* 382 */,
+/* 383 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

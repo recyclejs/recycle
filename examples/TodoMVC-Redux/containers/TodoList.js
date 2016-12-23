@@ -4,7 +4,16 @@ import React from 'react'
 export default function TodoListContainer () {
   return {
     dispatch (childrenActions) {
-      return childrenActions
+      return [
+        childrenActions
+          .filterByType('toggleAll'),
+
+        childrenActions
+          .filterByType('deleteCompleted'),
+
+        childrenActions
+          .filterByType('insertTodo')
+      ]
     },
 
     view (props, state) {

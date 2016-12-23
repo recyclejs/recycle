@@ -64,15 +64,15 @@
 
 	var _index2 = _interopRequireDefault(_index);
 
-	var _store = __webpack_require__(349);
+	var _store = __webpack_require__(354);
 
 	var _store2 = _interopRequireDefault(_store);
 
-	var _index3 = __webpack_require__(365);
+	var _index3 = __webpack_require__(370);
 
 	var _index4 = _interopRequireDefault(_index3);
 
-	var _utils = __webpack_require__(367);
+	var _utils = __webpack_require__(372);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -30489,7 +30489,12 @@
 /* 346 */,
 /* 347 */,
 /* 348 */,
-/* 349 */
+/* 349 */,
+/* 350 */,
+/* 351 */,
+/* 352 */,
+/* 353 */,
+/* 354 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30506,7 +30511,7 @@
 	exports.setByPath = setByPath;
 	exports.shouldUpdate = shouldUpdate;
 
-	var _objectpath = __webpack_require__(350);
+	var _objectpath = __webpack_require__(355);
 
 	var _objectpath2 = _interopRequireDefault(_objectpath);
 
@@ -30632,14 +30637,14 @@
 	}
 
 /***/ },
-/* 350 */
+/* 355 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(351).ObjectPath;
+	module.exports = __webpack_require__(356).ObjectPath;
 
 
 /***/ },
-/* 351 */
+/* 356 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
@@ -30747,11 +30752,6 @@
 	}();
 
 /***/ },
-/* 352 */,
-/* 353 */,
-/* 354 */,
-/* 355 */,
-/* 356 */,
 /* 357 */,
 /* 358 */,
 /* 359 */,
@@ -30760,7 +30760,12 @@
 /* 362 */,
 /* 363 */,
 /* 364 */,
-/* 365 */
+/* 365 */,
+/* 366 */,
+/* 367 */,
+/* 368 */,
+/* 369 */,
+/* 370 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30770,11 +30775,11 @@
 	});
 	exports.default = TodoListContainer;
 
-	var _reducers = __webpack_require__(366);
+	var _reducers = __webpack_require__(371);
 
-	var _utils = __webpack_require__(367);
+	var _utils = __webpack_require__(372);
 
-	var _index = __webpack_require__(368);
+	var _index = __webpack_require__(373);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -30798,7 +30803,7 @@
 	}
 
 /***/ },
-/* 366 */
+/* 371 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30810,7 +30815,7 @@
 	exports.toggleAll = toggleAll;
 	exports.deleteCompleted = deleteCompleted;
 
-	var _utils = __webpack_require__(367);
+	var _utils = __webpack_require__(372);
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -30854,7 +30859,7 @@
 	}
 
 /***/ },
-/* 367 */
+/* 372 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -30905,7 +30910,7 @@
 	}
 
 /***/ },
-/* 368 */
+/* 373 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30915,15 +30920,15 @@
 	});
 	exports.default = TodoList;
 
-	var _actions = __webpack_require__(369);
+	var _actions = __webpack_require__(374);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _view = __webpack_require__(370);
+	var _view = __webpack_require__(375);
 
 	var _view2 = _interopRequireDefault(_view);
 
-	var _reducers = __webpack_require__(377);
+	var _reducers = __webpack_require__(382);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -30941,7 +30946,7 @@
 	}
 
 /***/ },
-/* 369 */
+/* 374 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30951,7 +30956,7 @@
 	});
 	exports.default = actions;
 
-	var _utils = __webpack_require__(367);
+	var _utils = __webpack_require__(372);
 
 	function actions(sources) {
 	  var newTodoInput = sources.DOM.select('.new-todo');
@@ -30984,7 +30989,7 @@
 	}
 
 /***/ },
-/* 370 */
+/* 375 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30994,7 +30999,7 @@
 	});
 	exports.default = view;
 
-	var _index = __webpack_require__(371);
+	var _index = __webpack_require__(376);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -31109,7 +31114,7 @@
 	}
 
 /***/ },
-/* 371 */
+/* 376 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31119,9 +31124,9 @@
 	});
 	exports.default = TodoContainer;
 
-	var _reducers = __webpack_require__(372);
+	var _reducers = __webpack_require__(377);
 
-	var _index = __webpack_require__(373);
+	var _index = __webpack_require__(378);
 
 	var _index2 = _interopRequireDefault(_index);
 
@@ -31145,7 +31150,7 @@
 	}
 
 /***/ },
-/* 372 */
+/* 377 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -31171,7 +31176,7 @@
 	}
 
 /***/ },
-/* 373 */
+/* 378 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31181,15 +31186,15 @@
 	});
 	exports.default = Todo;
 
-	var _actions = __webpack_require__(374);
+	var _actions = __webpack_require__(379);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _view = __webpack_require__(375);
+	var _view = __webpack_require__(380);
 
 	var _view2 = _interopRequireDefault(_view);
 
-	var _reducers = __webpack_require__(376);
+	var _reducers = __webpack_require__(381);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
@@ -31209,7 +31214,7 @@
 	}
 
 /***/ },
-/* 374 */
+/* 379 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31219,7 +31224,7 @@
 	});
 	exports.default = actions;
 
-	var _utils = __webpack_require__(367);
+	var _utils = __webpack_require__(372);
 
 	function actions(sources) {
 	  var toggleCheckbox = sources.DOM.select('.toggle');
@@ -31243,7 +31248,7 @@
 	}
 
 /***/ },
-/* 375 */
+/* 380 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31296,7 +31301,7 @@
 	}
 
 /***/ },
-/* 376 */
+/* 381 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31322,7 +31327,7 @@
 	}
 
 /***/ },
-/* 377 */
+/* 382 */
 /***/ function(module, exports) {
 
 	'use strict';
