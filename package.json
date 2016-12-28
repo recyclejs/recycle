@@ -1,6 +1,6 @@
 {
   "name": "recyclejs",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "A functional and reactive library for React",
   "main": "index.js",
   "scripts": {
@@ -41,6 +41,7 @@
     "gitbook-cli": "^2.3.0",
     "jest": "^17.0.3",
     "react-router": "^3.0.0",
+    "react-test-renderer": "^15.4.1",
     "redux": "^3.6.0",
     "style-loader": "^0.13.1",
     "todomvc-app-css": "^2.0.6",
