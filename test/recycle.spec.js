@@ -8,8 +8,7 @@ import Recycle, {
   getComponentStructure,
   createReactElement,
   isReactComponent,
-  forceArray,
-  applyRecycleObservable
+  forceArray
 } from '../src/recycle'
 
 const adapter = {
@@ -56,14 +55,6 @@ describe('recycle.spec.js', function () {
       expect(forceArray(a)).toBe(a)
       const b = 'notarr'
       expect(forceArray(b)).toEqual([b])
-    })
-  })
-
-  describe('applyRecycleObservable', () => {
-    it('should add reducer and filterByType filters', () => {
-      applyRecycleObservable(Rx.Observable)
-      expect(typeof Rx.Observable.prototype.reducer).toBe('function')
-      expect(typeof Rx.Observable.prototype.filterByType).toBe('function')
     })
   })
 
