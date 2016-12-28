@@ -6,6 +6,7 @@ import 'rxjs/add/observable/merge'
 import 'rxjs/add/observable/fromEvent'
 import 'rxjs/add/operator/withLatestFrom'
 import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/take'
 import 'rxjs/add/operator/mapTo'
 import 'rxjs/add/operator/do'
 import 'rxjs/add/operator/share'
@@ -13,6 +14,25 @@ import 'rxjs/add/operator/switch'
 import 'rxjs/add/operator/filter'
 import 'rxjs/add/operator/merge'
 import createRecycle from './recycle'
+
+Observable.prototype.reducer = function reducer (reducerFn) {
+  return this.map(action => ({ reducer: reducerFn, action }))
+}
+
+Observable.prototype.filterByType = function filterByType (type) {
+  return this.filter(action => action.type === type)
+}
+
+Observable.prototype.filterByComponent = function filterByComponent (constructor) {
+  return this.filter(action => action.childComponent === constructor)
+}
+
+Observable.prototype.mapToLatest = function mapToLatest (sourceFirst, sourceSecond) {
+  if (sourceSecond) {
+    return this.mapToLatest(sourceFirst).withLatestFrom(sourceSecond, (props, state) => ({props, state}))
+  }
+  return this.withLatestFrom(sourceFirst, (first, second) => second)
+}
 
 export default (props, publicContext, updateQueue) => {
   if (!props || !props.root) {
@@ -62,4 +82,10 @@ function applyPlugins (recycle, pluginsArr) {
     plugins[name] = instance
     return false
   })
+}
+
+export {
+  Observable,
+  Subject,
+  React
 }
