@@ -31,7 +31,7 @@ export default function reducers (sources) {
 }
 
 
-export function insertTodo (state, action) {
+function insertTodo (state, action) {
   let lastId = state.list.length > 0
    ? state.list[state.list.length - 1].id : 0
 
@@ -44,21 +44,21 @@ export function insertTodo (state, action) {
   return state
 }
 
-export function editTodo (state, action) {
+function editTodo (state, action) {
   let todo = state.list.find(todo => todo.id === action.id)
   todo.title = action.title
 
   return state
 }
 
-export function toggleTodo (state, action) {
+function toggleTodo (state, action) {
   let todo = state.list.find(todo => todo.id === action.id)
   todo.completed = !todo.completed
 
   return state
 }
 
-export function toggleAll (state, action) {
+function toggleAll (state, action) {
   let amountCompleted = state.list
     .filter(todoData => todoData.completed)
     .length
@@ -66,27 +66,27 @@ export function toggleAll (state, action) {
   let amountActive = state.list.length - amountCompleted
 
   state.list.forEach(todo => {
-    todo.completed = (amountActive)
+    todo.completed = (amountActive) ? true : false
   })
 
   return state
 }
 
-export function deleteTodo (state, action) {
+function deleteTodo (state, action) {
   state.list = state.list
     .filter(todo => !(todo.id === action.id))
 
   return state
 }
 
-export function deleteCompleted (state, action) {
+function deleteCompleted (state, action) {
   state.list = state.list
     .filter(todo => todo.completed === false)
 
   return state
 }
 
-export function inputVal (state, action) {
+function inputVal (state, action) {
   state.inputVal = action.payload
 
   return state
