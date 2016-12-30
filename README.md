@@ -19,56 +19,9 @@ where View is a visual representation of the state which can be changed by reduc
 ```bash
 npm install --save recyclejs
 ```
-
 ## Usage
-```javascript
-import React from 'react'
-import ReactDOM from 'react-dom'
-import Recycle from 'recyclejs'
-
-function SingleCounter () {
-  return {
-    initialState: {
-      timesClicked: 0
-    },
-
-    actions (sources) {
-      // selecting element is isolated only to current component
-      const button = sources.DOM.select('button')
-
-      return [
-        button
-          .events('click')
-          .mapTo({ type: 'buttonClicked' })
-      ]
-    },
-
-    reducers (sources) {
-      return [
-        sources.actions
-          .filterByType('buttonClicked')
-          .reducer(function (state) {
-            state.timesClicked++
-            return state
-          })
-      ]
-    },
-
-    view (props, state) {
-      return (
-        <div>
-          <span>Times clicked: {state.timesClicked}</span>
-          <button>Click me</button>
-        </div>
-      )
-    }
-  }
-}
-
-ReactDOM.render((
-  <Recycle root={SingleCounter} />
-), document.getElementById('app'))
-```
+Short example of converting React component to Recycle:
+<img src="https://cloud.githubusercontent.com/assets/1868852/21557750/279d54ea-ce31-11e6-81f3-e1da977dab6b.gif" style="border: 5px solid #1e1e1e" alt="Recycle example" width="600" />
 
 ## Documentation
 
