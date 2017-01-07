@@ -1,5 +1,4 @@
 import React from 'react'
-import { findDOMNode } from 'react-dom'
 import { Subject } from 'rxjs/Subject'
 import { Observable } from 'rxjs/Observable'
 import 'rxjs/add/observable/merge'
@@ -15,50 +14,76 @@ import 'rxjs/add/operator/filter'
 import 'rxjs/add/operator/merge'
 import createRecycle from './recycle'
 
-Observable.prototype.reducer = function reducer (reducerFn) {
-  return this.map(action => ({ reducer: reducerFn, action }))
-}
-
-Observable.prototype.filterByType = function filterByType (type) {
-  return this.filter(action => action.type === type)
-}
-
-Observable.prototype.filterByComponent = function filterByComponent (constructor) {
-  return this.filter(action => action.childComponent === constructor)
-}
-
-Observable.prototype.mapToLatest = function mapToLatest (sourceFirst, sourceSecond) {
-  if (sourceSecond) {
-    return this.mapToLatest(sourceFirst).withLatestFrom(sourceSecond, (props, state) => ({props, state}))
-  }
-  return this.withLatestFrom(sourceFirst, (first, second) => second)
-}
-
-export default (props, publicContext, updateQueue) => {
-  if (!props || !props.root) {
-    throw new Error('Missing root component for initializing Recycle')
-  }
-
-  const recycle = createRecycle({
-    React,
-    findDOMNode,
-    Observable,
-    Subject
-  })
-
-  if (props.plugins) {
-    applyPlugins(recycle, props.plugins)
-  }
-
+export default function (props, publicContext, updateQueue) {
   // if Recycle was called as react component
-  // return React element
   if (updateQueue && updateQueue.isMounted) {
+    const recycle = createRecycle(adapter(props))
+
+    if (!props || !props.root) {
+      throw new Error('Missing root component for initializing Recycle')
+    }
+
+    if (props.plugins) {
+      applyPlugins(recycle, props.plugins)
+    }
+
     return React.createElement(toReact.call(recycle, props.root, props.props), props.props)
   }
 
   // if Recycle was called idependently
-  // return React component
-  return toReact.call(recycle, props.root, props.props)
+  let plugins = []
+  if (arguments.length) {
+    for (let i = 0; i < arguments.length; i++) {
+      plugins.push(arguments[i])
+    }
+  }
+
+  return function (rootComponent, props) {
+    const recycle = createRecycle(adapter(props))
+    applyPlugins(recycle, plugins)
+    return toReact.call(recycle, rootComponent, props)
+  }
+}
+
+function recycleOperators (Observable) {
+  Observable.prototype.reducer = function reducer (reducerFn) {
+    return this.map(action => ({ reducer: reducerFn, action }))
+  }
+
+  Observable.prototype.filterByType = function filterByType (type) {
+    return this.filter(action => action.type === type)
+  }
+
+  Observable.prototype.filterByComponent = function filterByComponent (constructor) {
+    return this.filter(action => action.childComponent === constructor)
+  }
+
+  Observable.prototype.mapToLatest = function mapToLatest (sourceFirst, sourceSecond) {
+    if (sourceSecond) {
+      return this.mapToLatest(sourceFirst).withLatestFrom(sourceSecond, (props, state) => ({props, state}))
+    }
+    return this.withLatestFrom(sourceFirst, (first, second) => second)
+  }
+}
+
+function adapter (props) {
+  let adapterReact = React
+  let adapterObservable = Observable
+  let adapterSubject = Subject
+
+  if (props && props.adapter) {
+    adapterReact = props.adapter && props.adapter.React || React
+    adapterObservable = props.adapter && props.adapter.Observable || Observable
+    adapterSubject = props.adapter && props.adapter.Subject || Subject
+  }
+
+  recycleOperators(adapterObservable)
+
+  return {
+    React: adapterReact,
+    Observable: adapterObservable,
+    Subject: adapterSubject
+  }
 }
 
 function toReact (Component, props) {
