@@ -4,9 +4,8 @@ import {
   getByPath,
   setByPath,
   deleteByPath,
-  shouldUpdate,
   parsePath
-} from '../../src/plugins/store'
+} from '../../src/plugins/redux'
 
 describe('store.spec.js', function () {
   describe('getByPath', () => {
@@ -58,17 +57,6 @@ describe('store.spec.js', function () {
 
       setByPath(['prop2', 'not', 'defined'], 2, source)
       expect(source.prop2.not.defined).toBe(2)
-    })
-  })
-
-  describe('shouldUpdate', () => {
-    it('should return true if componenent needs to update', function () {
-      expect(shouldUpdate(['todos', 'list'], null)).toBe(false)
-      expect(shouldUpdate(['todos', 'list'], ['something'])).toBe(false)
-      expect(shouldUpdate(['todos', 'list'], ['todos'])).toBe(true)
-      expect(shouldUpdate(['todos', 'list'], ['todos', 'list'])).toBe(true)
-      expect(shouldUpdate(['todos', 'list'], ['todos', 'list', 2])).toBe(true)
-      expect(shouldUpdate(['todos', 'list', 0], ['todos', 'list'])).toBe(true)
     })
   })
 
