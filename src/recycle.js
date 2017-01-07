@@ -1,6 +1,5 @@
 export default function ({
     React,
-    findDOMNode,
     Observable,
     Subject
   }) {
@@ -11,7 +10,8 @@ export default function ({
 
   function createComponent (constructor, props, parent) {
     const key = (props) ? props.key : null
-    const domNodes = {}
+    const refsSubjects = {}
+    let refs = []
     const children = new Map()
     const childrenActions = new Subject()
     const injectedState = new Subject()
@@ -30,11 +30,27 @@ export default function ({
     componentName = config.displayName || constructor.name
 
     const componentSources = {
-      DOM: { select: generateDOMSource(domNodes) },
+      select: generateDOMSource(refsSubjects),
       childrenActions: childrenActions.switch().share(),
       actions: new Subject(),
       props: propsReference.share(),
       state: stateReference.share()
+    }
+
+    function updateRefs (componentRefs) {
+      Object.keys(refsSubjects).forEach((selector) => {
+        Object.keys(refsSubjects[selector]).forEach((event) => {
+          const foundRefs = refs.filter(ref => ref.selector === selector)
+          const streams = foundRefs.map(ref => {
+            return Observable.fromEvent(componentRefs[`recycle-${ref.index}`], event)
+              .map(e => {
+                e.recycleValue = ref.value
+                return e
+              })
+          })
+          refsSubjects[selector][event].next(Observable.merge(...streams))
+        })
+      })
     }
 
     function updateStatePropsReference () {
@@ -90,9 +106,7 @@ export default function ({
           })
 
           updateChildrenActions()
-
-          const el = findDOMNode(this)
-          updateDomStreams(domNodes, el)
+          updateRefs(this.refs)
 
           if (config.componentDidMount) {
             return config.componentDidMount()
@@ -112,14 +126,11 @@ export default function ({
           updateStatePropsReference()
 
           emit('componentUpdate', thisComponent)
-          const el = findDOMNode(this)
-          updateDomStreams(domNodes, el)
+          updateRefs(this.refs)
 
           if (config.componentDidUpdate) {
             const params = {
-              select: (selector) => {
-                return el.querySelector(selector)
-              },
+              refs: this.refs,
               props: this.props,
               state: this.state.recycleState,
               prevProps,
@@ -146,6 +157,7 @@ export default function ({
 
         render () {
           timesRendered++
+          refs = []
           if (!config.view) return null
 
           let before = React.createElement
@@ -163,6 +175,20 @@ export default function ({
     }
 
     function jsxHandler () {
+      let selector = arguments['1'].recycle
+      if (selector) {
+        let value
+        if (typeof selector === 'object') {
+          value = selector.value
+          selector = selector.selector
+        }
+        let newRef = { selector, value }
+        newRef.index = refs.length + 1
+        refs.push(newRef)
+        arguments['1'].ref = `recycle-${refs.length}`
+        delete arguments['1'].recycle
+      }
+
       if (typeof arguments['0'] === 'function') {
         const childConstructor = arguments['0']
         const childProps = arguments['1'] || {}
@@ -200,8 +226,7 @@ export default function ({
         ...forceArray(getChildren())
           .filter(component => component.getActions())
           .map(component => component.getActions().map(a => {
-            a.childComponent = component.getConstructor()
-            return a
+            return {...a, childComponent: component.getConstructor()}
           }))
       )
 
@@ -321,7 +346,7 @@ export default function ({
 
   function generateDOMSource (domNodes) {
     return function domSelector (selector) {
-      return {
+      const api = {
         events: function getEvent (event) {
           if (!domNodes[selector]) {
             domNodes[selector] = {}
@@ -332,20 +357,25 @@ export default function ({
           }
 
           return domNodes[selector][event].switch().share()
+        },
+        on: function (event) {
+          return api
+            .events(event)
+            .map(e => {
+              if (e.recycleValue !== undefined) {
+                let toReturn = { type: selector, event: e, value: e.recycleValue }
+                delete e.recycleValue
+                return toReturn
+              }
+              if (e.target && e.target.value !== undefined) {
+                return { type: selector, event: e, value: e.target.value }
+              }
+              return { type: selector, event: e }
+            })
         }
       }
+      return api
     }
-  }
-
-  function updateDomStreams (domNodes, el) {
-    Object.keys(domNodes).forEach((selector) => {
-      Object.keys(domNodes[selector]).forEach((event) => {
-        const domEl = el.querySelector(selector)
-        if (domEl) {
-          domNodes[selector][event].next(Observable.fromEvent(domEl, event))
-        }
-      })
-    })
   }
 
   function addListener (event, cb) {
