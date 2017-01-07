@@ -14,15 +14,11 @@ const store = createStore(todos, {
   list: getFromLocalStorage()
 })
 
-const TodoListReact = Recycle({
-  root: TodoList,
-  plugins: [recycleRedux(store)]
-})
-
 store.subscribe(() => {
   updateLocalStorage(store.getState())
 })
 
+const TodoListReact = Recycle(recycleRedux(store))(TodoList)
 ReactDOM.render((
   <Router history={hashHistory}>
     <Route path='/' filter='' component={TodoListReact} />

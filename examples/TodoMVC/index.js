@@ -6,9 +6,7 @@ import 'todomvc-app-css/index.css'
 import Recycle from '../../src/index'
 import TodoList from './components/TodoList/index'
 
-const TodoListReact = Recycle({
-  root: TodoList
-})
+const TodoListReact = Recycle()(TodoList)
 
 ReactDOM.render((
   <Router history={hashHistory}>

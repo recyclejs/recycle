@@ -7,17 +7,17 @@ export default function TodoListContainer () {
   return {
     storePath: 'todos.list',
 
-    reducers (sources) {
+    dispatch (childrenActions) {
       return [
-        sources.childrenActions
+        childrenActions
           .filterByType('toggleAll')
           .reducer(toggleAll),
 
-        sources.childrenActions
+        childrenActions
           .filterByType('deleteCompleted')
           .reducer(deleteCompleted),
 
-        sources.childrenActions
+        childrenActions
           .filterByType('insertTodo')
           .reducer(insertTodo)
       ]

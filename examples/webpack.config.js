@@ -5,9 +5,8 @@ var APP_DIR = path.resolve(__dirname, '')
 var config = {
   entry: {
     todomvc: APP_DIR + '/TodoMVC/index.js',
-    todomvcstore1: APP_DIR + '/TodoMVC-Store-1/index.js',
-    todomvcstore2: APP_DIR + '/TodoMVC-Store-2/index.js',
     todomvcredux: APP_DIR + '/TodoMVC-Redux/index.js',
+    todomvcredux2: APP_DIR + '/TodoMVC-Redux-2/index.js',
     recyclereact: APP_DIR + '/CombiningWithReact/index.js',
     clickcounter: APP_DIR + '/ClickCounter/index.js',
     websocket: APP_DIR + '/Websocket/index.js',

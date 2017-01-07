@@ -4,23 +4,31 @@ import { Router, Route, hashHistory } from 'react-router'
 import 'todomvc-common/base.css'
 import 'todomvc-app-css/index.css'
 import Recycle from '../../src/index'
-import createStore from '../../src/plugins/store'
+import recycleRedux from '../../src/plugins/redux'
 import TodoList from './containers/TodoList/index'
+import { createStore } from 'redux'
 import { updateLocalStorage, getFromLocalStorage } from './utils'
 
-const storePlugin = createStore({
-  initialState: {
-    todos: {
-      list: getFromLocalStorage()
-    }
-  },
-  onUpdate: updateLocalStorage
+function reducer (state, action) {
+  switch (action.type) {
+    case 'RECYCLE_REDUCER':
+      return action.payload
+    default:
+      return state
+  }
+}
+
+const store = createStore(reducer, {
+  todos: {
+    list: getFromLocalStorage()
+  }
 })
 
-const TodoListReact = Recycle({
-  root: TodoList,
-  plugins: [storePlugin]
+store.subscribe(() => {
+  updateLocalStorage(store.getState())
 })
+
+const TodoListReact = Recycle(recycleRedux(store))(TodoList)
 
 ReactDOM.render((
   <Router history={hashHistory}>

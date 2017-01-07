@@ -14,11 +14,11 @@ export function arrToObj (arr, key = 'id') {
 }
 
 export function updateLocalStorage (store) {
-  localStorage.setItem('todos-recycle-2', JSON.stringify(store.todos.list))
+  localStorage.setItem('todos-recycle-redux-2', JSON.stringify(store.todos.list))
 }
 
 export function getFromLocalStorage () {
-  let saved = localStorage.getItem('todos-recycle-2')
+  let saved = localStorage.getItem('todos-recycle-redux-2')
   try {
     saved = JSON.parse(saved) || {}
   } catch (e) {

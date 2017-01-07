@@ -6,17 +6,17 @@ export default function TodoContainer (props) {
   return {
     storePath: `todos.list.${props.id}`,
 
-    reducers (sources) {
+    dispatch (childrenActions) {
       return [
-        sources.childrenActions
+        childrenActions
           .filterByType('destroy')
           .reducer(deleteTodo),
 
-        sources.childrenActions
+        childrenActions
           .filterByType('titleChanged')
           .reducer(editTodo),
 
-        sources.childrenActions
+        childrenActions
           .filterByType('toggle')
           .reducer(toggleTodo)
       ]
