@@ -1,6 +1,6 @@
 {
   "name": "recyclejs",
-  "version": "0.6.2",
+  "version": "0.7.0-beta",
   "description": "A functional and reactive library for React",
   "main": "index.js",
   "scripts": {
@@ -51,6 +51,6 @@
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
     "rxjs": "^5.0.1",
-    "objectpath": "^1.2.1"
+    "objectpath": "1.2.1"
   }
 }
