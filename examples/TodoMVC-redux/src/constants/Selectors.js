@@ -1,0 +1,7 @@
+export const TODO_DELETE = 'TODO_DELETE'
+export const TODO_LABEL = 'TODO_LABEL'
+export const TODO_TOGGLE = 'TODO_TOGGLE'
+export const CLEAR_COMPLETED = 'CLEAR_COMPLETED'
+export const TODO_FILTER = 'TODO_FILTER'
+export const TOGGLE_ALL = 'TOGGLE_ALL'
+export const TEXT_INPUT = 'TEXT_INPUT'
