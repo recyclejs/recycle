@@ -12,27 +12,19 @@ function WebSocketEcho () {
     },
 
     actions (sources) {
-      const input = sources.DOM.select('input')
-
-      return [
-        input
-          .events('input')
-          .map(e => ({ type: 'inputVal', payload: e.target.value })),
-
-        input
-          .events('keydown')
-          .filter(e => e.keyCode === 13)
-          .mapToLatest(sources.state)
-          .map(state => ({ type: 'send', payload: state.inputVal }))
-      ]
+      return sources.select('input')
+        .events('keydown')
+        .filter(e => e.keyCode === 13)
+        .mapToLatest(sources.state)
+        .map(state => ({ type: 'send', payload: state.inputVal }))
     },
 
     reducers (sources) {
       return [
-        sources.actions
-          .filterByType('inputVal')
-          .reducer((state, action) => {
-            state.inputVal = action.payload
+        sources.select('input')
+          .events('input')
+          .reducer((state, e) => {
+            state.inputVal = e.target.value
             return state
           }),
 
@@ -54,7 +46,7 @@ function WebSocketEcho () {
       return (
         <div>
           <h2>Websocket Echo Test</h2>
-          <div>Send: <input value={state.inputVal} type='text' /></div>
+          <div>Send: <input recycle='input' value={state.inputVal} type='text' /></div>
           <br />
           <div>Status: {state.status}</div>
           <div>Response: {state.response}</div>

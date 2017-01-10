@@ -17,17 +17,17 @@ export function deleteTodo (state, action) {
 
 export function editTodo (state, action) {
   return state.map(todo =>
-    todo.id === action.id ?
-      { ...todo, text: action.text } :
-      todo
+    todo.id === action.id
+      ? { ...todo, text: action.text }
+      : todo
   )
 }
 
 export function completeTodo (state, action) {
   return state.map(todo =>
-    todo.id === action.id ?
-      { ...todo, completed: !todo.completed } :
-      todo
+    todo.id === action.id
+      ? { ...todo, completed: !todo.completed }
+      : todo
   )
 }
 

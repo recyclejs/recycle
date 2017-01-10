@@ -7,7 +7,15 @@ import { addTodo, deleteTodo, editTodo, completeTodo, completeAll, clearComplete
 
 export default function App () {
   return {
-    reducerPath: 'todos',
+    storePath: 'todos',
+
+    initialState: [
+      {
+        text: 'Use Redux',
+        completed: false,
+        id: 0
+      }
+    ],
 
     dispatch (childrenActions) {
       return [
@@ -47,11 +55,11 @@ export default function App () {
       ]
     },
 
-    view (props, state) {
+    view (props, todos) {
       return (
         <div>
           <Header addTodo={actions.addTodo} />
-          <MainSection todos={state.todos} actions={actions} />
+          <MainSection todos={todos} actions={actions} />
         </div>
       )
     }
