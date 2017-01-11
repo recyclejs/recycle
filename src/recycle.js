@@ -54,8 +54,8 @@ export default function ({
     }
 
     function updateStatePropsReference () {
-      stateReference.next({...state})
-      propsReference.next({...props})
+      stateReference.next(shallowImmutable(state))
+      propsReference.next(shallowImmutable(props))
     }
 
     function getReactComponent () {
@@ -82,31 +82,16 @@ export default function ({
               .filter(action => action)
               .subscribe(componentSources.actions)
           }
-          updateStatePropsReference()
-          this.stateSubsription = getStateStream().merge(injectedState).subscribe((newVal) => {
-            const newState = newVal.state
-            const newAction = newVal.action
 
-            if (typeof newState !== 'object' || Array.isArray(newState)) {
-              let lastActionErr = ''
-              if (typeof newAction === 'object') {
-                lastActionErr = ` Last recieved action: '${JSON.stringify(newAction.type)}'.`
-              }
-              let componentNameErr = ''
-              if (componentName) {
-                componentNameErr = ` Check reducers of ${componentName} component.`
-              }
-              const stateStr = JSON.stringify(newState)
-              throw new Error(`Component state must be an object, got: '${stateStr}'.${componentNameErr}${lastActionErr}`)
-            }
-
+          this.stateSubsription = getStateStream().merge(injectedState).subscribe(newVal => {
             this.setState({
-              recycleState: {...newState}
+              recycleState: shallowImmutable(newVal.state)
             })
           })
 
           updateChildrenActions()
           updateRefs(this.refs)
+          updateStatePropsReference()
 
           if (config.componentDidMount) {
             return config.componentDidMount()
@@ -265,11 +250,8 @@ export default function ({
 
       return Observable.merge(...reducers)
         .map(({ reducer, action }) => {
-          let newState = reducer({...state}, action)
+          let newState = reducer(shallowImmutable(state), action)
           emit('newState', [thisComponent, newState, action])
-          if (newState === false) {
-            newState = {...state}
-          }
           return {
             state: newState,
             reducer,
@@ -496,4 +478,13 @@ export function isReactComponent (constructor) {
 export function forceArray (arr) {
   if (!Array.isArray(arr)) return [arr]
   return arr
+}
+
+export function shallowImmutable (data) {
+  if (Array.isArray(data)) {
+    return data.map(i => i)
+  } else if (typeof data === 'object') {
+    return {...data}
+  }
+  return data
 }
