@@ -108,13 +108,17 @@ export default function ({
         componentDidUpdate (prevProps, prevState) {
           props = this.props
           state = this.state.recycleState
-          updateStatePropsReference()
 
           emit('componentUpdate', thisComponent)
           updateRefs(this.refs)
-
+          updateStatePropsReference()
           if (config.componentDidUpdate) {
             const params = {
+              selectAll: (selector) => {
+                return refs.filter(ref => ref.selector === selector)
+                        .map(ref => this.refs[`recycle-${ref.index}`])
+              },
+              select: (selector) => params.selectAll(selector)[0],
               refs: this.refs,
               props: this.props,
               state: this.state.recycleState,
