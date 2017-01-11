@@ -66,10 +66,6 @@ export default function ({
       class ReactClass extends BaseComponent {
         constructor (ownProps) {
           super(ownProps)
-          if (config.initialState && (typeof config.initialState !== 'object' || Array.isArray(config.initialState))) {
-            const stateStr = JSON.stringify(config.initialState)
-            throw new Error(`Component state must be an object, got: '${stateStr}'`)
-          }
           this.state = {
             recycleState: config.initialState
           }
