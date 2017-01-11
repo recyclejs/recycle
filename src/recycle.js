@@ -228,6 +228,7 @@ export default function ({
         ...forceArray(getChildren())
           .filter(component => component.getActions())
           .map(component => component.getActions().map(a => {
+            // todo: type check
             return {...a, childComponent: component.getConstructor()}
           }))
       )
