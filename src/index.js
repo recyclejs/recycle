@@ -14,6 +14,28 @@ import 'rxjs/add/operator/filter'
 import 'rxjs/add/operator/merge'
 import createRecycle from './recycle'
 
+recycleOperators(Observable)
+function recycleOperators (Observable) {
+  Observable.prototype.reducer = function reducer (reducerFn) {
+    return this.map(action => ({ reducer: reducerFn, action }))
+  }
+
+  Observable.prototype.filterByType = function filterByType (type) {
+    return this.filter(action => action.type === type)
+  }
+
+  Observable.prototype.filterByComponent = function filterByComponent (constructor) {
+    return this.filter(action => action.childComponent === constructor)
+  }
+
+  Observable.prototype.mapToLatest = function mapToLatest (sourceFirst, sourceSecond) {
+    if (sourceSecond) {
+      return this.mapToLatest(sourceFirst).withLatestFrom(sourceSecond, (props, state) => ({props, state}))
+    }
+    return this.withLatestFrom(sourceFirst, (first, second) => second)
+  }
+}
+
 export default function (props, publicContext, updateQueue) {
   // if Recycle was called as react component
   if (updateQueue && updateQueue.isMounted) {
@@ -45,39 +67,19 @@ export default function (props, publicContext, updateQueue) {
   }
 }
 
-function recycleOperators (Observable) {
-  Observable.prototype.reducer = function reducer (reducerFn) {
-    return this.map(action => ({ reducer: reducerFn, action }))
-  }
-
-  Observable.prototype.filterByType = function filterByType (type) {
-    return this.filter(action => action.type === type)
-  }
-
-  Observable.prototype.filterByComponent = function filterByComponent (constructor) {
-    return this.filter(action => action.childComponent === constructor)
-  }
-
-  Observable.prototype.mapToLatest = function mapToLatest (sourceFirst, sourceSecond) {
-    if (sourceSecond) {
-      return this.mapToLatest(sourceFirst).withLatestFrom(sourceSecond, (props, state) => ({props, state}))
-    }
-    return this.withLatestFrom(sourceFirst, (first, second) => second)
-  }
-}
-
 function adapter (props) {
   let adapterReact = React
   let adapterObservable = Observable
   let adapterSubject = Subject
 
   if (props && props.adapter) {
-    adapterReact = props.adapter && props.adapter.React || React
-    adapterObservable = props.adapter && props.adapter.Observable || Observable
-    adapterSubject = props.adapter && props.adapter.Subject || Subject
+    adapterReact = props.adapter.React || React
+    adapterObservable = props.adapter.Observable || Observable
+    adapterSubject = props.adapter.Subject || Subject
+    if (props.adapter.Observable) {
+      recycleOperators(adapterObservable)
+    }
   }
-
-  recycleOperators(adapterObservable)
 
   return {
     React: adapterReact,
