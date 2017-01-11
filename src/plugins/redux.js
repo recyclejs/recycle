@@ -46,8 +46,22 @@ export default (store) => (recycle) => {
       })
 
       component._reduxUnsubscribe = store.subscribe(() => {
-        component.setState(store.getState())
+        let storePath = component.get('storePath')
+        let state = store.getState()
+
+        if (storePath) {
+          storePath = parsePath(storePath)
+          state = getByPath(storePath, state)
+        }
+        component.setState(state)
       })
+
+      if (component.get('initialState')) {
+        let storeState = {...store.getState()}
+        let storePath = parsePath(component.get('storePath'))
+        setByPath(storePath || [], component.get('initialState'), storeState)
+        manualActions.next({ type: 'RECYCLE_REDUCER', payload: storeState })
+      }
     }
   })
 
