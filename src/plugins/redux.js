@@ -103,7 +103,9 @@ export function getByPath (parts, current) {
 export function setByPath (path, value, current) {
   path.forEach((i, index) => {
     if (index === path.length - 1) {
-      current[i] = value
+      if (i) {
+        current[i] = value
+      }
       return
     }
     if (!current[i]) {
