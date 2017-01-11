@@ -1,25 +1,26 @@
 import { Observable } from 'rxjs/Observable'
+import { Subject } from 'rxjs/Subject'
 import objectpath from 'objectpath'
 
 export default (store) => (recycle) => {
   recycle.on('componentInit', (component) => {
     const dispatchFunction = component.get('dispatch')
     if (dispatchFunction) {
-      component.set('initialState', store.getState())
-
       const childrenActions = component.getSource('childrenActions')
       const actionsArr = forceArray(dispatchFunction(childrenActions))
+      const manualActions = new Subject()
+      actionsArr.push(manualActions)
       const actionsStream = Observable.merge(...actionsArr)
 
       component._actionsSubscription = actionsStream.subscribe(a => {
         let action = a
         if (typeof a.reducer === 'function') {
-          let reducerPath = component.get('reducerPath')
+          let storePath = component.get('storePath')
           let state = store.getState()
 
-          if (reducerPath) {
-            reducerPath = parsePath(reducerPath)
-            state = getByPath(reducerPath, state)
+          if (storePath) {
+            storePath = parsePath(storePath)
+            state = getByPath(storePath, state)
           }
 
           action.type = 'RECYCLE_REDUCER'
@@ -27,12 +28,12 @@ export default (store) => (recycle) => {
           delete recycleAction.childComponent
           let recycleState = a.reducer(state, recycleAction)
 
-          if (reducerPath) {
+          if (storePath) {
             let storeState = {...store.getState()}
             if (recycleState === false) {
-              deleteByPath(reducerPath, storeState)
+              deleteByPath(storePath, storeState)
             } else {
-              setByPath(reducerPath, recycleState, storeState)
+              setByPath(storePath, recycleState, storeState)
             }
             recycleState = storeState
           }
