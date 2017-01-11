@@ -42,6 +42,10 @@ export default function ({
         Object.keys(refsSubjects[selector]).forEach((event) => {
           const foundRefs = refs.filter(ref => ref.selector === selector)
           const streams = foundRefs.map(ref => {
+            if (ref.events && ref.events[event]) {
+              return ref.events[event]
+            }
+            // todo: check if dom el
             return Observable.fromEvent(componentRefs[`recycle-${ref.index}`], event)
               .map(e => {
                 e.recycleValue = ref.value
@@ -156,14 +160,27 @@ export default function ({
     }
 
     function jsxHandler () {
-      let selector = arguments['1'].recycle
+      let selector = (arguments['1']) ? arguments['1'].recycle : null
       if (selector) {
         let value
+        let events = {}
         if (typeof selector === 'object') {
           value = selector.value
           selector = selector.selector
         }
-        let newRef = { selector, value }
+
+        for (let i in arguments['1']) {
+          if (typeof arguments['1'][i] === 'function') {
+            let subject = new Subject()
+            events[i] = subject
+            let func = arguments['1'][i]
+            arguments['1'][i] = function () {
+              subject.next(func.apply(this, arguments))
+            }
+          }
+        }
+
+        let newRef = { selector, value, events }
         newRef.index = refs.length + 1
         refs.push(newRef)
         arguments['1'].ref = `recycle-${refs.length}`
