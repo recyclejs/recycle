@@ -1,27 +1,23 @@
 /* global expect describe it document */
 import Rx from 'rxjs/Rx'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import streamAdapter from '../src/adapter/rxjs'
+import componentAdapter from '../src/adapter/react'
 import Recycle, {
   registerComponent,
   getAllComponents,
   getComponentStructure,
-  createReactElement,
   isReactComponent,
   forceArray
 } from '../src/recycle'
 
-const adapter = {
-  React,
-  findDOMNode: ReactDOM.findDOMNode,
-  Observable: Rx.Observable,
-  Subject: Rx.Subject
-}
+const reactAdapter = componentAdapter(React)
+const rxjsAdapter = streamAdapter(Rx)
 
 describe('recycle.spec.js', function () {
   describe('registerComponent', () => {
     it('should add new component in map', function () {
-      const recycle = Recycle(adapter)
+      const recycle = Recycle(reactAdapter, rxjsAdapter)
       const savedChildren = new Map()
       const constructor1 = function () { return {} }
 
@@ -60,7 +56,7 @@ describe('recycle.spec.js', function () {
 
   describe('getComponentStructure', () => {
     it('should return component structure tree', () => {
-      const recycle = Recycle(adapter)
+      const recycle = Recycle(reactAdapter, rxjsAdapter)
       const rootComponent = recycle.createComponent(() => ({}))
       const tree = getComponentStructure(rootComponent)
 
@@ -71,7 +67,7 @@ describe('recycle.spec.js', function () {
 
   describe('getAllComponents', () => {
     it('should return component structure tree', () => {
-      const recycle = Recycle(adapter)
+      const recycle = Recycle(reactAdapter, rxjsAdapter)
       const constructor = () => ({})
       const rootComponent = recycle.createComponent(constructor)
       const components = getAllComponents(rootComponent)

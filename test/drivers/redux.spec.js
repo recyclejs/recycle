@@ -5,7 +5,7 @@ import {
   setByPath,
   deleteByPath,
   parsePath
-} from '../../src/plugins/redux'
+} from '../../src/drivers/redux'
 
 describe('store.spec.js', function () {
   describe('getByPath', () => {
