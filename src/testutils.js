@@ -21,19 +21,19 @@ function createPromise (testStream, inputSource, val) {
   })
 }
 
-function createDOMSelectors (DOMstreams) {
+function createNodeSelectors (refsSubjects) {
   return function (selector) {
     return {
-      events: function (event) {
-        if (!DOMstreams[selector]) {
-          DOMstreams[selector] = {}
+      on: function (event, all) {
+        if (!refsSubjects[selector]) {
+          refsSubjects[selector] = {}
         }
 
-        if (!DOMstreams[selector][event]) {
-          DOMstreams[selector][event] = new Subject()
+        if (!refsSubjects[selector][event]) {
+          refsSubjects[selector][event] = new Subject()
         }
 
-        return DOMstreams[selector][event]
+        return refsSubjects[selector][event]
       }
     }
   }
@@ -60,7 +60,9 @@ export function inspectObservable (testFun, userSourcesList) {
     actions: 'actions',
     props: 'props',
     state: 'state',
-    select: 'select'
+    select: 'select',
+    selectClass: 'selectClass',
+    selectId: 'selectId'
   }, userSourcesList)
 
   let testStream = new Subject()
@@ -69,8 +71,8 @@ export function inspectObservable (testFun, userSourcesList) {
   const DOMstreams = {}
 
   for (let source in sourcesList) {
-    if (source === 'select') {
-      sources[source] = createDOMSelectors(DOMstreams)
+    if (source === 'select' || source === 'selectClass' || source === 'selectId') {
+      sources[source] = createNodeSelectors(DOMstreams)
       api[sourcesList[source]] = createDOMHandlers(DOMstreams, testStream)
     } else {
       sources[source] = new Subject()
