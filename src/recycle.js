@@ -357,7 +357,7 @@ export default function (componentAdapter, streamAdapter) {
   function generateDOMStream (refsSubjects, prefix = '') {
     return function domSelector (selector) {
       selector = prefix + selector
-      const api = {
+      return {
         on: function getEvent (event, all) {
           if (!refsSubjects[selector]) {
             refsSubjects[selector] = {}
@@ -371,7 +371,6 @@ export default function (componentAdapter, streamAdapter) {
             .map(val => (val.value !== undefined) ? val.value : val.event)
         }
       }
-      return api
     }
   }
 
