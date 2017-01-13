@@ -335,6 +335,7 @@ export default function (componentAdapter, streamAdapter) {
       getReactComponent,
       jsxHandler,
       getByConstructor,
+      getSources: () => componentSources,
       getActions: () => componentSources.actions,
       getName: () => componentName,
       getKey: () => key,
