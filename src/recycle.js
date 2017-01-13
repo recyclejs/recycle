@@ -1,8 +1,7 @@
-export default function ({
-    React,
-    Observable,
-    Subject
-  }) {
+export default function (componentAdapter, streamAdapter) {
+  const { React, getEventHandler } = componentAdapter
+  const { Subject, Observable } = streamAdapter
+
   const events = {}
   let createElement = React.createElement
   let BaseComponent = React.Component
