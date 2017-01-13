@@ -1,6 +1,6 @@
 /* global describe it expect */
 import TodoItem from './index'
-import { inspectObservable, applyReducer } from '../../../../src/testutils'
+import { inspectObservable, applyReducer } from 'recyclejs/testutils'
 import { ENTER_KEY, ESC_KEY } from '../../utils'
 
 describe('TodoItem Actions', function () {
@@ -9,14 +9,14 @@ describe('TodoItem Actions', function () {
   it('should dispatch destroy', function () {
     on.props({ id: 1 })
 
-    return on.select('destroy', 'click')
+    return on.selectClass('destroy', 'click')
       .then(res => expect(res).toEqual({ type: 'destroy', id: 1 }))
   })
 
   it('should dispatch toggle', function () {
     on.props({ id: 2 })
 
-    return on.select('toggle', 'change')
+    return on.selectClass('toggle', 'change')
       .then(res => expect(res).toEqual({ type: 'toggle', id: 2 }))
   })
 
@@ -24,7 +24,7 @@ describe('TodoItem Actions', function () {
     on.props({ id: 3 })
     on.state({ inputVal: 'Changed' })
 
-    return on.select('edit', 'keyup', {keyCode: ENTER_KEY})
+    return on.selectClass('edit', 'keyUp', {keyCode: ENTER_KEY})
       .then(result => expect(result).toEqual({ type: 'titleChanged', id: 3, title: 'Changed' }))
   })
 
@@ -32,7 +32,7 @@ describe('TodoItem Actions', function () {
     on.props({ id: 3 })
     on.state({ inputVal: 'Changed' })
 
-    return on.select('edit', 'blur')
+    return on.selectClass('edit', 'blur')
       .then(result => expect(result).toEqual({ type: 'titleChanged', id: 3, title: 'Changed' }))
   })
 })
@@ -51,7 +51,7 @@ describe('TodoItem Reducers', function () {
       inputVal: 'something'
     }
 
-    return on.select('edit', 'input', 'something')
+    return on.selectClass('edit', 'change', 'something')
       .then(res => applyReducer(res, initialState))
       .then(state => expect(state).toEqual(nextState))
   })
@@ -83,7 +83,7 @@ describe('TodoItem Reducers', function () {
       inputVal: 'todo item'
     }
 
-    return on.select('label', 'dblclick')
+    return on.selectClass('label', 'doubleClick')
       .then(res => applyReducer(res, initialState))
       .then(state => expect(state).toEqual(nextState))
   })
@@ -101,7 +101,7 @@ describe('TodoItem Reducers', function () {
       inputVal: 'initial title'
     }
 
-    return on.select('edit', 'keyup', { keyCode: ESC_KEY })
+    return on.selectClass('edit', 'keyUp', { keyCode: ESC_KEY })
       .then(res => applyReducer(res, initialState))
       .then(state => expect(state).toEqual(nextState))
   })

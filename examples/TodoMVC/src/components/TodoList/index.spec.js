@@ -3,7 +3,7 @@ import React from 'react'
 import TodoList from './index'
 import renderer from 'react-test-renderer'
 import { ENTER_KEY } from '../../utils'
-import { inspectObservable, applyReducer } from '../../../../src/testutils'
+import { inspectObservable, applyReducer } from 'recyclejs/testutils'
 
 describe('TodoList Reducers', function () {
   const on = inspectObservable(TodoList().reducers)
@@ -65,7 +65,7 @@ describe('TodoList Reducers', function () {
       ]
     }
 
-    return on.select('toggleAll', 'click')
+    return on.selectClass('toggle-all', 'click')
       .then(res => applyReducer(res, initialState))
       .then(state => expect(state).toEqual(nextState))
   })
@@ -106,7 +106,7 @@ describe('TodoList Reducers', function () {
       ]
     }
 
-    return on.select('clearCompleted', 'click')
+    return on.selectClass('clear-completed', 'click')
       .then(res => applyReducer(res, initialState))
       .then(state => expect(state).toEqual(nextState))
   })
@@ -126,7 +126,7 @@ describe('TodoList Reducers', function () {
       inputVal: ''
     }
 
-    return on.select('newTodo', 'keydown', {target: {value: 'second'}, keyCode: ENTER_KEY})
+    return on.selectClass('new-todo', 'keyDown', {target: {value: 'second'}, keyCode: ENTER_KEY})
       .then(res => applyReducer(res, initialState))
       .then(state => expect(state).toEqual(nextState))
   })
@@ -140,7 +140,7 @@ describe('TodoList Reducers', function () {
       inputVal: 'hello'
     }
 
-    return on.select('newTodo', 'input', {target: {value: 'hello'}})
+    return on.selectClass('new-todo', 'change', {target: {value: 'hello'}})
       .then(res => applyReducer(res, initialState))
       .then(state => expect(state).toEqual(nextState))
   })
@@ -157,7 +157,6 @@ describe('TodoList View', function () {
         <header className='header'>
           <h1>todos</h1>
           <input
-            recycle='newTodo'
             className='new-todo'
             type='text'
             value={state.inputVal}
@@ -166,7 +165,7 @@ describe('TodoList View', function () {
         </header>
 
         <section className='main' style={{ 'display': 'none' }}>
-          <input recycle='toggleAll' className='toggle-all' type='checkbox' defaultChecked={true} />
+          <input className='toggle-all' type='checkbox' defaultChecked={true} />
           <ul className='todo-list'>
           </ul>
         </section>
