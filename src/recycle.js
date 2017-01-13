@@ -69,9 +69,7 @@ export default function (componentAdapter, streamAdapter) {
             recycleState: config.initialState
           }
           state = this.state.recycleState
-        }
 
-        componentDidMount () {
           if (config.actions) {
             Observable.merge(...forceArray(config.actions(componentSources)))
               .filter(action => action)
@@ -107,15 +105,10 @@ export default function (componentAdapter, streamAdapter) {
           state = this.state.recycleState
 
           emit('componentUpdate', thisComponent)
-          updateRefs(this.refs)
+          updateRefs()
           updateStatePropsReference()
           if (config.componentDidUpdate) {
             const params = {
-              selectAll: (selector) => {
-                return refs.filter(ref => ref.selector === selector)
-                        .map(ref => this.refs[`recycle-${ref.index}`])
-              },
-              select: (selector) => params.selectAll(selector)[0],
               refs: this.refs,
               props: this.props,
               state: this.state.recycleState,
