@@ -1,13 +1,10 @@
-import { Observable } from 'rxjs/Observable'
-import { Subject } from 'rxjs/Subject'
 import objectpath from 'objectpath'
 
-export default (store) => (recycle) => {
+export default (store) => (recycle, componentAdapter, {Observable, Subject}) => {
   recycle.on('componentInit', (component) => {
     const dispatchFunction = component.get('dispatch')
     if (dispatchFunction) {
-      const childrenActions = component.getSource('childrenActions')
-      const actionsArr = forceArray(dispatchFunction(childrenActions))
+      const actionsArr = forceArray(dispatchFunction(component.getSources()))
       const manualActions = new Subject()
       actionsArr.push(manualActions)
       const actionsStream = Observable.merge(...actionsArr)
@@ -61,6 +58,8 @@ export default (store) => (recycle) => {
         let storePath = parsePath(component.get('storePath'))
         setByPath(storePath || [], component.get('initialState'), storeState)
         manualActions.next({ type: 'RECYCLE_REDUCER', payload: storeState })
+      } else {
+        component.set('initialState', store.getState())
       }
     }
   })

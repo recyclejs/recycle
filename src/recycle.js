@@ -407,14 +407,33 @@ export default function (componentAdapter, streamAdapter) {
     }
   }
 
-  return {
+  function applyDrivers (driversArr) {
+    if (!Array.isArray(driversArr)) {
+      throw new Error('Drivers must be defined in an array.')
+    }
+
+    const drivers = {}
+    api.getDriver = name => drivers[name]
+
+    driversArr.map((m) => {
+      const instance = m(api, componentAdapter, streamAdapter)
+      const name = (instance && instance.name) ? instance.name : 'driver-' + Math.random()
+      drivers[name] = instance
+      return false
+    })
+  }
+
+  const api = {
     on: addListener,
     unbind: removeListener,
     createComponent,
+    applyDrivers,
     getComponentStructure: () => getComponentStructure(rootComponent),
     getRootComponent: () => rootComponent,
     getAllComponents: () => getAllComponents(rootComponent)
   }
+
+  return api
 }
 
 export function registerComponent (newComponent, children) {
