@@ -30,29 +30,25 @@ export default function ({
     componentName = config.displayName || constructor.name
 
     const componentSources = {
-      select: generateDOMSource(refsSubjects),
+      select: generateDOMStream(refsSubjects),
+      selectClass: generateDOMStream(refsSubjects, 'CLASSNAME-'),
+      selectId: generateDOMStream(refsSubjects, 'ID-'),
       childrenActions: childrenActions.switch().share(),
       actions: new Subject(),
       props: propsReference.share(),
       state: stateReference.share()
     }
 
-    function updateRefs (componentRefs) {
+    function updateRefs () {
       Object.keys(refsSubjects).forEach((selector) => {
         Object.keys(refsSubjects[selector]).forEach((event) => {
           const foundRefs = refs.filter(ref => ref.selector === selector)
-          const streams = foundRefs.map(ref => {
-            if (ref.events && ref.events[event]) {
-              return ref.events[event]
-            }
-            // todo: check if dom el
-            return Observable.fromEvent(componentRefs[`recycle-${ref.index}`], event)
-              .map(e => {
-                e.recycleValue = ref.value
-                return e
-              })
-          })
-          refsSubjects[selector][event].next(Observable.merge(...streams))
+          const streams = foundRefs.filter(ref => ref.events && ref.events[event])
+                                   .map(ref => ref.events[event])
+          if (streams.length) {
+            const nextStream = (streams.length === 1) ? streams[0] : Observable.merge(...streams)
+            refsSubjects[selector][event].next(nextStream)
+          }
         })
       })
     }
@@ -88,9 +84,11 @@ export default function ({
               recycleState: shallowImmutable(newVal.state)
             })
           })
+        }
 
+        componentDidMount () {
           updateChildrenActions()
-          updateRefs(this.refs)
+          updateRefs()
           updateStatePropsReference()
 
           if (config.componentDidMount) {
@@ -164,32 +162,51 @@ export default function ({
     }
 
     function jsxHandler () {
-      let selector = (arguments['1']) ? arguments['1'].recycle : null
-      if (selector) {
-        let value
-        let events = {}
-        if (typeof selector === 'object') {
-          value = selector.value
-          selector = selector.selector
-        }
+      let recycleSelector = (arguments['1']) ? arguments['1'].recycle : undefined
+      let className = (arguments['1']) ? arguments['1'].className : undefined
+      let id = (arguments['1']) ? arguments['1'].id : undefined
+      let value = (arguments['1']) ? arguments['1'].return : undefined
 
-        for (let i in arguments['1']) {
-          if (typeof arguments['1'][i] === 'function') {
-            let subject = new Subject()
-            events[i] = subject
-            let func = arguments['1'][i]
-            arguments['1'][i] = function () {
-              subject.next(func.apply(this, arguments))
-            }
-          }
-        }
-
-        let newRef = { selector, value, events }
-        newRef.index = refs.length + 1
-        refs.push(newRef)
-        arguments['1'].ref = `recycle-${refs.length}`
-        delete arguments['1'].recycle
+      let selectors = []
+      if (recycleSelector) {
+        selectors.push(recycleSelector)
       }
+      if (className) {
+        let classes = className.split(' ').map(className => 'CLASSNAME-' + className)
+        selectors = selectors.concat(classes)
+      }
+      if (id) {
+        selectors.push('ID-' + id)
+      }
+
+      selectors.forEach(selector => {
+        // if recycle selector is provided
+        let events = {}
+
+        if (refsSubjects[selector]) {
+          Object.keys(refsSubjects[selector]).forEach(listenTo => {
+            // create streams from reactEvents
+            const reactEvent = getEventHandler(listenTo) || listenTo
+            let subject = new Subject()
+            events[listenTo] = subject
+            let customFunction
+            if (typeof arguments['1'][reactEvent] === 'function') {
+              customFunction = arguments['1'][reactEvent]
+            }
+            arguments['1'][reactEvent] = function () {
+              let event = arguments['0']
+              if (customFunction) {
+                event = customFunction.apply(this, arguments)
+              }
+              subject.next({ event, value })
+            }
+          })
+
+          refs.push({ selector, events })
+        }
+      })
+      delete arguments['1'].recycle
+      delete arguments['1'].return
 
       if (typeof arguments['0'] === 'function') {
         const childConstructor = arguments['0']
@@ -344,34 +361,21 @@ export default function ({
     return thisComponent
   }
 
-  function generateDOMSource (domNodes) {
+  function generateDOMStream (refsSubjects, prefix = '') {
     return function domSelector (selector) {
+      selector = prefix + selector
       const api = {
-        events: function getEvent (event) {
-          if (!domNodes[selector]) {
-            domNodes[selector] = {}
+        on: function getEvent (event, all) {
+          if (!refsSubjects[selector]) {
+            refsSubjects[selector] = {}
           }
 
-          if (!domNodes[selector][event]) {
-            domNodes[selector][event] = new Subject()
+          if (!refsSubjects[selector][event]) {
+            refsSubjects[selector][event] = new Subject()
           }
 
-          return domNodes[selector][event].switch().share()
-        },
-        on: function (event) {
-          return api
-            .events(event)
-            .map(e => {
-              if (e.recycleValue !== undefined) {
-                let toReturn = { type: selector, event: e, value: e.recycleValue }
-                delete e.recycleValue
-                return toReturn
-              }
-              if (e.target && e.target.value !== undefined) {
-                return { type: selector, event: e, value: e.target.value }
-              }
-              return { type: selector, event: e }
-            })
+          return refsSubjects[selector][event].switch().share()
+            .map(val => (val.value !== undefined) ? val.value : val.event)
         }
       }
       return api
