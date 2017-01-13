@@ -1,4 +1,6 @@
 # Recycle Redux TodoMVC Example
+This is a fork of [the official TodoMVC example from Redux](https://github.com/reactjs/redux/tree/master/examples/todomvc) 
+with a difference of using *Recycle Redux driver* rather than *React bindings for Redux*.
 
 This project template was built with [Create React App](https://github.com/facebookincubator/create-react-app).
 
