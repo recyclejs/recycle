@@ -5,18 +5,18 @@ export default function view ({ completed, title, editing, inputVal }) {
   return (
     <li className={'todoRoot ' + classNames({ completed, editing })}>
       <div className='view'>
-        <input recycle='toggle' className='toggle' type='checkbox' checked={completed} />
-        <label recycle='label'>{title}</label>
-        <button recycle='destroy' className='destroy' />
+        <input className='toggle' type='checkbox' checked={completed} />
+        <label className='label'>{title}</label>
+        <button className='destroy' />
       </div>
-      <input recycle='edit' className='edit' type='text' value={inputVal} />
+      <input ref='edit' className='edit' type='text' value={inputVal} />
     </li>
   )
 }
 
-export function componentDidUpdate ({select, state, prevState}) {
+export function componentDidUpdate ({refs, state, prevState}) {
   if (!prevState.editing && state.editing) {
-    const node = select('edit')
+    const node = refs.edit
     node.focus()
     node.select()
   }

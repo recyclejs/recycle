@@ -23,28 +23,28 @@ export default function TodoList () {
           .filterByType('titleChanged')
           .reducer(editTodo),
 
-        sources.select('clearCompleted')
-          .events('click')
+        sources.selectClass('clear-completed')
+          .on('click')
           .reducer(deleteCompleted),
 
-        sources.select('toggleAll')
-          .events('click')
+        sources.selectClass('toggle-all')
+          .on('click')
           .reducer(toggleAll),
 
-        sources.select('newTodo')
-          .events('input')
+        sources.selectClass('new-todo')
+          .on('change')
           .map(e => e.target.value)
           .reducer(inputVal),
 
-        sources.select('newTodo')
-          .events('keydown')
+        sources.selectClass('new-todo')
+          .on('keyDown')
           .filter(e => e.keyCode === ENTER_KEY)
           .map(e => e.target.value.trim())
           .filter(val => val.length > 0)
           .reducer(insertTodo),
 
-        sources.select('newTodo')
-          .events('keydown')
+        sources.selectClass('new-todo')
+          .on('keyDown')
           .filter(e => e.keyCode === ESC_KEY)
           .mapTo('')
           .reducer(inputVal)

@@ -10,7 +10,6 @@ export default function view ({ todos, inputVal, filter }) {
       <header className='header'>
         <h1>todos</h1>
         <input
-          recycle='newTodo'
           className='new-todo'
           type='text'
           value={inputVal}
@@ -19,7 +18,7 @@ export default function view ({ todos, inputVal, filter }) {
       </header>
 
       <section className='main' style={{ 'display': todos.length ? '' : 'none' }}>
-        <input recycle='toggleAll' className='toggle-all' type='checkbox' defaultChecked={active === 0} />
+        <input className='toggle-all' type='checkbox' defaultChecked={active === 0} />
         <ul className='todo-list'>
           {
             todos
@@ -48,7 +47,7 @@ export default function view ({ todos, inputVal, filter }) {
           <li><a href='#/completed' className={(filter === 'completed') ? 'selected' : ''}>Completed</a></li>
         </ul>
         {completed > 0 ? (
-          <button recycle='clearCompleted' className='clear-completed'>Clear completed ({completed}) </button>
+          <button className='clear-completed'>Clear completed ({completed}) </button>
         ) : ''}
       </footer>
     </div>

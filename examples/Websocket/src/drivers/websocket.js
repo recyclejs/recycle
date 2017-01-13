@@ -1,7 +1,6 @@
 /* global WebSocket */
-import { Subject } from 'rxjs/Subject'
 
-export default function WebSocketPlugin (recycle) {
+export default function (recycle, componentAdapter, { Subject }) {
   const response$ = new Subject()
   const status$ = new Subject()
 

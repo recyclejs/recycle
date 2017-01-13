@@ -23,7 +23,7 @@ export default function TodoItem (props) {
           .mapTo(props.deleteTodo(props.todo.id)),
 
         sources.select(TODO_TOGGLE)
-          .on('click')
+          .on('change')
           .mapTo(props.completeTodo(props.todo.id)),
 
         sources.childrenActions
@@ -35,7 +35,7 @@ export default function TodoItem (props) {
     reducers (sources) {
       return [
         sources.select(TODO_LABEL)
-          .events('dblclick')
+          .on('doubleClick')
           .reducer(function (state) {
             state.editing = true
             return state
@@ -51,7 +51,7 @@ export default function TodoItem (props) {
     },
 
     view (props, state) {
-      return view ({
+      return view({
         todo: props.todo,
         editing: state.editing
       })

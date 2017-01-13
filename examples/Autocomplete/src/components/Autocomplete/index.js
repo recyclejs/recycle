@@ -9,8 +9,8 @@ export default function Autocomplete () {
 
     reducers (sources) {
       return [
-        sources.select('searchInput')
-          .events('onChange')
+        sources.selectId('searchInput')
+          .on('change')
           .filter(val => val.length > 2)
           .debounceTime(500)
           .switchMap(val => Observable.ajax('https://api.github.com/search/users?q=' + val))

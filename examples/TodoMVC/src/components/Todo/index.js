@@ -10,20 +10,20 @@ export default function Todo () {
 
     actions (sources) {
       return [
-        sources.select('destroy')
-          .events('click')
+        sources.selectClass('destroy')
+          .on('click')
           .mapToLatest(sources.props)
           .map(props => ({ type: 'destroy', id: props.id })),
 
-        sources.select('toggle')
-          .events('change')
+        sources.selectClass('toggle')
+          .on('change')
           .mapToLatest(sources.props)
           .map(props => ({ type: 'toggle', id: props.id })),
 
-        sources.select('edit')
-          .events('keyup')
+        sources.selectClass('edit')
+          .on('keyUp')
           .filter(ev => ev.keyCode === ENTER_KEY)
-          .merge(sources.select('edit').events('blur', true))
+          .merge(sources.selectClass('edit').on('blur'))
           .mapToLatest(sources.props, sources.state)
           .map(({props, state}) => ({ type: 'titleChanged', id: props.id, title: state.inputVal }))
       ]
@@ -31,8 +31,8 @@ export default function Todo () {
 
     reducers (sources) {
       return [
-        sources.select('label')
-          .events('dblclick')
+        sources.selectClass('label')
+          .on('doubleClick')
           .mapToLatest(sources.props)
           .reducer((state, props) => {
             state.editing = true
@@ -40,8 +40,8 @@ export default function Todo () {
             return state
           }),
 
-        sources.select('edit')
-          .events('keyup')
+        sources.selectClass('edit')
+          .on('keyUp')
           .filter(ev => ev.keyCode === ESC_KEY)
           .mapToLatest(sources.props)
           .reducer((state, props) => {
@@ -50,8 +50,8 @@ export default function Todo () {
             return state
           }),
 
-        sources.select('edit')
-          .events('input')
+        sources.selectClass('edit')
+          .on('change')
           .reducer((state, e) => {
             state.inputVal = e.target.value
             return state

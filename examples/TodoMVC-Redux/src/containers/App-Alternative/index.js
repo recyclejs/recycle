@@ -17,7 +17,7 @@ export default function App () {
       }
     ],
 
-    dispatch (childrenActions) {
+    dispatch ({childrenActions}) {
       return [
         childrenActions
           .filterByType(ADD_TODO)

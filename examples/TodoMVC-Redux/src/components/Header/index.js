@@ -14,9 +14,9 @@ export default function Header (props) {
 
     view () {
       return (
-        <header className="header">
+        <header className='header'>
           <h1>todos</h1>
-          <TodoTextInput newTodo placeholder="What needs to be done?" />
+          <TodoTextInput newTodo placeholder='What needs to be done?' />
         </header>
       )
     }

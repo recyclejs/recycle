@@ -6,7 +6,6 @@ export default function (suggestions) {
   return (
     <div>
       <TextField
-        recycle='searchInput'
         id='searchInput'
         placeholder='Find GitHub Login'
         onChange={e => e.target.value}

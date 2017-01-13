@@ -14,10 +14,12 @@ export default function Footer (props) {
     actions (sources) {
       return [
         sources.select(CLEAR_COMPLETED)
-          .on('click'),
+          .on('click')
+          .mapTo({ type: CLEAR_COMPLETED }),
 
         sources.select(TODO_FILTER)
           .on('click')
+          .map(filter => ({ type: TODO_FILTER, value: filter }))
       ]
     },
 

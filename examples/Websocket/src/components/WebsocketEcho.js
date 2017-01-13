@@ -1,9 +1,6 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
-import Recycle from '../../src/index'
-import WebSocketPlugin from './websocket-plugin'
 
-function WebSocketEcho () {
+export default function WebSocketEcho () {
   return {
     initialState: {
       inputVal: '',
@@ -12,8 +9,8 @@ function WebSocketEcho () {
     },
 
     actions (sources) {
-      return sources.select('input')
-        .events('keydown')
+      return sources.selectClass('input')
+        .on('keyDown')
         .filter(e => e.keyCode === 13)
         .mapToLatest(sources.state)
         .map(state => ({ type: 'send', payload: state.inputVal }))
@@ -21,8 +18,8 @@ function WebSocketEcho () {
 
     reducers (sources) {
       return [
-        sources.select('input')
-          .events('input')
+        sources.selectClass('input')
+          .on('change')
           .reducer((state, e) => {
             state.inputVal = e.target.value
             return state
@@ -46,7 +43,7 @@ function WebSocketEcho () {
       return (
         <div>
           <h2>Websocket Echo Test</h2>
-          <div>Send: <input recycle='input' value={state.inputVal} type='text' /></div>
+          <div>Send: <input className='input' value={state.inputVal} type='text' /></div>
           <br />
           <div>Status: {state.status}</div>
           <div>Response: {state.response}</div>
@@ -56,7 +53,4 @@ function WebSocketEcho () {
   }
 }
 
-ReactDOM.render((
-  <Recycle root={WebSocketEcho} plugins={[WebSocketPlugin]} />
-), document.getElementById('app'))
 

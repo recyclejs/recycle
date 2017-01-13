@@ -6,7 +6,7 @@ import * as actionTypes from '../constants/ActionTypes'
 
 export default function App () {
   return {
-    dispatch (childrenActions) {
+    dispatch ({childrenActions}) {
       // dispatch actions from child components
       // accept only actions defined in ActionTypes
       return childrenActions.filter(a => actionTypes[a.type])

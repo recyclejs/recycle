@@ -3,8 +3,16 @@ import ReactDOM from 'react-dom'
 import { Router, Route, hashHistory } from 'react-router'
 import 'todomvc-common/base.css'
 import 'todomvc-app-css/index.css'
-import Recycle from 'recyclejs'
 import TodoList from './components/TodoList'
+
+// RECYCLE DEFINED USING DEFAULT ADAPTER
+import Recycle from 'recyclejs'
+
+// RECYCLE DEFINED USING CUSTOM ADAPTER
+// import Rx from 'rxjs/Rx'
+// import streamAdapter from 'recyclejs/adapter/rxjs'
+// import componentAdapter, { createRecycle } from 'recyclejs/adapter/react'
+// const Recycle = createRecycle(componentAdapter(React), streamAdapter(Rx))
 
 const TodoListReact = Recycle()(TodoList)
 

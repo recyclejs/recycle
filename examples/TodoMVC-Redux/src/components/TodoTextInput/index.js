@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react'
 import classnames from 'classnames'
 import { TEXT_INPUT } from '../../constants/Selectors'
 
-export default function TodoTextInput(props) {
+export default function TodoTextInput (props) {
   return {
     propTypes: {
       text: PropTypes.string,
@@ -18,21 +18,23 @@ export default function TodoTextInput(props) {
     actions (sources) {
       return [
         sources.select(TEXT_INPUT)
-          .on('keydown')
-          .filter(a => a.event.which === 13)
-          .filter(a => a.value.length !== 0),
+          .on('keyDown')
+          .filter(e => e.which === 13)
+          .filter(e => e.target.value.length)
+          .map(e => ({ type: TEXT_INPUT, value: e.target.value })),
 
         sources.select(TEXT_INPUT)
           .on('blur')
           .filter(() => !props.newTodo)
-          .filter(a => a.value.length !== 0)
+          .filter(e => e.target.value.length)
+          .map(e => ({ type: TEXT_INPUT, value: e.target.value }))
       ]
     },
 
     reducers (sources) {
       return [
         sources.select(TEXT_INPUT)
-          .events('input')
+          .on('change')
           .reducer((state, e) => {
             state.text = e.target.value
             return state
@@ -58,9 +60,9 @@ export default function TodoTextInput(props) {
             })
           }
           value={state.text}
-          type="text"
+          type='text'
           placeholder={props.placeholder}
-          autoFocus="true" />
+          autoFocus='true' />
       )
     }
   }
