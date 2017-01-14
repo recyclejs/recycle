@@ -81,6 +81,8 @@ export default function (componentAdapter, streamAdapter) {
           updateRefs()
           updateStatePropsReference()
 
+          emit('componentDidMount', thisComponent)
+
           if (config.componentDidMount) {
             return config.componentDidMount()
           }
@@ -190,10 +192,10 @@ export default function (componentAdapter, streamAdapter) {
           refs.push({ selector, events })
         }
       })
-      if (arguments['1'] && arguments['1'].recycle) {
+      if (arguments['1'] && arguments['1'].recycle !== undefined) {
         delete arguments['1'].recycle
       }
-      if (arguments['1'] && arguments['1'].return) {
+      if (arguments['1'] && arguments['1'].return !== undefined) {
         delete arguments['1'].return
       }
 
@@ -341,7 +343,16 @@ export default function (componentAdapter, streamAdapter) {
       getConstructor: () => constructor
     }
 
+    if (!parent) {
+      if (rootComponent) throw new Error('rootComponent already set')
+      rootComponent = thisComponent
+      emit('initialize')
+    }
+
+    emit('componentInit', thisComponent)
+
     if (config.actions) {
+      // todo: error for unsupported actions
       let act = config.actions(componentSources)
       if (act) {
         Observable.merge(...forceArray(act))
@@ -350,14 +361,6 @@ export default function (componentAdapter, streamAdapter) {
       }
     }
     stateStream = getStateStream().merge(injectedState)
-
-    if (!parent) {
-      if (rootComponent) throw new Error('rootComponent already set')
-      rootComponent = thisComponent
-      emit('initialize')
-    }
-
-    emit('componentInit', thisComponent)
     return thisComponent
   }
 

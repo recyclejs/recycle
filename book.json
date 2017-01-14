@@ -3,6 +3,9 @@
   "title": "Recycle",
   "plugins": ["edit-link", "github"],
   "pluginsConfig": {
+    "theme-default": {
+      "showLevel": true
+    },
     "edit-link": {
       "base": "https://github.com/recyclejs/recycle/tree/master",
       "label": "Edit This Page"
