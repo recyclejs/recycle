@@ -16,6 +16,7 @@ export default function (componentAdapter, streamAdapter) {
     const injectedState = new Subject()
     const propsReference = new Subject()
     const stateReference = new Subject()
+    let stateStream
     let ReactComponent
     let componentName
     let timesRendered = 0
@@ -65,25 +66,17 @@ export default function (componentAdapter, streamAdapter) {
       class ReactClass extends BaseComponent {
         constructor (ownProps) {
           super(ownProps)
-          this.state = {
-            recycleState: config.initialState
-          }
+          this.state = { recycleState: config.initialState }
           state = this.state.recycleState
+        }
 
-          if (config.actions) {
-            Observable.merge(...forceArray(config.actions(componentSources)))
-              .filter(action => action)
-              .subscribe(componentSources.actions)
-          }
-
-          this.stateSubsription = getStateStream().merge(injectedState).subscribe(newVal => {
+        componentDidMount () {
+          this.stateSubsription = stateStream.subscribe(newVal => {
             this.setState({
               recycleState: shallowImmutable(newVal.state)
             })
           })
-        }
 
-        componentDidMount () {
           updateChildrenActions()
           updateRefs()
           updateStatePropsReference()
@@ -197,8 +190,12 @@ export default function (componentAdapter, streamAdapter) {
           refs.push({ selector, events })
         }
       })
-      delete arguments['1'].recycle
-      delete arguments['1'].return
+      if (arguments['1'] && arguments['1'].recycle) {
+        delete arguments['1'].recycle
+      }
+      if (arguments['1'] && arguments['1'].return) {
+        delete arguments['1'].return
+      }
 
       if (typeof arguments['0'] === 'function') {
         const childConstructor = arguments['0']
@@ -343,6 +340,16 @@ export default function (componentAdapter, streamAdapter) {
       getProps: () => props,
       getConstructor: () => constructor
     }
+
+    if (config.actions) {
+      let act = config.actions(componentSources)
+      if (act) {
+        Observable.merge(...forceArray(act))
+          .filter(action => action)
+          .subscribe(componentSources.actions)
+      }
+    }
+    stateStream = getStateStream().merge(injectedState)
 
     if (!parent) {
       if (rootComponent) throw new Error('rootComponent already set')
