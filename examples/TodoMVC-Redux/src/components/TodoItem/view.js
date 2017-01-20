@@ -1,7 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
 import TodoTextInput from '../TodoTextInput'
-import { TODO_DELETE, TODO_LABEL, TODO_TOGGLE } from '../../constants/Selectors'
 
 function view ({ todo, editing }) {
   let element
@@ -13,15 +12,15 @@ function view ({ todo, editing }) {
   } else {
     element = (
       <div className='view'>
-        <input recycle={TODO_TOGGLE}
+        <input
           return={todo.id}
           className='toggle'
           type='checkbox'
           checked={todo.completed} />
-        <label recycle={TODO_LABEL} >
+        <label>
           {todo.text}
         </label>
-        <button recycle={TODO_DELETE}
+        <button
           return={todo.id}
           className='destroy' />
       </div>

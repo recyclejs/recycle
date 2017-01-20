@@ -1,13 +1,11 @@
 import React from 'react'
 import TodoItem from '../TodoItem'
 import Footer from '../Footer'
-import { TOGGLE_ALL } from '../../constants/Selectors'
 
 function view ({children, todos, actions, filter}) {
   const renderToggleAll = () => {
     if (todos.length > 0) {
       return <input
-        recycle={TOGGLE_ALL}
         className='toggle-all'
         type='checkbox'
         checked={todos.completed === todos.length} />

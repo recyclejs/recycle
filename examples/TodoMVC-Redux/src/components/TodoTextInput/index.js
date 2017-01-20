@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import classnames from 'classnames'
-import { TEXT_INPUT } from '../../constants/Selectors'
+import { TEXT_INPUT } from '../../constants/ActionTypes'
 
 export default function TodoTextInput (props) {
   return {
@@ -17,13 +17,13 @@ export default function TodoTextInput (props) {
 
     actions (sources) {
       return [
-        sources.select(TEXT_INPUT)
+        sources.select('input')
           .on('keyDown')
           .filter(e => e.which === 13)
           .filter(e => e.target.value.length)
           .map(e => ({ type: TEXT_INPUT, value: e.target.value })),
 
-        sources.select(TEXT_INPUT)
+        sources.select('input')
           .on('blur')
           .filter(() => !props.newTodo)
           .filter(e => e.target.value.length)
@@ -33,7 +33,7 @@ export default function TodoTextInput (props) {
 
     reducers (sources) {
       return [
-        sources.select(TEXT_INPUT)
+        sources.select('input')
           .on('change')
           .reducer((state, e) => {
             state.text = e.target.value
@@ -52,7 +52,7 @@ export default function TodoTextInput (props) {
 
     view (props, state) {
       return (
-        <input recycle={TEXT_INPUT}
+        <input
           className={
             classnames({
               edit: props.editing,

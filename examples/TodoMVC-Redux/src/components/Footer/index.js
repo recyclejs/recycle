@@ -1,9 +1,9 @@
 import { PropTypes } from 'react'
 import view from './view'
 import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from '../../constants/TodoFilters'
-import { TODO_FILTER, CLEAR_COMPLETED } from '../../constants/Selectors'
+import { TODO_FILTER, CLEAR_COMPLETED } from '../../constants/ActionTypes'
 
-export default function Footer (props) {
+export default function Footer () {
   return {
     propTypes: {
       completedCount: PropTypes.number.isRequired,
@@ -13,13 +13,13 @@ export default function Footer (props) {
 
     actions (sources) {
       return [
-        sources.select(CLEAR_COMPLETED)
+        sources.selectClass('clear-complete')
           .on('click')
           .mapTo({ type: CLEAR_COMPLETED }),
 
-        sources.select(TODO_FILTER)
+        sources.selectClass('filter-link')
           .on('click')
-          .map(filter => ({ type: TODO_FILTER, value: filter }))
+          .map(filter => ({ type: TODO_FILTER, filter }))
       ]
     },
 

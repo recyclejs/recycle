@@ -1,7 +1,7 @@
 import { PropTypes } from 'react'
 import view from './view'
 import TodoTextInput from '../TodoTextInput'
-import { TODO_DELETE, TODO_LABEL, TODO_TOGGLE } from '../../constants/Selectors'
+import { TEXT_INPUT } from '../../constants/ActionTypes'
 
 export default function TodoItem (props) {
   return {
@@ -18,31 +18,31 @@ export default function TodoItem (props) {
 
     actions (sources) {
       return [
-        sources.select(TODO_DELETE)
+        sources.selectClass('destroy')
           .on('click')
           .mapTo(props.deleteTodo(props.todo.id)),
 
-        sources.select(TODO_TOGGLE)
+        sources.selectClass('toggle')
           .on('change')
           .mapTo(props.completeTodo(props.todo.id)),
 
-        sources.childrenActions
-          .filterByComponent(TodoTextInput)
+        sources.select(TodoTextInput)
+          .on(TEXT_INPUT)
           .map(a => props.editTodo(props.todo.id, a.value))
       ]
     },
 
     reducers (sources) {
       return [
-        sources.select(TODO_LABEL)
+        sources.select('label')
           .on('doubleClick')
           .reducer(function (state) {
             state.editing = true
             return state
           }),
 
-        sources.childrenActions
-          .filterByComponent(TodoTextInput)
+        sources.select(TodoTextInput)
+          .on(TEXT_INPUT)
           .reducer(function (state) {
             state.editing = false
             return state

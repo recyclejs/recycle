@@ -17,41 +17,31 @@ export default function App () {
       }
     ],
 
-    dispatch ({childrenActions}) {
+    dispatch (sources) {
       return [
-        childrenActions
-          .filterByType(ADD_TODO)
+        sources.select(Header)
+          .on(ADD_TODO)
           .reducer(addTodo),
 
-        childrenActions
-          .filterByType(DELETE_TODO)
+        sources.select(MainSection)
+          .on(DELETE_TODO)
           .reducer(deleteTodo),
 
-        childrenActions
-          .filterByType(EDIT_TODO)
+        sources.select(MainSection)
+          .on(EDIT_TODO)
           .reducer(editTodo),
 
-        childrenActions
-          .filterByType(COMPLETE_TODO)
+        sources.select(MainSection)
+          .on(COMPLETE_TODO)
           .reducer(completeTodo),
 
-        childrenActions
-          .filterByType(COMPLETE_ALL)
+        sources.select(MainSection)
+          .on(COMPLETE_ALL)
           .reducer(completeAll),
 
-        childrenActions
-          .filterByType(CLEAR_COMPLETED)
+        sources.select(MainSection)
+          .on(CLEAR_COMPLETED)
           .reducer(clearCompleted)
-
-        //  for chaining async operations like ajax:
-        //
-        //  childrenActions
-        //    .filterByType(ADD_TODO)
-        //    .switchMap(todo =>
-        //      Observable.ajax({ url: '/addtodo', method: 'POST', body: todo })
-        //        .reducer(addTodo)
-        //        .catch(errorAction)
-        //    )
       ]
     },
 

@@ -1,5 +1,4 @@
 import view from './view'
-import { Observable } from 'rxjs/Observable'
 
 export default function Autocomplete () {
   return {
@@ -7,15 +6,20 @@ export default function Autocomplete () {
       suggestions: []
     },
 
-    reducers (sources) {
+    actions (sources) {
       return [
         sources.selectId('searchInput')
-          .on('change')
+          .on('onChange')
           .filter(val => val.length > 2)
           .debounceTime(500)
-          .switchMap(val => Observable.ajax('https://api.github.com/search/users?q=' + val))
-          .reducer(function (state, res) {
-            state.suggestions = res.response.items.slice(0, 10)
+      ]
+    },
+
+    reducers (sources) {
+      return [
+        sources.suggestions
+          .reducer(function (state, items) {
+            state.suggestions = items.slice(0, 10)
             return state
           })
       ]

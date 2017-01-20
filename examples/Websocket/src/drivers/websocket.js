@@ -1,6 +1,6 @@
 /* global WebSocket */
 
-export default function (recycle, componentAdapter, { Subject }) {
+export default function (recycle, { Subject }) {
   const response$ = new Subject()
   const status$ = new Subject()
 

@@ -1,12 +1,13 @@
 import React from 'react'
 import TodoTextInput from '../TodoTextInput'
+import { TEXT_INPUT } from '../../constants/ActionTypes'
 
 export default function Header (props) {
   return {
     actions (sources) {
       return [
-        sources.childrenActions
-          .filterByComponent(TodoTextInput)
+        sources.select(TodoTextInput)
+          .on(TEXT_INPUT)
           .map(a => a.value.trim())
           .map(props.addTodo)
       ]

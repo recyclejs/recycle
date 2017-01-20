@@ -1,4 +1,5 @@
 import view from './view'
+import Todo from '../Todo'
 import { toggleTodo, deleteTodo, editTodo, deleteCompleted, toggleAll, insertTodo, inputVal } from './reducers'
 import { ENTER_KEY, ESC_KEY, updateLocalStorage, getFromLocalStorage } from '../../utils'
 
@@ -11,16 +12,16 @@ export default function TodoList () {
 
     reducers (sources) {
       return [
-        sources.childrenActions
-          .filterByType('toggle')
+        sources.select(Todo)
+          .on('toggle')
           .reducer(toggleTodo),
 
-        sources.childrenActions
-          .filterByType('destroy')
+        sources.select(Todo)
+          .on('destroy')
           .reducer(deleteTodo),
 
-        sources.childrenActions
-          .filterByType('titleChanged')
+        sources.select(Todo)
+          .on('titleChanged')
           .reducer(editTodo),
 
         sources.selectClass('clear-completed')

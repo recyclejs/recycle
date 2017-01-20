@@ -1,13 +1,12 @@
 import React from 'react'
 import classnames from 'classnames'
-import { TODO_FILTER, CLEAR_COMPLETED } from '../../constants/Selectors'
 
 function view ({ activeCount, completedCount, filter }) {
   function renderFilterLink (filterKey, title) {
+    let selected = filterKey === filter.selected
     return (
-      <a recycle={TODO_FILTER}
-        return={filterKey}
-        className={classnames({ selected: filterKey === filter.selected })}
+      <a return={filterKey}
+        className={classnames({ 'filter-link': true, selected })}
         style={{ cursor: 'pointer' }}
          >
         {title}
@@ -18,7 +17,7 @@ function view ({ activeCount, completedCount, filter }) {
   function clearButton () {
     if (completedCount > 0) {
       return (
-        <button recycle={CLEAR_COMPLETED} className='clear-completed'>
+        <button className='clear-completed'>
           Clear completed
         </button>
       )
