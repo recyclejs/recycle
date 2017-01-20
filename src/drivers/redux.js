@@ -1,7 +1,7 @@
 import objectpath from 'objectpath'
 
-export default (store) => (recycle, componentAdapter, {Observable, Subject}) => {
-  recycle.on('componentInit', (component) => {
+export default (store) => (recycle, {Observable, Subject}) => {
+  recycle.on('sourcesReady', (component) => {
     const dispatchFunction = component.get('dispatch')
     if (dispatchFunction) {
       const actionsArr = forceArray(dispatchFunction(component.getSources()))
