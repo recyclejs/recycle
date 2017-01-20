@@ -268,6 +268,13 @@ export default function (componentAdapter, streamAdapter) {
       }
 
       return Observable.merge(...reducers)
+        .filter(e => {
+          if (!e || !e.reducer) {
+            console.error('Could not change state, missing reducer function.')
+            return false
+          }
+          return true
+        })
         .map(({ reducer, action }) => {
           let newState = reducer(shallowImmutable(state), action)
           emit('newState', [thisComponent, newState, action])
