@@ -429,7 +429,7 @@ export default function (componentAdapter, streamAdapter) {
     api.getDriver = name => drivers[name]
 
     driversArr.map((m) => {
-      const instance = m(api, componentAdapter, streamAdapter)
+      const instance = m(api, streamAdapter, componentAdapter)
       const name = (instance && instance.name) ? instance.name : 'driver-' + Math.random()
       drivers[name] = instance
       return false
