@@ -231,10 +231,7 @@ export default function (componentAdapter, streamAdapter) {
       const newActions = Observable.merge(
         ...forceArray(getChildren())
           .filter(component => component.getActions())
-          .map(component => component.getActions().map(a => {
-            // todo: type check
-            return {...a, childComponent: component.getConstructor()}
-          }))
+          .map(component => component.getActions())
       )
 
       if (newActions) {
