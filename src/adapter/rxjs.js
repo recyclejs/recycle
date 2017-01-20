@@ -9,10 +9,6 @@ export default function ({ Observable, Subject }) {
     return this.filter(action => action.type === type)
   }
 
-  Observable.prototype.filterByComponent = function filterByComponent (constructor) {
-    return this.filter(action => action.childComponent === constructor)
-  }
-
   Observable.prototype.mapToLatest = function mapToLatest (sourceFirst, sourceSecond) {
     if (sourceSecond) {
       return this.mapToLatest(sourceFirst).withLatestFrom(sourceSecond, (props, state) => ({props, state}))
