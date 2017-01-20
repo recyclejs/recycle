@@ -1,22 +1,21 @@
 # Table of contents
 
-## [README](/README.md)
+## Introduction
+* [Read Me](/README.md)
 
-## Quick Start
-* [Hello World](/docs/quick-start/HelloWorld.md)
-* [Stateful Component](/docs/quick-start/StatefulComponent.md)
-* [Parent-Child Relationship](/docs/quick-start/ParentChild.md)
-* [Usage with React](/docs/quick-start/UsingReactComponents.md)
+## Motivation
+* [Reactive Programming](/docs/motivation/ReactiveProgramming.md)
+* [Separation of Concerns](/docs/motivation/SeparationOfConcerns.md)
 
-## Advanced Examples
-* [Autocomplete](/docs/advanced-examples/Autocomplete.md)
-* [WebSocket Echo](/docs/advanced-examples/WebsocketEcho.md)
-* [Without Store](/docs/advanced-examples/todomvc/TodoMVCNoPlugin.md)
-* [With Store](/docs/advanced-examples/todomvc/TodoMVCStore.md)
-* [Isolated Reducers](/docs/advanced-examples/todomvc/TodoMVCStoreIsolated.md)
-* [Redux](/docs/advanced-examples/todomvc/TodoMVCRedux.md)
+## Concepts
+* [Stateful Component](/docs/concepts/StatefulComponent.md)
+* [Parent-Child Relationship](/docs/concepts/ParentChild.md)
+* [Drivers](/docs/concepts/Drivers.md)
+* [Usage with React](/docs/concepts/UsageWithReact.md)
+* [Usage with Redux](/docs/concepts/UsageWithRedux.md)
+* [Testing](/docs/concepts/Testing.md)
 
 ## API Reference
 * [Component](/docs/api-reference/Component.md)
 * [Recycle RxJS Operators](/docs/api-reference/recycleRxjsOperators.md)
-* [Plugins](/docs/api-reference/Plugins.md)
+* [Drivers](/docs/api-reference/Drivers.md)
