@@ -9,13 +9,13 @@ export default function (componentAdapter, streamAdapter) {
 
   function createComponent (constructor, props, parent) {
     const key = (props) ? props.key : null
-    const refsSubjects = {}
-    let refs = []
     const children = new Map()
     const childrenActions = new Subject()
     const injectedState = new Subject()
     const propsReference = new Subject()
     const stateReference = new Subject()
+    const registeredNodeStreams = []
+    let currentNodeStreams = []
     let stateStream
     let ReactComponent
     let componentName
@@ -30,26 +30,26 @@ export default function (componentAdapter, streamAdapter) {
     componentName = config.displayName || constructor.name
 
     const componentSources = {
-      select: generateDOMStream(refsSubjects),
-      selectClass: generateDOMStream(refsSubjects, 'CLASSNAME-'),
-      selectId: generateDOMStream(refsSubjects, 'ID-'),
+      select: registerNodeStream(registeredNodeStreams, 'tag'),
+      selectClass: registerNodeStream(registeredNodeStreams, 'class'),
+      selectId: registerNodeStream(registeredNodeStreams, 'id'),
       childrenActions: childrenActions.switch().share(),
       actions: new Subject(),
       props: propsReference.share(),
       state: stateReference.share()
     }
 
-    function updateRefs () {
-      Object.keys(refsSubjects).forEach((selector) => {
-        Object.keys(refsSubjects[selector]).forEach((event) => {
-          const foundRefs = refs.filter(ref => ref.selector === selector)
-          const streams = foundRefs.filter(ref => ref.events && ref.events[event])
-                                   .map(ref => ref.events[event])
-          if (streams.length) {
-            const nextStream = (streams.length === 1) ? streams[0] : Observable.merge(...streams)
-            refsSubjects[selector][event].next(nextStream)
-          }
-        })
+    function updateNodeStreams () {
+      registeredNodeStreams.forEach(regRef => {
+        const streams = currentNodeStreams
+                .filter(ref => ref.selector === regRef.selector)
+                .filter(ref => ref.selectorType === regRef.selectorType)
+                .filter(ref => ref.event === regRef.event)
+                .map(ref => ref.stream)
+
+        if (streams.length) {
+          regRef.stream.next((streams.length === 1) ? streams[0] : Observable.merge(...streams))
+        }
       })
     }
 
@@ -78,7 +78,7 @@ export default function (componentAdapter, streamAdapter) {
           })
 
           updateChildrenActions()
-          updateRefs()
+          updateNodeStreams()
           updateStatePropsReference()
 
           emit('componentDidMount', thisComponent)
@@ -100,7 +100,7 @@ export default function (componentAdapter, streamAdapter) {
           state = this.state.recycleState
 
           emit('componentUpdate', thisComponent)
-          updateRefs()
+          updateNodeStreams()
           updateStatePropsReference()
           if (config.componentDidUpdate) {
             const params = {
@@ -131,7 +131,7 @@ export default function (componentAdapter, streamAdapter) {
 
         render () {
           timesRendered++
-          refs = []
+          currentNodeStreams = []
           if (!config.view) return null
 
           let before = React.createElement
@@ -149,54 +149,46 @@ export default function (componentAdapter, streamAdapter) {
     }
 
     function jsxHandler () {
-      let recycleSelector = (arguments['1']) ? arguments['1'].recycle : undefined
-      let className = (arguments['1']) ? arguments['1'].className : undefined
-      let id = (arguments['1']) ? arguments['1'].id : undefined
-      let value = (arguments['1']) ? arguments['1'].return : undefined
+      let selectors = getNodeSelectors(arguments['0'], arguments['1'])
+      let returnValue = (arguments['1']) ? arguments['1'].return : undefined
 
-      let selectors = []
-      if (recycleSelector) {
-        selectors.push(recycleSelector)
-      }
-      if (className) {
-        let classes = className.split(' ').map(className => 'CLASSNAME-' + className)
-        selectors = selectors.concat(classes)
-      }
-      if (id) {
-        selectors.push('ID-' + id)
-      }
-
-      selectors.forEach(selector => {
-        // if recycle selector is provided
-        let events = {}
-
-        if (refsSubjects[selector]) {
-          Object.keys(refsSubjects[selector]).forEach(listenTo => {
-            // create streams from reactEvents
-            const reactEvent = getEventHandler(listenTo) || listenTo
-            let subject = new Subject()
-            events[listenTo] = subject
-            let customFunction
-            if (typeof arguments['1'][reactEvent] === 'function') {
-              customFunction = arguments['1'][reactEvent]
-            }
-            arguments['1'][reactEvent] = function () {
-              let event = arguments['0']
-              if (customFunction) {
-                event = customFunction.apply(this, arguments)
-              }
-              subject.next({ event, value })
-            }
-          })
-
-          refs.push({ selector, events })
-        }
-      })
-      if (arguments['1'] && arguments['1'].recycle !== undefined) {
-        delete arguments['1'].recycle
-      }
       if (arguments['1'] && arguments['1'].return !== undefined) {
         delete arguments['1'].return
+      }
+
+      const setNodeStream = (child) => {
+        selectors.forEach(({ selectorType, selector }) => {
+          registeredNodeStreams
+            .filter(ref => ref.selector === selector)
+            .filter(ref => ref.selectorType === selectorType)
+            .forEach(registredRef => {
+              let ref = {
+                selector,
+                selectorType,
+                event: registredRef.event
+              }
+              if (child) {
+                ref.stream = child.getActions()
+                  .filter(a => a.type === ref.event)
+                  .map(event => ({ event }))
+              } else if (typeof arguments['1'][ref.event] === 'function') {
+                ref.stream = new Subject()
+                let customFunction = arguments['1'][ref.event]
+                arguments['1'][ref.event] = function () {
+                  let event = customFunction.apply(this, arguments)
+                  ref.stream.next({ event, returnValue })
+                }
+              } else {
+                ref.stream = new Subject()
+                const reactEvent = getEventHandler(ref.event) || ref.event
+                arguments['1'][reactEvent] = function () {
+                  let event = arguments['0']
+                  ref.stream.next({ event, returnValue })
+                }
+              }
+              currentNodeStreams.push(ref)
+            })
+        })
       }
 
       if (typeof arguments['0'] === 'function') {
@@ -204,6 +196,7 @@ export default function (componentAdapter, streamAdapter) {
         const childProps = arguments['1'] || {}
 
         if (isReactComponent(childConstructor)) {
+          setNodeStream()
           return createReactElement(createElement, arguments, jsxHandler)
         }
 
@@ -217,13 +210,16 @@ export default function (componentAdapter, streamAdapter) {
               throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
             }
           }
+          setNodeStream(child)
           return createElement(child.getReactComponent(), childProps)
         }
 
         const newComponent = createComponent(childConstructor, childProps, thisComponent)
         registerComponent(newComponent, children)
+        setNodeStream(newComponent)
         return createElement(newComponent.getReactComponent(), childProps)
       }
+      setNodeStream()
       return createElement.apply(this, arguments)
     }
 
@@ -361,23 +357,33 @@ export default function (componentAdapter, streamAdapter) {
       }
     }
     stateStream = getStateStream().merge(injectedState)
+
+    emit('sourcesReady', thisComponent)
     return thisComponent
   }
 
-  function generateDOMStream (refsSubjects, prefix = '') {
-    return function domSelector (selector) {
-      selector = prefix + selector
+  function registerNodeStream (registeredNodeStreams, selectorType) {
+    return selector => {
       return {
-        on: function getEvent (event, all) {
-          if (!refsSubjects[selector]) {
-            refsSubjects[selector] = {}
+        on: event => {
+          const foundRefs = registeredNodeStreams
+            .filter(ref => ref.selector === selector)
+            .filter(ref => ref.selectorType === selectorType)
+            .filter(ref => ref.event === event)
+
+          let ref = foundRefs[0]
+
+          if (!ref) {
+            ref = {
+              selector,
+              selectorType,
+              event,
+              stream: new Subject()
+            }
+            registeredNodeStreams.push(ref)
           }
 
-          if (!refsSubjects[selector][event]) {
-            refsSubjects[selector][event] = new Subject()
-          }
-
-          return refsSubjects[selector][event].switch().share()
+          return ref.stream.switch().share()
             .map(val => (val.value !== undefined) ? val.value : val.event)
         }
       }
@@ -530,4 +536,31 @@ export function shallowImmutable (data) {
     return {...data}
   }
   return data
+}
+
+function getNodeSelectors (nodeName, attrs) {
+  let selectors = []
+
+  let tag = (typeof nodeName === 'string') ? nodeName : undefined
+  let id = (attrs) ? attrs.id : undefined
+  let className = (attrs) ? attrs.className : undefined
+  let functionSelector = (typeof nodeName === 'function') ? nodeName : undefined
+
+  if (tag) {
+    selectors.push({ selector: tag, selectorType: 'tag' })
+  }
+
+  if (functionSelector) {
+    selectors.push({ selector: functionSelector, selectorType: 'tag' })
+  }
+
+  if (className) {
+    let classes = className.split(' ').map(classNcame => ({ selector: className, selectorType: 'class' }))
+    selectors = selectors.concat(classes)
+  }
+  if (id) {
+    selectors.push({ selector: id, selectorType: 'id' })
+  }
+
+  return selectors
 }
