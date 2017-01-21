@@ -2,9 +2,14 @@ import objectpath from 'objectpath'
 
 export default (store) => (recycle, {Observable, Subject}) => {
   recycle.on('sourcesReady', (component) => {
-    const dispatchFunction = component.get('dispatch')
-    if (dispatchFunction) {
-      const actionsArr = forceArray(dispatchFunction(component.getSources()))
+    const container = component.get('container')
+    if (container) {
+      const actionsFunction = component.get('actions')
+      if (!actionsFunction) {
+        throw new Error('Container component must have the actions property')
+      }
+
+      const actionsArr = forceArray(actionsFunction(component.getSources()))
       const manualActions = new Subject()
       actionsArr.push(manualActions)
       const actionsStream = Observable.merge(...actionsArr)
@@ -53,13 +58,21 @@ export default (store) => (recycle, {Observable, Subject}) => {
         component.setState(state)
       })
 
+      let storePath = parsePath(component.get('storePath'))
+      let storeState = {...store.getState()}
+
+      if (storePath) {
+        let newState = getByPath(storePath, storeState)
+        if (newState) {
+          component.replaceState(newState)
+        }
+      } else {
+        component.replaceState(storeState)
+      }
+
       if (component.get('initialState')) {
-        let storeState = {...store.getState()}
-        let storePath = parsePath(component.get('storePath'))
         setByPath(storePath || [], component.get('initialState'), storeState)
         manualActions.next({ type: 'RECYCLE_REDUCER', payload: storeState })
-      } else {
-        component.set('initialState', store.getState())
       }
     }
   })

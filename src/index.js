@@ -13,9 +13,9 @@ import 'rxjs/add/operator/filter'
 import 'rxjs/add/operator/merge'
 
 import streamAdapter from './adapter/rxjs'
-import componentAdapter, { createRecycle } from './adapter/react'
+import createRecycle from './react'
 
-export default createRecycle(componentAdapter(React), streamAdapter({ Observable, Subject }))
+export default createRecycle(React, streamAdapter({ Observable, Subject }))
 
 export {
   Observable,

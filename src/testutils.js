@@ -25,15 +25,15 @@ function createNodeSelectors (refsSubjects) {
   return function (selector) {
     return {
       on: function (event, all) {
-        if (!refsSubjects[selector]) {
-          refsSubjects[selector] = {}
+        if (!refsSubjects.has(selector)) {
+          refsSubjects.set(selector, {})
         }
 
-        if (!refsSubjects[selector][event]) {
-          refsSubjects[selector][event] = new Subject()
+        if (!refsSubjects.get(selector)[event]) {
+          refsSubjects.get(selector)[event] = new Subject()
         }
 
-        return refsSubjects[selector][event]
+        return refsSubjects.get(selector)[event]
       }
     }
   }
@@ -41,16 +41,16 @@ function createNodeSelectors (refsSubjects) {
 
 function createDOMHandlers (DOMstreams, testStream) {
   return function (selector, event, input) {
-    if (!DOMstreams[selector] || !DOMstreams[selector][event]) {
+    if (!DOMstreams.get(selector) || !DOMstreams.get(selector)[event]) {
       return new Promise(function (resolve, reject) {
-        reject(`${event} event on ${selector} is not defined`)
+        reject(`${event} event on ${(typeof selector === 'function') ? selector.name : selector} is not defined`)
       })
     }
 
     if (typeof input === 'string') {
       input = { target: { value: input } }
     }
-    return createPromise(testStream, DOMstreams[selector][event], input)
+    return createPromise(testStream, DOMstreams.get(selector)[event], input)
   }
 }
 
@@ -68,7 +68,7 @@ export function inspectObservable (testFun, userSourcesList) {
   let testStream = new Subject()
   const api = {}
   const sources = {}
-  const DOMstreams = {}
+  const DOMstreams = new Map()
 
   for (let source in sourcesList) {
     if (source === 'select' || source === 'selectClass' || source === 'selectId') {

@@ -1,10 +1,7 @@
-export default function (componentAdapter, streamAdapter) {
-  const { React, getEventHandler } = componentAdapter
+export default function (streamAdapter) {
   const { Subject, Observable } = streamAdapter
 
   const events = {}
-  let createElement = React.createElement
-  let BaseComponent = React.Component
   let rootComponent
 
   function createComponent (constructor, props, parent) {
@@ -12,215 +9,16 @@ export default function (componentAdapter, streamAdapter) {
     const children = new Map()
     const childrenActions = new Subject()
     const injectedState = new Subject()
-    const propsReference = new Subject()
-    const stateReference = new Subject()
-    const registeredNodeStreams = []
-    let currentNodeStreams = []
+    const componentDefinition = constructor(props)
+    const privateProps = {}
+    const componentName = componentDefinition.displayName || constructor.name
     let stateStream
-    let ReactComponent
-    let componentName
-    let timesRendered = 0
-    let state = null
-    let config
 
-    config = constructor(props)
-    if (typeof config === 'function') {
-      config = { view: config }
-    }
-    componentName = config.displayName || constructor.name
+    let state = null
 
     const componentSources = {
-      select: registerNodeStream(registeredNodeStreams, 'tag'),
-      selectClass: registerNodeStream(registeredNodeStreams, 'class'),
-      selectId: registerNodeStream(registeredNodeStreams, 'id'),
       childrenActions: childrenActions.switch().share(),
-      actions: new Subject(),
-      props: propsReference.share(),
-      state: stateReference.share()
-    }
-
-    function updateNodeStreams () {
-      registeredNodeStreams.forEach(regRef => {
-        const streams = currentNodeStreams
-                .filter(ref => ref.selector === regRef.selector)
-                .filter(ref => ref.selectorType === regRef.selectorType)
-                .filter(ref => ref.event === regRef.event)
-                .map(ref => ref.stream)
-
-        if (streams.length) {
-          regRef.stream.next((streams.length === 1) ? streams[0] : Observable.merge(...streams))
-        }
-      })
-    }
-
-    function updateStatePropsReference () {
-      stateReference.next(shallowImmutable(state))
-      propsReference.next(shallowImmutable(props))
-    }
-
-    function getReactComponent () {
-      if (ReactComponent) {
-        return ReactComponent
-      }
-
-      class ReactClass extends BaseComponent {
-        constructor (ownProps) {
-          super(ownProps)
-          this.state = { recycleState: config.initialState }
-          state = this.state.recycleState
-        }
-
-        componentDidMount () {
-          this.stateSubsription = stateStream.subscribe(newVal => {
-            this.setState({
-              recycleState: shallowImmutable(newVal.state)
-            })
-          })
-
-          updateChildrenActions()
-          updateNodeStreams()
-          updateStatePropsReference()
-
-          emit('componentDidMount', thisComponent)
-
-          if (config.componentDidMount) {
-            return config.componentDidMount()
-          }
-        }
-
-        shouldComponentUpdate (nextProps, nextState) {
-          if (config.shouldComponentUpdate) {
-            return config.shouldComponentUpdate(nextProps, nextState.recycleState, this.props, this.state.recycleState)
-          }
-          return true
-        }
-
-        componentDidUpdate (prevProps, prevState) {
-          props = this.props
-          state = this.state.recycleState
-
-          emit('componentUpdate', thisComponent)
-          updateNodeStreams()
-          updateStatePropsReference()
-          if (config.componentDidUpdate) {
-            const params = {
-              refs: this.refs,
-              props: this.props,
-              state: this.state.recycleState,
-              prevProps,
-              prevState: prevState.recycleState
-            }
-            return config.componentDidUpdate(params)
-          }
-        }
-
-        componentWillUnmount () {
-          emit('componentWillUnmount', thisComponent)
-
-          if (this.stateSubsription) {
-            this.stateSubsription.unsubscribe()
-          }
-          if (parent) {
-            parent.removeChild(thisComponent)
-          }
-
-          if (config.componentWillUnmount) {
-            return config.componentWillUnmount()
-          }
-        }
-
-        render () {
-          timesRendered++
-          currentNodeStreams = []
-          if (!config.view) return null
-
-          let before = React.createElement
-          React.createElement = jsxHandler
-          let toReturn = config.view(this.props, this.state.recycleState, jsxHandler)
-          React.createElement = before
-          return toReturn
-        }
-      }
-
-      ReactClass.displayName = componentName
-      ReactClass.propTypes = config.propTypes || null
-      ReactComponent = ReactClass
-      return ReactComponent
-    }
-
-    function jsxHandler () {
-      let selectors = getNodeSelectors(arguments['0'], arguments['1'])
-      let returnValue = (arguments['1']) ? arguments['1'].return : undefined
-
-      if (arguments['1'] && arguments['1'].return !== undefined) {
-        delete arguments['1'].return
-      }
-
-      const setNodeStream = (child) => {
-        selectors.forEach(({ selectorType, selector }) => {
-          registeredNodeStreams
-            .filter(ref => ref.selector === selector)
-            .filter(ref => ref.selectorType === selectorType)
-            .forEach(registredRef => {
-              let ref = {
-                selector,
-                selectorType,
-                event: registredRef.event
-              }
-              if (child) {
-                ref.stream = child.getActions()
-                  .filter(a => a.type === ref.event)
-                  .map(event => ({ event }))
-              } else if (typeof arguments['1'][ref.event] === 'function') {
-                ref.stream = new Subject()
-                let customFunction = arguments['1'][ref.event]
-                arguments['1'][ref.event] = function () {
-                  let event = customFunction.apply(this, arguments)
-                  ref.stream.next({ event, returnValue })
-                }
-              } else {
-                ref.stream = new Subject()
-                const reactEvent = getEventHandler(ref.event) || ref.event
-                arguments['1'][reactEvent] = function () {
-                  let event = arguments['0']
-                  ref.stream.next({ event, returnValue })
-                }
-              }
-              currentNodeStreams.push(ref)
-            })
-        })
-      }
-
-      if (typeof arguments['0'] === 'function') {
-        const childConstructor = arguments['0']
-        const childProps = arguments['1'] || {}
-
-        if (isReactComponent(childConstructor)) {
-          setNodeStream()
-          return createReactElement(createElement, arguments, jsxHandler)
-        }
-
-        const child = getByConstructor(childConstructor, childProps.key)
-
-        if (child) {
-          if (timesRendered === 1) {
-            if (!child.getKey()) {
-              throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
-            } else {
-              throw new Error(`Recycle component '${child.getName()}' called multiple times with the same key property '${child.getKey()}'`)
-            }
-          }
-          setNodeStream(child)
-          return createElement(child.getReactComponent(), childProps)
-        }
-
-        const newComponent = createComponent(childConstructor, childProps, thisComponent)
-        registerComponent(newComponent, children)
-        setNodeStream(newComponent)
-        return createElement(newComponent.getReactComponent(), childProps)
-      }
-      setNodeStream()
-      return createElement.apply(this, arguments)
+      actions: new Subject()
     }
 
     function updateChildrenActions () {
@@ -243,6 +41,16 @@ export default function (componentAdapter, streamAdapter) {
       return (children.has(constructor)) ? children.get(constructor)[key] : false
     }
 
+    function removeChild (component) {
+      if (!component) {
+        return
+      }
+
+      const components = children.get(component.getConstructor())
+      delete components[component.getKey()]
+      children.set(component.getConstructor(), components)
+    }
+
     function getChildren () {
       const childrenArr = []
 
@@ -256,15 +64,15 @@ export default function (componentAdapter, streamAdapter) {
       return childrenArr
     }
 
-    function getStateStream () {
+    function getInternalStateStream () {
       const reducers = [
         componentSources.actions
           .do(a => emit('action', [a, thisComponent]))
           .filter(() => false)
       ]
 
-      if (config.reducers) {
-        reducers.push(...forceArray(config.reducers(componentSources)))
+      if (componentDefinition.reducers) {
+        reducers.push(...forceArray(componentDefinition.reducers(componentSources)))
       }
 
       return Observable.merge(...reducers)
@@ -287,28 +95,34 @@ export default function (componentAdapter, streamAdapter) {
         .share()
     }
 
-    function removeChild (component) {
-      if (!component) {
-        return
-      }
-
-      const components = children.get(component.getConstructor())
-      delete components[component.getKey()]
-      children.set(component.getConstructor(), components)
-    }
-
     function setState (newState, action) {
       injectedState.next({
         state: newState
       })
     }
 
+    function replaceState (newState) {
+      state = newState
+    }
+
+    function replaceProps (newProps) {
+      props = newProps
+    }
+
     function get (prop) {
-      return config[prop]
+      return componentDefinition[prop]
     }
 
     function set (prop, val) {
-      config[prop] = val
+      componentDefinition[prop] = val
+    }
+
+    function getPrivate (prop) {
+      return privateProps[prop]
+    }
+
+    function setPrivate (prop, val) {
+      privateProps[prop] = val
     }
 
     function getSource (sourceName) {
@@ -323,24 +137,40 @@ export default function (componentAdapter, streamAdapter) {
     }
 
     const thisComponent = {
+      // getters/setters
       get,
       set,
+      getPrivate,
+      setPrivate,
       getSource,
       setSource,
-      updateChildrenActions,
-      setState,
-      getChildren,
-      removeChild,
-      getReactComponent,
-      jsxHandler,
-      getByConstructor,
-      getSources: () => componentSources,
+
+      // actions
       getActions: () => componentSources.actions,
+      updateChildrenActions,
+
+      // state
+      getState: () => state,
+      setState,
+      replaceState,
+      getStateStream: () => stateStream,
+
+      // props
+      getProps: () => props,
+      replaceProps,
+
+      // children
+      getChildren,
+      getChildrenMap: () => children,
+      removeChild,
+
+      // special getters
+      getSources: () => componentSources,
       getName: () => componentName,
       getKey: () => key,
-      getState: () => state,
-      getProps: () => props,
-      getConstructor: () => constructor
+      getConstructor: () => constructor,
+      getParent: () => parent,
+      getByConstructor
     }
 
     if (!parent) {
@@ -351,47 +181,19 @@ export default function (componentAdapter, streamAdapter) {
 
     emit('componentInit', thisComponent)
 
-    if (config.actions) {
+    if (componentDefinition.actions) {
       // todo: error for unsupported actions
-      let act = config.actions(componentSources)
+      let act = componentDefinition.actions(componentSources)
       if (act) {
         Observable.merge(...forceArray(act))
           .filter(action => action)
           .subscribe(componentSources.actions)
       }
     }
-    stateStream = getStateStream().merge(injectedState)
 
+    stateStream = getInternalStateStream().merge(injectedState)
     emit('sourcesReady', thisComponent)
     return thisComponent
-  }
-
-  function registerNodeStream (registeredNodeStreams, selectorType) {
-    return selector => {
-      return {
-        on: event => {
-          const foundRefs = registeredNodeStreams
-            .filter(ref => ref.selector === selector)
-            .filter(ref => ref.selectorType === selectorType)
-            .filter(ref => ref.event === event)
-
-          let ref = foundRefs[0]
-
-          if (!ref) {
-            ref = {
-              selector,
-              selectorType,
-              event,
-              stream: new Subject()
-            }
-            registeredNodeStreams.push(ref)
-          }
-
-          return ref.stream.switch().share()
-            .map(val => (val.value !== undefined) ? val.value : val.event)
-        }
-      }
-    }
   }
 
   function addListener (event, cb) {
@@ -420,16 +222,16 @@ export default function (componentAdapter, streamAdapter) {
     }
   }
 
-  function applyDrivers (driversArr) {
+  function use (driversArr) {
     if (!Array.isArray(driversArr)) {
-      throw new Error('Drivers must be defined in an array.')
+      driversArr = [driversArr]
     }
 
     const drivers = {}
     api.getDriver = name => drivers[name]
 
     driversArr.map((m) => {
-      const instance = m(api, streamAdapter, componentAdapter)
+      const instance = m(api, streamAdapter)
       const name = (instance && instance.name) ? instance.name : 'driver-' + Math.random()
       drivers[name] = instance
       return false
@@ -440,7 +242,8 @@ export default function (componentAdapter, streamAdapter) {
     on: addListener,
     unbind: removeListener,
     createComponent,
-    applyDrivers,
+    use,
+    emit,
     getComponentStructure: () => getComponentStructure(rootComponent),
     getRootComponent: () => rootComponent,
     getAllComponents: () => getAllComponents(rootComponent)
@@ -540,31 +343,4 @@ export function shallowImmutable (data) {
     return {...data}
   }
   return data
-}
-
-function getNodeSelectors (nodeName, attrs) {
-  let selectors = []
-
-  let tag = (typeof nodeName === 'string') ? nodeName : undefined
-  let id = (attrs) ? attrs.id : undefined
-  let className = (attrs) ? attrs.className : undefined
-  let functionSelector = (typeof nodeName === 'function') ? nodeName : undefined
-
-  if (tag) {
-    selectors.push({ selector: tag, selectorType: 'tag' })
-  }
-
-  if (functionSelector) {
-    selectors.push({ selector: functionSelector, selectorType: 'tag' })
-  }
-
-  if (className) {
-    let classes = className.split(' ').map(classNcame => ({ selector: className, selectorType: 'class' }))
-    selectors = selectors.concat(classes)
-  }
-  if (id) {
-    selectors.push({ selector: id, selectorType: 'id' })
-  }
-
-  return selectors
 }
