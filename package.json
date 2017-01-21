@@ -1,10 +1,10 @@
 {
   "name": "recyclejs",
-  "version": "0.7.0-beta.12",
+  "version": "0.7.1",
   "description": "A functional and reactive library for React",
   "main": "index.js",
   "scripts": {
-    "prepublish": "npm test && npm run build && build:umd && build:umd:min",
+    "prepublish": "npm test && npm run build && npm run build:umd && npm run build:umd:min",
     "test:watch": "jest -c jest.json --watch",
     "test": "jest -c jest.json",
     "build": "babel src -d ./",
