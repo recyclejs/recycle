@@ -2,9 +2,11 @@
 /index.js
 /recycle.js
 /testutils.js
+/react.js
 /adapter
 /drivers
 /plugins
+/dist
 _book
 
 node_modules
