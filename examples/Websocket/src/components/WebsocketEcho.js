@@ -9,7 +9,7 @@ export default function WebSocketEcho () {
     },
 
     actions (sources) {
-      return sources.selectClass('input')
+      return sources.select('input')
         .on('keyDown')
         .filter(e => e.keyCode === 13)
         .mapToLatest(sources.state)
@@ -18,7 +18,7 @@ export default function WebSocketEcho () {
 
     reducers (sources) {
       return [
-        sources.selectClass('input')
+        sources.select('input')
           .on('change')
           .reducer((state, e) => {
             state.inputVal = e.target.value
@@ -43,7 +43,7 @@ export default function WebSocketEcho () {
       return (
         <div>
           <h2>Websocket Echo Test</h2>
-          <div>Send: <input className='input' value={state.inputVal} type='text' /></div>
+          <div>Send: <input value={state.inputVal} type='text' /></div>
           <br />
           <div>Status: {state.status}</div>
           <div>Response: {state.response}</div>

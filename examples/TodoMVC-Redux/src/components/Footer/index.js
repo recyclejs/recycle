@@ -13,7 +13,7 @@ export default function Footer () {
 
     actions (sources) {
       return [
-        sources.selectClass('clear-complete')
+        sources.selectClass('clear-completed')
           .on('click')
           .mapTo({ type: CLEAR_COMPLETED }),
 

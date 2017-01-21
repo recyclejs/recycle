@@ -7,6 +7,8 @@ import { addTodo, deleteTodo, editTodo, completeTodo, completeAll, clearComplete
 
 export default function App () {
   return {
+    container: true,
+
     storePath: 'todos',
 
     initialState: [
@@ -17,7 +19,7 @@ export default function App () {
       }
     ],
 
-    dispatch (sources) {
+    actions (sources) {
       return [
         sources.select(Header)
           .on(ADD_TODO)

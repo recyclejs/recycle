@@ -6,13 +6,12 @@ import 'todomvc-app-css/index.css'
 import TodoList from './components/TodoList'
 
 // RECYCLE DEFINED USING DEFAULT ADAPTER
-// import Recycle from 'recyclejs'
+import Recycle from 'recyclejs'
 
 // RECYCLE DEFINED USING CUSTOM ADAPTER
-import Rx from 'rxjs/Rx'
-import streamAdapter from 'recyclejs/adapter/rxjs'
-import componentAdapter, { createRecycle } from 'recyclejs/adapter/react'
-const Recycle = createRecycle(componentAdapter(React), streamAdapter(Rx))
+// import Rx from 'rxjs/Rx'
+// import createRecycle from 'recyclejs/react'
+// const Recycle = createRecycle(React, Rx)
 
 const TodoListReact = Recycle()(TodoList)
 

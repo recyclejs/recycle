@@ -1,4 +1,5 @@
 import view from './view'
+import TextField from 'material-ui/TextField'
 
 export default function Autocomplete () {
   return {
@@ -8,8 +9,9 @@ export default function Autocomplete () {
 
     actions (sources) {
       return [
-        sources.selectId('searchInput')
+        sources.select(TextField)
           .on('onChange')
+          .map(e => e.target.value)
           .filter(val => val.length > 2)
           .debounceTime(500)
       ]

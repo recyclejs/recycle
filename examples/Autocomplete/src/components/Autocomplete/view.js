@@ -8,7 +8,6 @@ export default function (suggestions) {
       <TextField
         id='searchInput'
         placeholder='Find GitHub Login'
-        onChange={e => e.target.value}
       />
       <List>
         {suggestions.map((item, i) => <ListItem key={i} primaryText={item.login} />)}

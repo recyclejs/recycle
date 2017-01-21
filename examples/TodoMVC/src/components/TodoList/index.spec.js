@@ -1,6 +1,7 @@
 /* global describe it expect */
 import React from 'react'
 import TodoList from './index'
+import Todo from '../Todo'
 import renderer from 'react-test-renderer'
 import { ENTER_KEY } from '../../utils'
 import { inspectObservable, applyReducer } from 'recyclejs/testutils'
@@ -21,7 +22,7 @@ describe('TodoList Reducers', function () {
       ]
     }
 
-    return on.childrenActions({type: 'titleChanged', id: 1, title: 'sometitle'})
+    return on.select(Todo, 'titleChanged', {type: 'titleChanged', id: 1, title: 'sometitle'})
       .then(res => applyReducer(res, initialState))
       .then(state => expect(state).toEqual(nextState))
   })
@@ -43,7 +44,7 @@ describe('TodoList Reducers', function () {
       ]
     }
 
-    return on.childrenActions({ type: 'toggle', id: 2 })
+    return on.select(Todo, 'toggle', { type: 'toggle', id: 2 })
       .then(res => applyReducer(res, initialState))
       .then(state => expect(state).toEqual(nextState))
   })
@@ -86,7 +87,7 @@ describe('TodoList Reducers', function () {
       ]
     }
 
-    return on.childrenActions({ type: 'destroy', id: 1 })
+    return on.select(Todo, 'destroy', { type: 'destroy', id: 1 })
       .then(res => applyReducer(res, initialState))
       .then(state => expect(state).toEqual(nextState))
   })
@@ -147,7 +148,7 @@ describe('TodoList Reducers', function () {
 })
 
 describe('TodoList View', function () {
-  it('should', function () {
+  it('should have correct structure', function () {
     const props = { route: {filter: ''} }
     const state = { list: [] }
     const component = renderer.create(TodoList().view(props, state))

@@ -8,9 +8,8 @@ import Recycle from 'recyclejs'
 
 // RECYCLE DEFINED USING CUSTOM ADAPTER
 // import Rx from 'rxjs/Rx'
-// import streamAdapter from 'recyclejs/adapter/rxjs'
-// import componentAdapter, { createRecycle } from 'recyclejs/adapter/react'
-// const Recycle = createRecycle(componentAdapter(React), streamAdapter(Rx))
+// import createRecycle from 'recyclejs/react'
+// const Recycle = createRecycle(React, Rx)
 
 ReactDOM.render((
   <Recycle root={WebsocketEcho} drivers={[WebsocketDriver]} />

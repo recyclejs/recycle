@@ -40,7 +40,7 @@ export default function MainSection (props) {
         sources.select(Footer)
           .on(TODO_FILTER)
           .reducer(function (state, action) {
-            state.filter = action.value
+            state.filter = action.filter
             return state
           })
       ]
