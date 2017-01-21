@@ -1,6 +1,6 @@
 {
   "name": "recyclejs",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "A functional and reactive library for React",
   "main": "index.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "docs:prepare": "gitbook install",
     "docs:watch": "npm run docs:prepare && gitbook serve",
     "docs:build": "npm run docs:prepare && rm -rf _book && gitbook build",
-    "docs:publish": "npm run docs:build && git init && git commit --allow-empty -m 'Update docs' && git checkout -b gh-pages && git add . && git commit -am 'Update docs' && git push https://github.com/recyclejs/recycle gh-pages --force && git checkout master"
+    "docs:publish": "npm run docs:build && cd _book && git init && git commit --allow-empty -m 'Update docs' && git checkout -b gh-pages && git add . && git commit -am 'Update docs' && git push https://github.com/recyclejs/recycle gh-pages --force && git checkout master"
   },
   "repository": {
     "type": "git",
