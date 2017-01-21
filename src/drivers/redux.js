@@ -5,47 +5,46 @@ export default (store) => (recycle, {Observable, Subject}) => {
     const container = component.get('container')
     if (container) {
       const actionsFunction = component.get('actions')
-      if (!actionsFunction) {
-        throw new Error('Container component must have the actions property')
-      }
-
-      const actionsArr = forceArray(actionsFunction(component.getSources()))
       const manualActions = new Subject()
-      actionsArr.push(manualActions)
-      const actionsStream = Observable.merge(...actionsArr)
 
-      component._actionsSubscription = actionsStream.subscribe(a => {
-        let action = a
-        if (typeof a.reducer === 'function') {
-          let storePath = component.get('storePath')
-          let state = store.getState()
+      if (actionsFunction) {
+        const actionsArr = forceArray(actionsFunction(component.getSources()))
+        actionsArr.push(manualActions)
+        const actionsStream = Observable.merge(...actionsArr)
 
-          if (storePath) {
-            storePath = parsePath(storePath)
-            state = getByPath(storePath, state)
-          }
+        component._actionsSubscription = actionsStream.subscribe(a => {
+          let action = a
+          if (typeof a.reducer === 'function') {
+            let storePath = component.get('storePath')
+            let state = store.getState()
 
-          action.type = 'RECYCLE_REDUCER'
-          const recycleAction = a.action
-          delete recycleAction.childComponent
-          let recycleState = a.reducer(state, recycleAction)
-
-          if (storePath) {
-            let storeState = {...store.getState()}
-            if (recycleState === false) {
-              deleteByPath(storePath, storeState)
-            } else {
-              setByPath(storePath, recycleState, storeState)
+            if (storePath) {
+              storePath = parsePath(storePath)
+              state = getByPath(storePath, state)
             }
-            recycleState = storeState
-          }
 
-          delete action.reducer
-          delete action.action
-          action.payload = recycleState
-        }
-        store.dispatch(action)
-      })
+            action.type = 'RECYCLE_REDUCER'
+            const recycleAction = a.action
+            delete recycleAction.childComponent
+            let recycleState = a.reducer(state, recycleAction)
+
+            if (storePath) {
+              let storeState = {...store.getState()}
+              if (recycleState === false) {
+                deleteByPath(storePath, storeState)
+              } else {
+                setByPath(storePath, recycleState, storeState)
+              }
+              recycleState = storeState
+            }
+
+            delete action.reducer
+            delete action.action
+            action.payload = recycleState
+          }
+          store.dispatch(action)
+        })
+      }
 
       component._reduxUnsubscribe = store.subscribe(() => {
         let storePath = component.get('storePath')
@@ -70,7 +69,7 @@ export default (store) => (recycle, {Observable, Subject}) => {
         component.replaceState(storeState)
       }
 
-      if (component.get('initialState')) {
+      if (actionsFunction && component.get('initialState')) {
         setByPath(storePath || [], component.get('initialState'), storeState)
         manualActions.next({ type: 'RECYCLE_REDUCER', payload: storeState })
       }
