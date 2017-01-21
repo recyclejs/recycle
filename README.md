@@ -1,8 +1,11 @@
 # Recycle
 
-Recycle is a functional and reactive library for [React](https://facebook.github.io/react).
+Recycle is a functional and reactive library for managing components.
 
-With Recycle you can create your components using [FRP paradigm](https://en.wikipedia.org/wiki/Functional_reactive_programming).
+With the official *React driver* (enabled by default), 
+it can be used as a [React](https://facebook.github.io/react) component,
+giving you the ability to use [FRP paradigm](https://en.wikipedia.org/wiki/Functional_reactive_programming)
+for designing your apps.
 
 [![npm version](https://img.shields.io/npm/v/recyclejs.svg?style=flat-square)](https://www.npmjs.com/package/recyclejs)
 [![npm downloads](https://img.shields.io/npm/dm/recyclejs.svg?style=flat-square)](https://www.npmjs.com/package/recyclejs)
@@ -62,7 +65,7 @@ function ClickCounter () {
 
     reducers (sources) {
       return [
-        sources.selectTag('button')
+        sources.select('button')
           .on('click')
           .reducer(function (state) {
             state.timesClicked++
