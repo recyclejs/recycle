@@ -4,10 +4,12 @@
   "description": "A functional and reactive library for React",
   "main": "index.js",
   "scripts": {
-    "prepublish": "npm test && npm run build",
+    "prepublish": "npm test && npm run build && build:umd && build:umd:min",
     "test:watch": "jest -c jest.json --watch",
     "test": "jest -c jest.json",
     "build": "babel src -d ./",
+    "build:umd": "browserify src/react.js -o dist/recycle.js -s createRecycle -t [ babelify --presets [ es2015 ] --plugins [ add-module-exports ] ]",
+    "build:umd:min": "uglifyjs --compress --mangle -o dist/recycle.min.js -- dist/recycle.js",
     "docs:prepare": "gitbook install",
     "docs:watch": "npm run docs:prepare && gitbook serve",
     "docs:build": "npm run docs:prepare && rm -rf _book && gitbook build",
@@ -25,11 +27,14 @@
   "homepage": "https://recycle.js.org",
   "devDependencies": {
     "babel-cli": "^6.18.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-syntax-jsx": "^6.18.0",
     "babel-plugin-transform-object-rest-spread": "^6.16.0",
     "babel-plugin-transform-react-jsx": "^6.8.0",
     "babel-preset-es2015": "^6.18.0",
     "babel-register": "^6.18.0",
+    "babelify": "^7.3.0",
+    "browserify": "^13.3.0",
     "classnames": "^2.2.5",
     "css-loader": "^0.25.0",
     "eslint": "^3.9.1",
@@ -45,11 +50,11 @@
     "redux": "^3.6.0",
     "style-loader": "^0.13.1",
     "todomvc-app-css": "^2.0.6",
-    "todomvc-common": "^1.0.3"
+    "todomvc-common": "^1.0.3",
+    "uglify-js": "^2.7.5"
   },
   "dependencies": {
     "react": "^15.4.1",
-    "react-dom": "^15.4.1",
     "rxjs": "^5.0.1",
     "objectpath": "1.2.1"
   }
