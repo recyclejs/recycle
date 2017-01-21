@@ -26,7 +26,7 @@ function view () {
 ```
 
 ## Parent Child Actions
-In previous example, a component is updating its state based on actions on DOM elements.
+In the previous example, a component is updating its state based on actions on DOM elements.
 But for a larger application, listening on component nodes is not enough. 
 What if we want to react on some actions from child components as well? 
 
@@ -39,22 +39,28 @@ Rather than being responsible for a parent's methods,
 every component can describe its behavior by defining it as a stream. 
 
 In Recycle, this stream is called `actions` and it's a form of a "*component API*".
-So if a parent wants to use this stream for updating its own state, 
-it can subscribe to it.
+So if a parent wants to make use of children actions for updating its own state, 
+it can bind listeners to it in the same way as for any other node.
 
 Suppose, a child component `ClickCounter` is dispatching `{type: 'buttonClicked'}` action:
 
 ```javascript
 function actions (sources) {
   return [
-    sources.selectTag('button')
+    sources.select('button')
       .on('click')
       .mapTo({ type: 'buttonClicked' })
   ]
 }
 ```
 
-then, this action will be avaiable in parent's `sources.childrenActions`.
+The same way a `div` element can be listened to by using: `select('div').on('click')`,
+a parent component can do the same for `ClickCounter`:
+
+```javascript
+select(ClickCounter)
+  .on('buttonClicked')
+```
 
 We can now create a component that is tracking how many times any of its child components button was clicked:
 
@@ -70,8 +76,8 @@ function MultipleClickCounters () {
 
     reducers (sources) {
       return [
-        sources.childrenActions
-          .filterByType('buttonClicked')
+        sources.select(ClickCounter)
+          .on('buttonClicked')
           .reducer(function (state) {
             state.childButtonClicked++
             return state
@@ -94,22 +100,7 @@ function MultipleClickCounters () {
 export default ClickCounter
 ```
 
-## Indentical Child Components Actions
-If, for some reason, multiple components are using the same action type, 
-but for a different kind of actions and you can't differentiate them by any other property you can use `filterByConstructor` operator:
-
-```javascript
-function actions (sources) {
-  return [
-    sources.childrenActions
-      .filterByType('buttonClicked')
-      .filterByConstructor(ClickCounter)
-      .mapTo({ type: 'childButtonClicked' }),
-    
-    sources.childrenActions
-      .filterByType('buttonClicked')
-      .filterByConstructor(SomeOtherComponent)
-      .mapTo({ type: 'someOtherAction' })
-  ]
-}
-```
+## TodoMVC
+For a more complex example of parent-child relationship, check out [TodoMVC](https://github.com/recyclejs/recycle/tree/master/examples/TodoMVC)
+implementation in Recycle. 
+Application is composed of *TodoList* (parent) and *Todo* (child) components.

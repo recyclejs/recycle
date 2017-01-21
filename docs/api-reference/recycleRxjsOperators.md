@@ -3,7 +3,8 @@ In addition to RxJS operators there are also Recycle-specific operators which yo
 
 * `reducer` - used for defining component reducers
   ```javascript
-  button.events('click')
+  select('button')
+    .on('click')
     .reducer(function (state) {
       state.timesClicked++
       return state
@@ -15,21 +16,15 @@ In addition to RxJS operators there are also Recycle-specific operators which yo
     .filterByType('buttonClicked')
     .mapTo({ type: 'childButtonClicked' })
   ```
-* `filterByComponent` - shorthand for `filter(action => action.childComponent === Component)`
-  ```javascript
-  sources.childrenActions
-    .filterByComponent(ClickCounter)
-    .mapTo({ type: 'childButtonClicked' })
-  ```
 * `mapToLatest` - used for retriving component state or props
   ```javascript
-  destroyIcon
-    .events('click')
+  selectClass('delete')
+    .on('click')
     .mapToLatest(sources.props)
     .map(props => ({ type: 'destroy', id: props.id }))
 
-  editInput
-    .events('keyup')
+  select('input')
+    .on('keyUp')
     .filter(ev => ev.keyCode === ENTER_KEY)
     .mapToLatest(sources.props, sources.state)
     .map(({props, state}) => ({ type: 'titleChanged', id: props.id, title: state.inputVal }))

@@ -1,16 +1,9 @@
-## React in Recycle
-React component can be invoked in the same way as any other component - by defining it in a view:
+# Usage With React
+React component can be a part of Recycle component,
+and Recycle component can be a part of React component.
 
-```javascript
-// React component
-class ReactComponent extends React.Component {
-  render () {
-    return (
-      <span>Hello from React Component!</span>
-    )
-  }
-}
-```
+## React in Recycle
+React component is used in the same way as any other component - by defining it in a view:
 
 ```javascript
 // View function of Recycle component
@@ -24,50 +17,41 @@ view () {
 }
 ```
 
-### Recycle in React
-There are two ways in which you can use Recycle in React app. 
+## Recycle in React
+There are two ways in which you can use Recycle in your React app: 
 
-#### Using Recycle React Component
-By using `Recycle` (special React component) and specify its `root` Recycle component:
+- By using `Recycle` as a React component:
+  ```javascript
+  import React from 'react'
+  import Recycle from 'recyclejs'
 
-```javascript
-import React from 'react'
-import Recycle from 'recyclejs'
-
-class ReactComponent extends React.Component {
-  render () {
-    return (
-      <span>
-        <Recycle root={RecycleComponent} />
-      </span>
-    )
+  class ReactComponent extends React.Component {
+    render () {
+      return (
+        <span>
+          <Recycle root={RecycleComponent} />
+        </span>
+      )
+    }
   }
-}
-```
+  ```
+- By converting Recycle in React. Useful when you need to use the same component multiple times (for example inside [React Router](https://github.com/ReactTraining/react-router)):
+  ```javascript
+  import React from 'react'
+  import Recycle from 'recyclejs'
+  import { Router, Route, hashHistory } from 'react-router'
+  import TodoListRecycle from './components/TodoList'
 
-#### Converting Recycle to React
-When you need to use the same component multiple times (for example inside [React Router](https://github.com/ReactTraining/react-router)),
-you can convert your Recycle component in React and define it separately:
+  const TodoListReact = Recycle()(TodoListRecycle)
 
+  ReactDOM.render((
+    <Router history={hashHistory}>
+      <Route path='/' filter='' component={TodoListReact} />
+      <Route path='/completed' filter='completed' component={TodoListReact} />
+      <Route path='/active' filter='active' component={TodoListReact} />
+    </Router>
+  ), document.getElementById('app'))
+  ```
 
-```javascript
-import React from 'react'
-import Recycle from 'recyclejs'
-import { Router, Route, hashHistory } from 'react-router'
-import TodoList from './components/TodoList'
-
-const TodoListReact = Recycle({
-  root: TodoList
-})
-
-ReactDOM.render((
-  <Router history={hashHistory}>
-    <Route path='/' filter='' component={TodoListReact} />
-    <Route path='/completed' filter='completed' component={TodoListReact} />
-    <Route path='/active' filter='active' component={TodoListReact} />
-  </Router>
-), document.getElementById('app'))
-```
-
-## Counter Example
-An example of Click counter using React and Recycle: [here](https://github.com/recyclejs/recycle/tree/master/examples/CombiningWithReact).
+## Autocomplete Example
+Example of using React components ([material-ui](http://www.material-ui.com/)) with Recycle: [Autocomplete](https://github.com/recyclejs/recycle/tree/master/examples/Autocomplete)

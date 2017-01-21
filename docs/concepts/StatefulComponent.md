@@ -11,10 +11,9 @@ In Recycle, this is done in a `reducers` function.
 All streams are defined by first specifying its source.
 
 So, for selecting a component node, we can use one of the following:
-- `sources.select` - selecting node(s) by its `recycle` attribute
+- `sources.select` - selecting node(s) by its tag name or by child component function
 - `sources.selectClass` - selecting node(s) by its class name 
 - `sources.selectId` - selecting node(s) by its id
-- `sources.selectTag` - selecting node(s) by its tag name
 
 Although this may resemble [query selectors](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), 
 Recycle uses React's inline event handlers and doesn't rely on the DOM. 
@@ -22,14 +21,14 @@ Selection is isolated per component and no child nodes can ever be accessed.
 
 For this example, our source is a `click` event on a `button` node.
 
-We can then use `selectTag` and specify its event using `on` method:
+We can then use `select` and specify its event using `on` method:
 
 ```javascript
-sources.selectTag('button')
+sources.select('button')
   .on('click')
 ```
 
-All event names are the same as [in React](https://facebook.github.io/react/docs/events.html) but specified as string:
+All event names for HTML elements (*div*, *span*, *ul*, etc.) are the same as [in React](https://facebook.github.io/react/docs/events.html) but specified as string:
 - `onClick` -> `on('click')`
 - `onChange` -> `on('change')`
 - `onDoubleClick` -> `on('doubleClick')`
@@ -39,7 +38,7 @@ All event names are the same as [in React](https://facebook.github.io/react/docs
 For actually changing a component state, we can use `reducer` operator:
 
 ```javascript
-sources.selectTag('button')
+sources.select('button')
   .on('click')
   .reducer(function (state) {
     state.timesClicked++
@@ -61,7 +60,7 @@ function ClickCounter () {
 
     reducers (sources) {
       return [
-        sources.selectTag('button')
+        sources.select('button')
           .on('click')
           .reducer(function (state) {
             state.timesClicked++

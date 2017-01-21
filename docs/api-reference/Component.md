@@ -6,11 +6,11 @@ function RecycleComponent () {
   return {
     initialState: {},
     view: function(props, state) { ... },
-    actions: function({DOM, childrenActions, actions, props, state, (?fromPlugin)}) { ... },
-    reducers: function({DOM, childrenActions, actions, props, state, (?fromPlugin)}) { ... },
+    actions: function(sources) { ... },
+    reducers: function(sources) { ... },
     componentDidMount: function() { ... },
     shouldComponentUpdate: function(nextProps, nextState, props, state) { ... },
-    componentDidUpdate: function({select, props, state, prevProps, prevState}) { ... },
+    componentDidUpdate: function({refs, props, state, prevProps, prevState}) { ... },
     componentWillUnmount: function() { ... },
     propTypes: {},
     displayName: 'string'
@@ -24,7 +24,7 @@ which is why `Recycle` initialization component is used:
 ##### Arguments
 1. `root`: Recycle root component 
 1. `props`: component state 
-1. `plugins`: list of plugins
+1. `drivers`: list of drivers
 
 ##### Example
 ```javascript
@@ -34,9 +34,7 @@ which is why `Recycle` initialization component is used:
 Or if defined separately:
 
 ```javascript
-const ReactComponent = Recycle({
-  root: RecycleComponent
-})
+const ReactComponent = Recycle(driver1, driver2...)(RecycleComponent)
 ```
 
 ### initialState
@@ -51,16 +49,15 @@ initialState: {
 ```
 
 ### view
-Function returning a component view, usually written in JSX
+Function returning a component view
 
 ##### Arguments
 1. `props`: component props
 1. `state`: component state 
-1. `jsx`: jsxHandler (equivalent of `React.createElement`)
 
 ##### Example
 ```javascript
-function view (jsx, props, state) {
+function view (props, state) {
   return (
     <div>
       <div><ClickCounter /></div>
@@ -75,19 +72,19 @@ Function returning an array of observables, representing component actions
 
 ##### Arguments
 1. `sources`: object containing component sources:
-  * DOM
-    * select - function for selecting a DOM element
-      * events - function for listening events on selected DOM element (returns an Observable)
+  * `sources.select` - selecting node(s) by its tag name or by child component function
+  * `sources.selectClass` - selecting node(s) by its class name 
+  * `sources.selectId` - selecting node(s) by its id
   * childrenActions - observable of all actions dispatched from a component children
   * actions - observable of all actions dispatched from a component (listening "to itself")
   * props - observable of component props (usually used in `mapToLatest` Observable operator)
   * state - observable of component state (usually used in `mapToLatest` Observable operator)
-  * (fromPlugin) - any other source that can be added by a plugin
+  * (fromDriver) - any other source that can be added by a driver
 
 ##### Example
 ```javascript
 function actions (sources) {
-  const button = sources.DOM.select('button')
+  const button = sources.select('button')
 
   return [
     button.events('click')
@@ -101,21 +98,21 @@ Function returning an array of observables, representing component reducers
 
 ##### Arguments
 1. `sources`: object containing component sources:
-  * DOM
-    * select - function for selecting a DOM element
-      * events - function for listening events on selected DOM element (returns an Observable)
+  * `sources.select` - selecting node(s) by its tag name or by child component function
+  * `sources.selectClass` - selecting node(s) by its class name 
+  * `sources.selectId` - selecting node(s) by its id
   * childrenActions - observable of all actions dispatched from a component children
-  * actions - observable of all actions dispatched from a component
+  * actions - observable of all actions dispatched from a component 
   * props - observable of component props (usually used in `mapToLatest` Observable operator)
   * state - observable of component state (usually used in `mapToLatest` Observable operator)
-  * (fromPlugin) - any other source that can be added by a plugin
+  * (fromDriver) - any other source that can be added by a driver
 
 ##### Example
 ```javascript
 function reducers (sources) {
   return [
-    sources.actions
-      .filterByType('buttonClicked')
+    sources.select('button')
+      .on('click')
       .reducer(function (state) {
         state.timesClicked++
         return state
@@ -129,7 +126,7 @@ Function invoked immediately after updating occurs.
 
 ##### Arguments
 1. `params`: object containing following properties:
-  * select - function for selecting a DOM element
+  * refs - component refs
   * props - component props
   * state - component state
   * prevProps - previous component props
@@ -137,11 +134,10 @@ Function invoked immediately after updating occurs.
 
 ##### Example
 ```javascript
-function componentDidUpdate ({select, state, prevState}) {
+function componentDidUpdate ({refs, state, prevState}) {
   if (!prevState.editing && state.editing) {
-    const node = select('input.edit')
-    node.focus()
-    node.select()
+    ref.input.focus()
+    ref.input.select()
   }
 }
 ```
