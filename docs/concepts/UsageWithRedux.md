@@ -4,7 +4,7 @@ As your apps are getting more complex,
 it's often useful to use some kind of state management tools.
 The most popular library for that purpose is - [Redux](http://redux.js.org).
 
-This is why in Recycle bindings for Redux are provided with the official *Redux driver*.
+This is why in Recycle, bindings for Redux are provided with the official *Redux driver*.
 
 Also, since Recycle is using Observables for defining actions,
 there is no need for Redux middlewares like 
