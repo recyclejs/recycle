@@ -40,7 +40,7 @@ every component can describe its behavior by defining it as a stream.
 
 In Recycle, this stream is called `actions` and it's a form of a "*component API*".
 So if a parent wants to make use of children actions for updating its own state, 
-it can bind listeners to it in the same way as for any other node.
+it can bind listeners to it, the same way as for any other node.
 
 Suppose, a child component `ClickCounter` is dispatching `{type: 'buttonClicked'}` action:
 

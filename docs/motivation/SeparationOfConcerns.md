@@ -41,7 +41,7 @@ React creates a single listener automatically.
 > It looks like DHTML from the 90's, but under the hood, it does the right thing.
 
 In Recycle, a component behavior is defined by specifying which node should be listened to and what should be done on user's actions.
-The node is selected by class name, id or a tag. 
+The node is selected by a class name, id or a tag. 
 Although it resembles [query selectors](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), 
 Recycle uses React's inline event handlers and doesn't rely on the DOM. 
 Since selection is isolated per component, no child nodes can ever be accessed.
