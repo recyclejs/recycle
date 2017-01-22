@@ -41,10 +41,11 @@ class App extends React.Component {
 }
 ```
 
-It's a component describing asynchronous behavior. On every `click` event on a `button` tag, the state is changed.
-Or in other words, the state is a type of value which **changes** as a result of **events** happening **over time**.
+It's a component describing asynchronous behaviour. On every `click` event on a `button` tag, the state is changed.
+Or in other words, the state **changes** as a result of **events** happening **over time**.
 
-A type of value which we might call - **a stream**. 
+As it turns out, there is a name for this.
+A sequence of ongoing events ordered in time is a definition of a - **stream**. 
 
 This is the whole point of reactive programming. 
 Instead of defining `this.state` as an object which will later be overwritten, what if we can define it more declaratively?
