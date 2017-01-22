@@ -69,8 +69,8 @@ In [RxJS](https://github.com/ReactiveX/rxjs), a stream is created using `Subject
 and for every message we will add it in a stream using `stream.next(message)`:
 
 ```javascript
-function WebSocketDriver (recycle, { Subject }) {
-  const response$ = new Subject()
+function WebSocketDriver (recycle, Rx) {
+  const response$ = new Rx.Subject()
   const websocket = new WebSocket('ws://echo.websocket.org/')
   
   websocket.onmessage = function (evt) {
