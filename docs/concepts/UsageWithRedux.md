@@ -79,8 +79,8 @@ function ContainerComponent () {
 }
 ```
 
-Redux driver will listen to actions of all components containing `container:true`.
-When an action occurs, it will then be dispatched in the Redux store.
+If an action occurs in the container component,
+it will be dispatched in the Redux store.
 
 ## Reducers in Containers
 If you prefer defining Redux reducers inside container components, 
