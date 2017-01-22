@@ -2,6 +2,7 @@ export default function (streamAdapter) {
   const { Subject, Observable } = streamAdapter
 
   const events = {}
+  const recycleProps = {}
   let rootComponent
 
   function createComponent (constructor, props, parent) {
@@ -238,8 +239,18 @@ export default function (streamAdapter) {
     })
   }
 
+  function get (prop) {
+    return recycleProps[prop]
+  }
+
+  function set (prop, val) {
+    recycleProps[prop] = val
+  }
+
   const api = {
     on: addListener,
+    get,
+    set,
     unbind: removeListener,
     createComponent,
     use,
