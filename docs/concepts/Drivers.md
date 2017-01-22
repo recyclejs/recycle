@@ -18,8 +18,6 @@ It would be a simple component with some kind of input field and an area for dis
 
 The component itself should not be too complicated, 
 but where should we write our logic for communicating with the network?
-If we write it in actions of our component, 
-we would end up with a much more complex component than it should be.
 
 A component should not care about the way messages are delivered to the server or whether it uses WebSockets, Ajax or something else. 
 Its implementation should be straightforward - describing conditions when a component should send an action (sending a message) and how should the component state be changed when a message is received.
