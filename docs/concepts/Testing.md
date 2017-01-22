@@ -6,7 +6,7 @@ import { inspectObservable, applyReducer } from 'recyclejs/testutils'
 
 `inspectObservable` and `applyReducer` are helper functions that makes it easy to test Recycle components.
 
-For demonstration purposes, we will use `ClickCounter` component:
+For demonstration purposes, we will use a `ClickCounter` component:
 
 ```javascript
 import React from 'react'
