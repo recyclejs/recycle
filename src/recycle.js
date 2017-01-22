@@ -9,7 +9,7 @@ export default function (streamAdapter) {
     const children = new Map()
     const childrenActions = new Subject()
     const injectedState = new Subject()
-    const componentDefinition = constructor(props)
+    const componentDefinition = (typeof constructor === 'function') ? constructor(props) : constructor
     const privateProps = {}
     const componentName = componentDefinition.displayName || constructor.name
     let stateStream
