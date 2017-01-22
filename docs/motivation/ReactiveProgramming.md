@@ -80,13 +80,13 @@ In the example above, you've seen how handling state could be transformed,
 but what about callbacks sent from a parent component?
 
 Rather than being responsible for a parent's methods,
-every component can describe its behavior by defining it as a stream. 
+every component can describe its behaviour by defining it as a stream. 
 
 In Recycle, this stream is called `actions` and it's a form of a "*component API*".
 So if a parent or any other module (like *Redux driver*) wants to leverage this *API*, 
 it can subscribe to this stream rather than using [React context].(https://facebook.github.io/react/docs/context.html).
 
-To recap, here are some of the benefits by defining async actions with streams:
+To recap, here are some of the benefits of using streams for defining component's async behaviour:
 - View is a pure representation of the state
 - A component can be defined without delegating responsibilities to child components
 - No more searching for `this.setState` statements
