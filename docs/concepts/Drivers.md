@@ -29,7 +29,7 @@ Sending a message is a component **output** operation, so it should be described
 Providing component input and listening for its output can be easily accomplished with the use of drivers.
 
 ## Simple WebSocket Driver
-To demonstrate how plugins are created, we can start by creating a simple WebSocket example - a component which sends a message and displays responses from the server. This component should also notify its connection status to the user. For our server, we can use [WebSocket Echo](http://www.websocket.org/echo.html).
+To demonstrate how drivers are created, we can start by creating a simple WebSocket example - a component which sends a message and displays responses from the server. This component should also notify its connection status to the user. For our server, we can use [WebSocket Echo](http://www.websocket.org/echo.html).
 
 ### Sending messages
 A component **actions** serves a role of the "component API" which driver will use as an input for sending messages.
