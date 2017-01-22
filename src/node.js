@@ -12,14 +12,14 @@ export default function (params) {
   const recycle = Recycle(streamAdapter(params.streamAdapter))
   const rootComponent = recycle.createComponent({})
 
-  if (params.children) {
-    params.children.forEach(child => {
-      recycle.createComponent(child, null, rootComponent)
-    })
-  }
-
   if (params.drivers) {
     recycle.use(params.drivers)
+  }
+
+  if (params.modules) {
+    params.modules.forEach(child => {
+      recycle.createComponent(child, null, rootComponent)
+    })
   }
 
   return recycle
