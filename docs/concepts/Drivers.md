@@ -61,7 +61,7 @@ function WebSocketDriver (recycle) {
 }
 ```
 
-### Recieving message
+### Recieving messages
 To change a component state, driver must provide a source.
 Our first source will be a stream which will provide messages recieved from a WebSocket.
 
