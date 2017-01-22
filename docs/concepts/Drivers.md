@@ -22,12 +22,11 @@ but where should we write our logic for communicating with the network?
 A component should not care about the way messages are delivered to the server or whether it uses WebSockets, Ajax or something else. 
 Its implementation should be straightforward - describing conditions when a component should send an action (sending a message) and how should the component state be changed when a message is received.
 
-Component connection to the "outside world" is in `sources` (available in component actions and reducers). 
-So if we choose not to write any communication logic in the component itself, it is evident that we need to create a source.
+Recieving a message is a component **input** operation, so it should be a part of `sources` object (available in component actions and reducers). 
 
-A source is representing a *read* operation of a component, but our component also has a *write* operation: sending messages in a form of dispatching actions.
+Sending a message is a component **output** operation, so it should be described in `actions`.
 
-So, for writing our communication logic we need both *read* (providing sources) and *write* (listening to component actions) operations of a component which can be easily created with a driver.
+Providing component input and listening for its output can be easily accomplished with the use of drivers.
 
 ## Simple WebSocket Driver
 To demonstrate how plugins are created, we can start by creating a simple WebSocket example - a component which sends a message and displays responses from the server. This component should also notify its connection status to the user. For our server, we can use [WebSocket Echo](http://www.websocket.org/echo.html).
