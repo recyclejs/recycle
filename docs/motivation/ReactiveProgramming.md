@@ -84,7 +84,7 @@ every component can describe its behaviour by defining it as a stream.
 
 In Recycle, this stream is called `actions` and it's a form of a "*component API*".
 So if a parent or any other module (like *Redux driver*) wants to leverage this *API*, 
-it can subscribe to this stream rather than using [React context].(https://facebook.github.io/react/docs/context.html).
+it can subscribe to this stream rather than using [React context](https://facebook.github.io/react/docs/context.html).
 
 To recap, here are some of the benefits of using streams for defining component's async behaviour:
 - View is a pure representation of the state
