@@ -7,7 +7,7 @@ export default function (streamAdapter) {
 
   function createComponent (constructor, props, parent) {
     const key = (props) ? props.key : null
-    const children = new Map()
+    const children = new Set()
     const childrenActions = new Subject()
     const injectedState = new Subject()
     const componentDefinition = (typeof constructor === 'function') ? constructor(props) : constructor
@@ -38,31 +38,19 @@ export default function (streamAdapter) {
       }
     }
 
-    function getByConstructor (constructor, key) {
-      return (children.has(constructor)) ? children.get(constructor)[key] : false
+    function addChild (component) {
+      children.add(component)
     }
 
     function removeChild (component) {
       if (!component) {
         return
       }
-
-      const components = children.get(component.getConstructor())
-      delete components[component.getKey()]
-      children.set(component.getConstructor(), components)
+      children.delete(component)
     }
 
     function getChildren () {
-      const childrenArr = []
-
-      for (const childrenConstructor of children.keys()) {
-        const components = children.get(childrenConstructor)
-        Object.keys(components).forEach((componentKey) => {
-          childrenArr.push(components[componentKey])
-        })
-      }
-
-      return childrenArr
+      return [...children]
     }
 
     function getInternalStateStream () {
@@ -145,10 +133,11 @@ export default function (streamAdapter) {
       setPrivate,
       getSource,
       setSource,
-
-      // actions
+      getSources: () => componentSources,
+      getName: () => componentName,
+      getKey: () => key,
       getActions: () => componentSources.actions,
-      updateChildrenActions,
+      getConstructor: () => constructor,
 
       // state
       getState: () => state,
@@ -160,24 +149,20 @@ export default function (streamAdapter) {
       getProps: () => props,
       replaceProps,
 
-      // children
-      getChildren,
-      getChildrenMap: () => children,
-      removeChild,
-
-      // special getters
-      getSources: () => componentSources,
-      getName: () => componentName,
-      getKey: () => key,
-      getConstructor: () => constructor,
+      // parent/child
       getParent: () => parent,
-      getByConstructor
+      updateChildrenActions,
+      getChildren,
+      addChild,
+      removeChild
     }
 
     if (!parent) {
       if (rootComponent) throw new Error('rootComponent already set')
       rootComponent = thisComponent
       emit('initialize')
+    } else {
+      parent.addChild(thisComponent)
     }
 
     emit('componentInit', thisComponent)
@@ -255,91 +240,10 @@ export default function (streamAdapter) {
     createComponent,
     use,
     emit,
-    getComponentStructure: () => getComponentStructure(rootComponent),
-    getRootComponent: () => rootComponent,
-    getAllComponents: () => getAllComponents(rootComponent)
+    getRootComponent: () => rootComponent
   }
 
   return api
-}
-
-export function registerComponent (newComponent, children) {
-  const constructor = newComponent.getConstructor()
-  const key = newComponent.getKey()
-  const name = newComponent.getName()
-
-  const obj = children.get(constructor) || {}
-
-  if (obj[key]) throw Error(`Could not register recycle component '${name}'. Key '${key}' is already in use.`)
-
-  obj[key] = newComponent
-  children.set(constructor, obj)
-}
-
-export function getAllComponents (rootComponent) {
-  const components = []
-  function addInArray (component) {
-    components.push(component)
-
-    if (component.getChildren()) {
-      component.getChildren().forEach((c) => {
-        addInArray(c)
-      })
-    }
-  }
-
-  addInArray(rootComponent)
-  return components
-}
-
-export function getComponentStructure (rootComponent) {
-  function addInStructure (parent, component) {
-    const current = {
-      component,
-      name: component.getName(),
-      children: []
-    }
-    if (parent.children) {
-      parent.children.push(current)
-    } else {
-      structure = current
-    }
-
-    if (component.getChildren()) {
-      component.getChildren().forEach((c) => {
-        addInStructure(current, c)
-      })
-    }
-  }
-
-  let structure = {}
-  addInStructure(structure, rootComponent)
-  return structure
-}
-
-export function createReactElement (createElementHandler, args) {
-  const constructor = args['0']
-  const props = args['1'] || {}
-
-  const newArgs = []
-  for (let i = 0; i < args.length || i < 2; i++) {
-    if (i === 0) {
-      newArgs.push(constructor)
-    } else if (i === 1) {
-      newArgs.push(props)
-    } else if (i > 1) {
-      newArgs.push(args[i])
-    }
-  }
-
-  return createElementHandler.apply(this, newArgs)
-}
-
-export function isReactComponent (constructor) {
-  if (constructor.prototype.render) {
-    return true
-  }
-  return false
 }
 
 export function forceArray (arr) {

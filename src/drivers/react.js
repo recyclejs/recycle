@@ -18,6 +18,10 @@ export default React => (recycle, streamAdapter) => {
     if (component.get('initialState') !== undefined) {
       component.replaceState(component.get('initialState'))
     }
+
+    if (!component.getPrivate('children')) {
+      component.setPrivate('children', new Map())
+    }
   })
 
   recycle.on('componentDidMount', component => {
@@ -31,9 +35,9 @@ export default React => (recycle, streamAdapter) => {
   })
 
   recycle.on('beforeRender', component => {
-    let timesRendered = component.get('timesRendered') || 0
+    let timesRendered = component.getPrivate('timesRendered') || 0
     timesRendered++
-    component.set('timesRendered', timesRendered)
+    component.setPrivate('timesRendered', timesRendered)
     component.set('currentNodeStreams', [])
 
     function jsxHandler () {
@@ -90,10 +94,13 @@ export default React => (recycle, streamAdapter) => {
           return createReactElement(createElement, arguments, jsxHandler)
         }
 
-        const child = component.getByConstructor(childConstructor, childProps.key)
+        let foundChildren = component.getChildren()
+                      .filter(child => child.getConstructor() === childConstructor)
+                      .filter(child => child.getKey() === childProps.key)
 
+        let child = foundChildren[0]
         if (child) {
-          if (component.get('timesRendered') === 1) {
+          if (component.getPrivate('timesRendered') === 1) {
             if (!child.getKey()) {
               throw new Error(`Recycle component '${child.getName()}' called multiple times without the key property`)
             } else {
@@ -105,7 +112,7 @@ export default React => (recycle, streamAdapter) => {
         }
 
         const newComponent = recycle.createComponent(childConstructor, childProps, component)
-        registerComponent(newComponent, component.getChildrenMap())
+
         setNodeStream(newComponent)
         return createElement(newComponent.get('ReactComponent'), childProps)
       }
@@ -248,13 +255,13 @@ export default React => (recycle, streamAdapter) => {
   }
 }
 
-function getNodeSelectors (nodeName, attrs) {
+export function getNodeSelectors (nodeName, attrs) {
   let selectors = []
 
   let tag = (typeof nodeName === 'string') ? nodeName : undefined
   let id = (attrs) ? attrs.id : undefined
   let className = (attrs) ? attrs.className : undefined
-  let functionSelector = (typeof nodeName === 'function') ? nodeName : undefined
+  let functionSelector = (typeof nodeName === 'function' || typeof nodeName === 'object') ? nodeName : undefined
 
   if (tag) {
     selectors.push({ selector: tag, selectorType: 'tag' })
@@ -275,14 +282,14 @@ function getNodeSelectors (nodeName, attrs) {
   return selectors
 }
 
-function isReactComponent (constructor) {
-  if (constructor.prototype.render) {
+export function isReactComponent (constructor) {
+  if (typeof constructor === 'function' && constructor.prototype.render) {
     return true
   }
   return false
 }
 
-function createReactElement (createElementHandler, args) {
+export function createReactElement (createElementHandler, args) {
   const constructor = args['0']
   const props = args['1'] || {}
 
@@ -300,20 +307,7 @@ function createReactElement (createElementHandler, args) {
   return createElementHandler.apply(this, newArgs)
 }
 
-function registerComponent (newComponent, children) {
-  const constructor = newComponent.getConstructor()
-  const key = newComponent.getKey()
-  const name = newComponent.getName()
-
-  const obj = children.get(constructor) || {}
-
-  if (obj[key]) throw Error(`Could not register recycle component '${name}'. Key '${key}' is already in use.`)
-
-  obj[key] = newComponent
-  children.set(constructor, obj)
-}
-
-function shallowImmutable (data) {
+export function shallowImmutable (data) {
   if (Array.isArray(data)) {
     return data.map(i => i)
   } else if (typeof data === 'object') {
@@ -322,7 +316,7 @@ function shallowImmutable (data) {
   return data
 }
 
-function getEventHandler (event) {
+export function getEventHandler (event) {
   const reactEvents = [
     'onCopy', 'onCut', 'onPaste', 'onCompositionEnd', 'onCompositionStart', 'onCompositionUpdate',
     'onKeyDown', 'onKeyPress', 'onKeyUp', 'onFocus', 'onBlur', 'onChange', 'onInput', 'onSubmit',
