@@ -52,7 +52,6 @@ Most of the events emitted from `recycle` will pass a `component` instance to a 
   - **getParent** `function`: retrive a component parent
   - **getSources** `function`: retrive a component sources
   - **getActions** `function`: retrive a component actions
-  - **getByConstructor** `function(constructor, key)`: retrive a component based on constructor and key
   - **getState** `function`: retrive a component state
   - **setState** `function(newState)`: set new component state
   - **replaceState** `function(newState)`: replace current state (state stream will stay silent)
@@ -60,6 +59,5 @@ Most of the events emitted from `recycle` will pass a `component` instance to a 
   - **getProps** `function`: retrive a component props
   - **replaceProps** `function(newProps)`: replace a component props
   - **getChildren** `function`: get component children (returns an array)
-  - **getChildrenMap** `function`: get component children (returns a Map)
   - **removeChild** `function(component)`: remove child from a component
   - **updateChildrenActions** `function`: update children actions (recursivly to a root component)
