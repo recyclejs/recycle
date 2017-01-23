@@ -20,7 +20,7 @@ for designing your apps.
 
 ## How does it look like?
 Example of converting React component to Recycle:
-<img src="https://cloud.githubusercontent.com/assets/1868852/21966114/b85449aa-db6d-11e6-934e-69028e585b25.gif" style="border: 5px solid #1e1e1e" alt="Recycle example" width="600" />
+<img src="https://cloud.githubusercontent.com/assets/1868852/22227336/192d20fe-e1cb-11e6-8c20-27218a6bc5e2.gif" style="border: 5px solid #1e1e1e" alt="Recycle example" width="600" />
 
 ## Quick Start
 The easiest way to get started with Recycle is to use [Create React App](https://github.com/facebookincubator/create-react-app)
