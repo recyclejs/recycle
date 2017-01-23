@@ -26,6 +26,7 @@ export default function view ({ todos, inputVal, filter }) {
               .filter(todoProps => !(filter === 'completed' && !todoProps.completed))
               .map(props => (
                 <Todo
+                  keyFun={function () {}}
                   id={props.id}
                   title={props.title}
                   completed={props.completed}
