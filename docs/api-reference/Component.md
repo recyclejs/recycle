@@ -2,7 +2,7 @@
 In Recycle, a component is a function which returns an object with the following properties:
 
 ```javascript
-function RecycleComponent () {
+function RecycleComponent (props) {
   return {
     initialState: {},
     view: function(props, state) { ... },
@@ -17,6 +17,11 @@ function RecycleComponent () {
   }
 }
 ```
+
+Note that this function is called only on a component initialization.
+So, if you want to use `props` in `actions` or `reducers`, 
+it's probably better to use `sources.props` stream.
+
 ### Initialization Component
 Recycle components can not be used in React directly, 
 which is why `Recycle` initialization component is used:

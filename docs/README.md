@@ -8,6 +8,7 @@
 * [Separation of Concerns](/docs/motivation/SeparationOfConcerns.md)
 
 ## Concepts
+* [Component Definition](/docs/concepts/ComponentDefinition.md)
 * [Stateful Component](/docs/concepts/StatefulComponent.md)
 * [Parent-Child Relationship](/docs/concepts/ParentChild.md)
 * [Drivers](/docs/concepts/Drivers.md)

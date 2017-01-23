@@ -98,7 +98,7 @@ actions (sources) {
         ]
       })
   ]
-},
+}
 ```
 
 This way, a container will always dispatch already calculated state in the form: 
