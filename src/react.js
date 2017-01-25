@@ -20,6 +20,9 @@ export default function (React, Rx) {
       return React.createElement(ReactComponent, props.props)
     }
 
+    if (Array.isArray(props)) {
+      drivers = drivers.concat(props)
+    }
     // if Recycle was called idependently
     if (arguments.length) {
       for (let i = 0; i < arguments.length; i++) {
