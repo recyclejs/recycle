@@ -1,26 +1,22 @@
 import Recycle from './recycle'
 import streamAdapter from './adapter/rxjs'
+import Rx from 'rxjs/Rx'
+import nodeDriver from './drivers/node'
 
-export default function (params) {
-  if (!params) {
-    throw new Error('Invalid params')
+export default function (driversArr) {
+  const recycle = Recycle(streamAdapter(Rx))
+  let drivers = [nodeDriver]
+
+  if (Array.isArray(driversArr)) {
+    drivers = drivers.concat(driversArr)
+  } else if (arguments.length) {
+    for (let i = 0; i < arguments.length; i++) {
+      drivers.push(arguments[i])
+    }
   }
-  if (!params.streamAdapter) {
-    throw new Error('Missing streamAdapter')
+  recycle.use(drivers)
+
+  return function (rootComponent, props) {
+    return recycle.createComponent(rootComponent, props)
   }
-
-  const recycle = Recycle(streamAdapter(params.streamAdapter))
-  const rootComponent = recycle.createComponent({})
-
-  if (params.drivers) {
-    recycle.use(params.drivers)
-  }
-
-  if (params.modules) {
-    params.modules.forEach(child => {
-      recycle.createComponent(child, null, rootComponent)
-    })
-  }
-
-  return recycle
 }
