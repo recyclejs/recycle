@@ -1,5 +1,4 @@
 import { PropTypes } from 'react'
-import { TEXT_INPUT } from '../../constants/ActionTypes'
 import view from './view'
 
 const TodoTextInput = (props) => ({
@@ -20,13 +19,13 @@ const TodoTextInput = (props) => ({
         .on('keyDown')
         .filter(e => e.which === 13)
         .filter(e => e.target.value.length)
-        .map(e => ({ type: TEXT_INPUT, value: e.target.value })),
+        .map(e => props.onSave(e.target.value)),
 
       sources.select('input')
         .on('blur')
         .filter(() => !props.newTodo)
         .filter(e => e.target.value.length)
-        .map(e => ({ type: TEXT_INPUT, value: e.target.value }))
+        .map(e => props.onSave(e.target.value))
     ]
   },
 
@@ -40,7 +39,6 @@ const TodoTextInput = (props) => ({
         }),
 
       sources.actions
-        .filterByType(TEXT_INPUT)
         .filter(() => props.newTodo)
         .reducer(state => {
           state.text = ''
