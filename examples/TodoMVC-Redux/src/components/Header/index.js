@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
 import TodoTextInput from '../TodoTextInput'
 
 function Header (props) {
   return {
+    propTypes: {
+      addTodo: PropTypes.func.isRequired
+    },
+
     actions (sources) {
       return [
         sources.select(TodoTextInput)

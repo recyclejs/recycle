@@ -3,9 +3,8 @@ import view from './view'
 import TodoItem from '../TodoItem'
 import Footer from '../Footer'
 import { SHOW_ALL, SHOW_ACTIVE, SHOW_COMPLETED } from '../../constants/TodoFilters'
-import { CLEAR_COMPLETED, TODO_FILTER, EDIT_TODO, DELETE_TODO, COMPLETE_TODO } from '../../constants/ActionTypes'
 
-const MainSection = () => ({
+const MainSection = (props) => ({
   propTypes: {
     todos: PropTypes.array.isRequired,
     actions: PropTypes.object.isRequired
@@ -16,32 +15,21 @@ const MainSection = () => ({
   actions (sources) {
     return [
       sources.select(TodoItem)
-        .on(EDIT_TODO),
+        .allActions(),
 
-      sources.select(TodoItem)
-        .on(DELETE_TODO),
-
-      sources.select(TodoItem)
-        .on(COMPLETE_TODO),
+      sources.select(Footer)
+        .allActions(),
 
       sources.selectClass('toggle-all')
         .on('change')
-        .withLatestFrom(sources.props, (action, props) => {
-          return props.actions.completeAll(action)
-        }),
-
-      sources.select(Footer)
-        .on(CLEAR_COMPLETED)
-        .withLatestFrom(sources.props, (action, props) => {
-          return props.actions.clearCompleted(action)
-        })
+        .map(props.actions.completeAll)
     ]
   },
 
   reducers (sources) {
     return [
       sources.select(Footer)
-        .on(TODO_FILTER)
+        .on('TODO_FILTER')
         .reducer(function (state, action) {
           state.filter = action.filter
           return state
@@ -63,7 +51,9 @@ const MainSection = () => ({
         completed: props.todos.filter(todo => todo.completed).length
       },
       actions: props.actions,
-      filter: state.filter
+      filter: state.filter,
+      onClearCompleted: props.actions.clearCompleted,
+      onShow: (filter) => ({ type: 'TODO_FILTER', filter })
     })
   }
 })

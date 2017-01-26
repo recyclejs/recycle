@@ -2,11 +2,12 @@ import React from 'react'
 import classnames from 'classnames'
 import TodoTextInput from '../TodoTextInput'
 
-function view ({ todo, editing }) {
+function view ({ todo, editing, editTodo }) {
   let element
   if (editing) {
     element = (
       <TodoTextInput text={todo.text}
+        onSave={editTodo}
         editing={editing} />
     )
   } else {

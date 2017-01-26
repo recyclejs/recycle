@@ -2,7 +2,7 @@ import React from 'react'
 import TodoItem from '../TodoItem'
 import Footer from '../Footer'
 
-function view ({children, todos, actions, filter}) {
+function view ({children, todos, actions, filter, onClearCompleted, onShow}) {
   const renderToggleAll = () => {
     if (todos.length > 0) {
       return <input
@@ -15,6 +15,8 @@ function view ({children, todos, actions, filter}) {
   const renderFooter = () => {
     if (todos.length) {
       return <Footer
+        onClearCompleted={onClearCompleted}
+        onShow={onShow}
         completedCount={todos.completed}
         activeCount={todos.length - todos.completed}
         filter={filter}

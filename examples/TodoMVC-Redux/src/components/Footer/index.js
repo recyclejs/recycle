@@ -1,24 +1,25 @@
 import { PropTypes } from 'react'
 import view from './view'
 import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from '../../constants/TodoFilters'
-import { TODO_FILTER, CLEAR_COMPLETED } from '../../constants/ActionTypes'
 
-const Footer = () => ({
+const Footer = (props) => ({
   propTypes: {
     completedCount: PropTypes.number.isRequired,
     activeCount: PropTypes.number.isRequired,
-    filter: PropTypes.string.isRequired
+    filter: PropTypes.string.isRequired,
+    onClearCompleted: PropTypes.func.isRequired,
+    onShow: PropTypes.func.isRequired
   },
 
   actions (sources) {
     return [
       sources.selectClass('clear-completed')
         .on('click')
-        .mapTo({ type: CLEAR_COMPLETED }),
+        .map(props.onClearCompleted),
 
       sources.selectClass('filter-link')
         .on('click')
-        .map(filter => ({ type: TODO_FILTER, filter }))
+        .map(props.onShow)
     ]
   },
 

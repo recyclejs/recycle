@@ -1,7 +1,6 @@
 import { PropTypes } from 'react'
 import view from './view'
 import TodoTextInput from '../TodoTextInput'
-import { TEXT_INPUT } from '../../constants/ActionTypes'
 
 const TodoItem = () => ({
   propTypes: {
@@ -28,10 +27,7 @@ const TodoItem = () => ({
         .map(props => props.completeTodo(props.todo.id)),
 
       sources.select(TodoTextInput)
-        .on(TEXT_INPUT)
-        .withLatestFrom(sources.props, (action, props) => {
-          return props.editTodo(props.todo.id, action.value)
-        })
+        .allActions()
     ]
   },
 
@@ -45,7 +41,7 @@ const TodoItem = () => ({
         }),
 
       sources.select(TodoTextInput)
-        .on(TEXT_INPUT)
+        .allActions()
         .reducer(function (state) {
           state.editing = false
           return state
@@ -56,7 +52,8 @@ const TodoItem = () => ({
   view (props, state) {
     return view({
       todo: props.todo,
-      editing: state.editing
+      editing: state.editing,
+      editTodo: (text) => props.editTodo(props.todo.id, text)
     })
   }
 })
