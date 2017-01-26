@@ -56,7 +56,6 @@ export default function (streamAdapter) {
     function getInternalStateStream () {
       const reducers = [
         componentSources.actions
-          .do(a => emit('action', [a, thisComponent]))
           .filter(() => false)
       ]
 
@@ -173,6 +172,7 @@ export default function (streamAdapter) {
       if (act) {
         Observable.merge(...forceArray(act))
           .filter(action => action)
+          .do(a => emit('action', [a, thisComponent]))
           .subscribe(componentSources.actions)
       }
     }
