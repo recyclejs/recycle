@@ -198,13 +198,13 @@ export default function (streamAdapter) {
 
   function emit (event, payload) {
     if (events[event]) {
-      for (const cb of events[event]) {
+      events[event].forEach(function (cb) {
         if (Array.isArray(payload)) {
           cb(...payload)
         } else {
           cb(payload)
         }
-      }
+      })
     }
   }
 
