@@ -19,13 +19,13 @@ const TodoTextInput = (props) => ({
         .on('keyDown')
         .filter(e => e.which === 13)
         .filter(e => e.target.value.length)
-        .map(e => props.onSave(e.target.value)),
+        .map(e => e.target.value),
 
       sources.select('input')
         .on('blur')
         .filter(() => !props.newTodo)
         .filter(e => e.target.value.length)
-        .map(e => props.onSave(e.target.value))
+        .map(e => e.target.value)
     ]
   },
 

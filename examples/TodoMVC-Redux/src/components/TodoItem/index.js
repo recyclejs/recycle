@@ -2,7 +2,7 @@ import { PropTypes } from 'react'
 import view from './view'
 import TodoTextInput from '../TodoTextInput'
 
-const TodoItem = () => ({
+const TodoItem = (props) => ({
   propTypes: {
     todo: PropTypes.object.isRequired,
     editTodo: PropTypes.func.isRequired,
@@ -26,8 +26,8 @@ const TodoItem = () => ({
         .mapToLatest(sources.props)
         .map(props => props.completeTodo(props.todo.id)),
 
-      sources.select(TodoTextInput)
-        .allActions()
+      sources.on(TodoTextInput)
+        .map(text => props.editTodo(props.todo.id, text))
     ]
   },
 
@@ -52,8 +52,7 @@ const TodoItem = () => ({
   view (props, state) {
     return view({
       todo: props.todo,
-      editing: state.editing,
-      editTodo: (text) => props.editTodo(props.todo.id, text)
+      editing: state.editing
     })
   }
 })

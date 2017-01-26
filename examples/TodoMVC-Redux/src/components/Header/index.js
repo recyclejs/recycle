@@ -9,8 +9,8 @@ function Header (props) {
 
     actions (sources) {
       return [
-        sources.select(TodoTextInput)
-          .allActions()
+        sources.on(TodoTextInput)
+          .map(props.addTodo)
       ]
     },
 
@@ -18,7 +18,7 @@ function Header (props) {
       return (
         <header className='header'>
           <h1>todos</h1>
-          <TodoTextInput newTodo onSave={props.addTodo} placeholder='What needs to be done?' />
+          <TodoTextInput newTodo placeholder='What needs to be done?' />
         </header>
       )
     }
