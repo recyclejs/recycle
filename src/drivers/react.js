@@ -1,3 +1,5 @@
+const ANY_EVENT = 'ANY_EVENT'
+
 export default React => (recycle, streamAdapter) => {
   const { Observable, Subject } = streamAdapter
   const createElement = React.createElement
@@ -62,7 +64,7 @@ export default React => (recycle, streamAdapter) => {
               }
               if (child) {
                 ref.stream = child.getActions()
-                  .filter(a => a.type === ref.event)
+                  .filter(a => a.type === ref.event || ref.event === ANY_EVENT)
                   .map(event => ({ event }))
               } else if (typeof arguments['1'][ref.event] === 'function') {
                 ref.stream = new Subject()
@@ -129,7 +131,7 @@ export default React => (recycle, streamAdapter) => {
 
   function registerNodeStream (registeredNodeStreams, selectorType) {
     return selector => {
-      return {
+      const api = {
         on: event => {
           const foundRefs = registeredNodeStreams
             .filter(ref => ref.selector === selector)
@@ -150,8 +152,12 @@ export default React => (recycle, streamAdapter) => {
 
           return ref.stream.switch().share()
             .map(val => (val.value !== undefined) ? val.value : val.event)
+        },
+        allActions: () => {
+          return api.on(ANY_EVENT)
         }
       }
+      return api
     }
   }
 
