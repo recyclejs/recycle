@@ -8,7 +8,7 @@ export default (store) => (recycle, {Observable, Subject}) => {
       const manualActions = new Subject()
 
       if (actionsFunction) {
-        const actionsArr = forceArray(actionsFunction(component.getSources()))
+        const actionsArr = forceArray(component.getActions())
         actionsArr.push(manualActions)
         const actionsStream = Observable.merge(...actionsArr)
 
