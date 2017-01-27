@@ -10,9 +10,6 @@ export default React => (recycle, streamAdapter) => {
     component.set('ReactComponent', createReactComponent(component))
 
     component.setSource('select', registerNodeStream(registeredNodeStreams, 'tag'))
-    component.setSource('on', function (node) {
-      return this.getSource('select')(node).allActions()
-    }.bind(component))
     component.setSource('selectClass', registerNodeStream(registeredNodeStreams, 'class'))
     component.setSource('selectId', registerNodeStream(registeredNodeStreams, 'id'))
     component.setSource('state', new Subject())
@@ -158,6 +155,9 @@ export default React => (recycle, streamAdapter) => {
         },
         allActions: () => {
           return api.on(ANY_EVENT)
+        },
+        onAnyAction: (mapFn) => {
+          return api.on(ANY_EVENT).map(mapFn)
         }
       }
       return api
