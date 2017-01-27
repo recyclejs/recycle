@@ -172,8 +172,16 @@ export default function (streamAdapter) {
       if (act) {
         Observable.merge(...forceArray(act))
           .filter(action => action)
-          .do(a => emit('action', [a, thisComponent]))
-          .subscribe(componentSources.actions)
+          .subscribe(a => {
+            emit('action', [a, thisComponent])
+            componentSources.actions.next(a)
+          }, err => {
+            emit('actionError', [err, thisComponent])
+            componentSources.actions.error(err)
+          }, a => {
+            emit('actionComplete', a)
+            componentSources.actions.complete(a)
+          })
       }
     }
 
