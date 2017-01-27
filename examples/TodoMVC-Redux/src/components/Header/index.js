@@ -9,8 +9,8 @@ function Header (props) {
 
     actions (sources) {
       return [
-        sources.on(TodoTextInput)
-          .map(props.addTodo)
+        sources.select(TodoTextInput)
+          .onAnyAction(props.addTodo)
       ]
     },
 

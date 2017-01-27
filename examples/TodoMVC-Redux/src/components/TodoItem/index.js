@@ -26,8 +26,8 @@ const TodoItem = (props) => ({
         .mapToLatest(sources.props)
         .map(props => props.completeTodo(props.todo.id)),
 
-      sources.on(TodoTextInput)
-        .map(text => props.editTodo(props.todo.id, text))
+      sources.select(TodoTextInput)
+        .onAnyAction(text => props.editTodo(props.todo.id, text))
     ]
   },
 
