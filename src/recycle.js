@@ -72,7 +72,7 @@ export default function (streamAdapter) {
           return true
         })
         .map(({ reducer, action }) => {
-          let newState = reducer(shallowImmutable(state), action)
+          let newState = reducer(shallowClone(state), action)
           emit('newState', [thisComponent, newState, action])
           return {
             state: newState,
@@ -178,9 +178,9 @@ export default function (streamAdapter) {
           }, err => {
             emit('actionError', [err, thisComponent])
             componentSources.actions.error(err)
-          }, a => {
-            emit('actionComplete', a)
-            componentSources.actions.complete(a)
+          }, () => {
+            emit('actionComplete')
+            componentSources.actions.complete()
           })
       }
     }
@@ -259,7 +259,7 @@ export function forceArray (arr) {
   return arr
 }
 
-export function shallowImmutable (data) {
+export function shallowClone (data) {
   if (Array.isArray(data)) {
     return data.map(i => i)
   } else if (typeof data === 'object') {
