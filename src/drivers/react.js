@@ -1,3 +1,5 @@
+import { shallowClone } from '../recycle'
+
 const ANY_EVENT = 'ANY_EVENT'
 
 export default React => (recycle, streamAdapter) => {
@@ -179,8 +181,8 @@ export default React => (recycle, streamAdapter) => {
   }
 
   function updateStatePropsReference (component) {
-    component.getSource('state').next(shallowImmutable(component.getState()))
-    component.getSource('props').next(shallowImmutable(component.getProps()))
+    component.getSource('state').next(shallowClone(component.getState()))
+    component.getSource('props').next(shallowClone(component.getProps()))
   }
 
   function createReactComponent (component) {
@@ -193,7 +195,7 @@ export default React => (recycle, streamAdapter) => {
       componentDidMount () {
         this.stateSubsription = component.getStateStream().subscribe(newVal => {
           this.setState({
-            recycleState: shallowImmutable(newVal.state)
+            recycleState: shallowClone(newVal.state)
           })
         })
 
@@ -314,15 +316,6 @@ export function createReactElement (createElementHandler, args) {
   }
 
   return createElementHandler.apply(this, newArgs)
-}
-
-export function shallowImmutable (data) {
-  if (Array.isArray(data)) {
-    return data.map(i => i)
-  } else if (typeof data === 'object') {
-    return {...data}
-  }
-  return data
 }
 
 export function getEventHandler (event) {

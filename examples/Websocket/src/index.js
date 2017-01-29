@@ -12,5 +12,5 @@ import Recycle from 'recyclejs'
 // const Recycle = createRecycle(React, Rx)
 
 ReactDOM.render((
-  <Recycle root={WebsocketEcho} drivers={[WebsocketDriver]} />
+  <Recycle root={WebsocketEcho} drivers={WebsocketDriver} />
 ), document.getElementById('root'))

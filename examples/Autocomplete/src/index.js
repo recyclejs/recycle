@@ -20,6 +20,6 @@ injectTapEventPlugin()
 
 ReactDOM.render((
   <MuiThemeProvider>
-    <Recycle root={Autocomplete} drivers={[ajaxDriver]} />
+    <Recycle root={Autocomplete} drivers={ajaxDriver} />
   </MuiThemeProvider>
 ), document.getElementById('root'))
