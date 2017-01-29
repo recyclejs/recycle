@@ -1,8 +1,8 @@
 # Recycle
 
-Recycle is a functional and reactive library for managing components.
+Recycle is a JavaScript library for creating modular applications using [Observable streams](http://reactivex.io/).
 
-With the official *React driver* (enabled by default), 
+With the official *React driver*, 
 it can be used as a [React](https://facebook.github.io/react) component,
 giving you the ability to use [FRP paradigm](https://en.wikipedia.org/wiki/Functional_reactive_programming)
 for designing your apps.
