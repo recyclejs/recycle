@@ -1,3 +1,4 @@
+import { shallowClone } from '../recycle'
 import objectpath from 'objectpath'
 
 export default (store) => (recycle, {Observable, Subject}) => {
@@ -27,6 +28,7 @@ export default (store) => (recycle, {Observable, Subject}) => {
             const recycleAction = a.action
             delete recycleAction.childComponent
             let recycleState = a.reducer(state, recycleAction)
+            let changedState = shallowClone(recycleState)
 
             if (storePath) {
               let storeState = {...store.getState()}
@@ -39,8 +41,8 @@ export default (store) => (recycle, {Observable, Subject}) => {
             }
 
             delete action.reducer
-            delete action.action
-            action.payload = recycleState
+            action.changedState = changedState
+            action.newState = recycleState
           }
           store.dispatch(action)
         })
@@ -71,7 +73,12 @@ export default (store) => (recycle, {Observable, Subject}) => {
 
       if (actionsFunction && component.get('initialState')) {
         setByPath(storePath || [], component.get('initialState'), storeState)
-        manualActions.next({ type: 'RECYCLE_REDUCER', payload: storeState })
+        manualActions.next({
+          type: 'RECYCLE_REDUCER',
+          action: { type: '@@recycle/INIT' },
+          changedState: storeState,
+          newState: storeState
+        })
       }
     }
   })
