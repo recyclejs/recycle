@@ -1,6 +1,6 @@
 {
   "name": "recyclejs",
-  "version": "0.7.10",
+  "version": "0.7.11",
   "description": "A functional and reactive library for React",
   "main": "index.js",
   "scripts": {
