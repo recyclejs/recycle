@@ -13,9 +13,10 @@ for designing your apps.
 ## Why?
 * Use [Observables](http://reactivex.io) for managing async behavior
 * Greater separation of concerns
-* It's fast - even though selecting nodes looks like [query selectors](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), Recycle uses React's inline event handlers
-* No need for another framework - use it as any other React component
+* Better component decoupling
+* Manage side effects outside a component definition
 * Use Observables for dispatching actions to [Redux](http://redux.js.org) store
+* No need for another framework - use it as any other React component
 
 ## How does it look like?
 Example of writing React component using Recycle:
