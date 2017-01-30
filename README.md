@@ -11,15 +11,14 @@ for designing your apps.
 [![npm downloads](https://img.shields.io/npm/dm/recyclejs.svg?style=flat-square)](https://www.npmjs.com/package/recyclejs)
 
 ## Why?
-* Greater separation of concerns - UI designers and JavaScript developers can live more peacefully
-* It's functional - all components can be defined without the use of classes
-* It's reactive - async operations are handled with [Observables](https://www.youtube.com/watch?v=XRYN2xt11Ek) (which is why they are built for)
+* Use [Observables](http://reactivex.io) for managing async behavior
+* Greater separation of concerns
 * It's fast - even though selecting nodes looks like [query selectors](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), Recycle uses React's inline event handlers
 * No need for another framework - use it as any other React component
-* Use Observables for dispatching actions to [Redux](http://redux.js.org) store (using official *Redux driver*)
+* Use Observables for dispatching actions to [Redux](http://redux.js.org) store
 
 ## How does it look like?
-Example of converting React component to Recycle:
+Example of writing React component using Recycle:
 <img src="https://cloud.githubusercontent.com/assets/1868852/22227336/192d20fe-e1cb-11e6-8c20-27218a6bc5e2.gif" style="border: 5px solid #1e1e1e" alt="Recycle example" width="600" />
 
 ## Quick Start
