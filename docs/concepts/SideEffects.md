@@ -1,4 +1,4 @@
-# Drivers
+# Side Effects
 
 Recycle *Driver* is a module which interacts with all components in the Recycle tree.
 
@@ -11,7 +11,7 @@ So basically, it has full control over all components.
 
 But, most often, a driver is used for managing side effects.
 
-## Managing Side Effects
+## Chat Application
 Suppose we need to write a Chat application. 
 We would probably start by defining a component structure and its actions.
 It would be a simple component with some kind of input field and an area for displaying messages.
