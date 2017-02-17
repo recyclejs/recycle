@@ -7,9 +7,14 @@ import MultipleClickCounters from './components/MultipleClickCounters'
 
 // RECYCLE DEFINED USING CUSTOM ADAPTER
 import Rx from 'rxjs/Rx'
-import createRecycle from 'recyclejs/react'
-const Recycle = createRecycle(React, Rx)
 
-ReactDOM.render((
-  <Recycle root={MultipleClickCounters} />
-), document.getElementById('root'))
+
+import RecycleT from 'recyclejs/recycle'
+import streamAdapter from 'recyclejs/adapter/rxjs'
+import reactDriver from 'recyclejs/drivers/react'
+
+
+const recycle = RecycleT(streamAdapter(Rx))
+recycle.use(reactDriver(React))
+const AppReact = recycle.createComponent(MultipleClickCounters).get('ReactComponent')
+console.log(AppReact)
