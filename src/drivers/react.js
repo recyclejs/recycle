@@ -3,6 +3,7 @@ import { shallowClone } from '../recycle'
 const ANY_EVENT = 'ANY_EVENT'
 
 export default React => (recycle, streamAdapter) => {
+  debugger
   const { Observable, Subject } = streamAdapter
   const createElement = React.createElement
 
@@ -294,7 +295,7 @@ export function getNodeSelectors (nodeName, attrs) {
 }
 
 export function isReactComponent (constructor) {
-  if (typeof constructor === 'function' && constructor.prototype.render) {
+  if (typeof constructor === 'function' && constructor.prototype && constructor.prototype.render) {
     return true
   }
   return false
