@@ -5,13 +5,15 @@ export default function (streamAdapter) {
   const recycleProps = {}
   let rootComponent
 
-  function createComponent (constructor, props, parent) {
+  function createComponent (constructor, props, parent, componentDefinition) {
     const key = (props) ? props.key : null
     const children = new Set()
     const childrenActions = new Subject()
     const injectedState = new Subject()
-    const componentDefinition = (typeof constructor === 'function') ? constructor(props) : constructor
     const privateProps = {}
+    if (!componentDefinition) {
+      componentDefinition = (typeof constructor === 'function') ? constructor(props) : constructor
+    }
     const componentName = componentDefinition.displayName || constructor.name
     let stateStream
 
