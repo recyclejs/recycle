@@ -3,8 +3,8 @@ import { shallowClone } from '../recycle'
 const ANY_EVENT = 'ANY_EVENT'
 
 export default React => (recycle, streamAdapter) => {
-  debugger
   const { Observable, Subject } = streamAdapter
+  const $$typeofReactElement = React.createElement(function() {}).$$typeof
   const createElement = React.createElement
 
   recycle.on('componentInit', component => {
@@ -116,7 +116,11 @@ export default React => (recycle, streamAdapter) => {
           return createElement(child.get('ReactComponent'), childProps)
         }
 
-        const newComponent = recycle.createComponent(childConstructor, childProps, component)
+        let componentDefinition = childConstructor(childProps)
+        if (componentDefinition.$$typeof === $$typeofReactElement) {
+          return componentDefinition
+        }
+        const newComponent = recycle.createComponent(childConstructor, childProps, component, componentDefinition)
 
         setNodeStream(newComponent)
         return createElement(newComponent.get('ReactComponent'), childProps)
