@@ -220,7 +220,12 @@ export default function (streamAdapter) {
 
   function use (driversArr) {
     if (!Array.isArray(driversArr)) {
-      driversArr = [driversArr]
+      driversArr = []
+      if (arguments.length) {
+        for (let i = 0; i < arguments.length; i++) {
+          driversArr.push(arguments[i])
+        }
+      }
     }
 
     const drivers = {}
