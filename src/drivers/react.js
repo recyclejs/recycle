@@ -133,6 +133,7 @@ export default React => (recycle, streamAdapter) => {
   })
 
   recycle.on('afterRender', component => {
+    component.updateChildrenActions()
     React.createElement = createElement
   })
 
@@ -204,7 +205,6 @@ export default React => (recycle, streamAdapter) => {
           })
         })
 
-        component.updateChildrenActions()
         recycle.emit('componentDidMount', component)
 
         if (component.get('componentDidMount')) {
