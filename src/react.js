@@ -8,22 +8,7 @@ export default function (React, Rx) {
     const recycle = Recycle(streamAdapter(Rx))
     let drivers = [reactDriver(React)]
     if (updateQueue && updateQueue.isMounted) {
-      let root
-      let passProps
-      if (props && props.root) {
-        root = props.root
-        passProps = props.props
-      }
-      else if (props && props.children) {
-        root = function () {
-          return {
-            view: function() {
-              return <div>{props.children}</div>
-            }
-          }
-        }
-      }
-      else {
+      if (!props || !props.root) {
         throw new Error('Missing root component for initializing Recycle')
       }
 
@@ -31,8 +16,8 @@ export default function (React, Rx) {
         drivers = drivers.concat(props.drivers)
       }
       recycle.use(drivers)
-      const ReactComponent = recycle.createComponent(root, passProps).get('ReactComponent')
-      return React.createElement(ReactComponent, passProps)
+      const ReactComponent = recycle.createComponent(props.root, props.props).get('ReactComponent')
+      return React.createElement(ReactComponent, props.props)
     }
 
     if (Array.isArray(props)) {
@@ -47,7 +32,14 @@ export default function (React, Rx) {
     recycle.use(drivers)
 
     return function (rootComponent, props) {
-      return recycle.createComponent(rootComponent, props).get('ReactComponent')
+      const $$typeofReactElement = React.createElement(function() {}).$$typeof
+      let componentDefinition = rootComponent(props)
+
+      if (componentDefinition.$$typeof === $$typeofReactElement) {
+        componentDefinition = { view: rootComponent }
+      }
+
+      return recycle.createComponent(rootComponent, props, false, componentDefinition).get('ReactComponent')
     }
   }
 }
