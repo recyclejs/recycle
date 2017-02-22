@@ -3,43 +3,32 @@ import reactDriver from './drivers/react'
 import streamAdapter from './adapter/rxjs'
 
 export default function (React, Rx) {
-  return function (props, publicContext, updateQueue) {
-    // if Recycle was called as react component
-    const recycle = Recycle(streamAdapter(Rx))
-    let drivers = [reactDriver(React)]
-    if (updateQueue && updateQueue.isMounted) {
-      if (!props || !props.root) {
-        throw new Error('Missing root component for initializing Recycle')
-      }
+  const recycle = Recycle(streamAdapter(Rx))
+  let drivers = [reactDriver(React)]
+  recycle.use(drivers)
 
-      if (props.drivers) {
-        drivers = drivers.concat(props.drivers)
-      }
-      recycle.use(drivers)
-      const ReactComponent = recycle.createComponent(props.root, props.props).get('ReactComponent')
-      return React.createElement(ReactComponent, props.props)
+  // "headless root component"
+  // its children can be react component or any other
+  const rootComponent = recycle.createComponent(() => ({}), null, false)
+
+  const createReactComponent = function (reactComponent, props) {
+    const $$typeofReactElement = React.createElement(function() {}).$$typeof
+    let componentDefinition = reactComponent(props)
+
+    if (componentDefinition.$$typeof === $$typeofReactElement) {
+      componentDefinition = { view: reactComponent }
     }
 
-    if (Array.isArray(props)) {
-      drivers = drivers.concat(props)
-    }
-    // if Recycle was called idependently
-    if (arguments.length) {
-      for (let i = 0; i < arguments.length; i++) {
-        drivers.push(arguments[i])
-      }
-    }
-    recycle.use(drivers)
+    return recycle.createComponent(reactComponent, props, rootComponent, componentDefinition).get('ReactComponent')
+  }
 
-    return function (rootComponent, props) {
-      const $$typeofReactElement = React.createElement(function() {}).$$typeof
-      let componentDefinition = rootComponent(props)
+  const createComponent = function (constructor, props) {
+    return recycle.createComponent(constructor, props, rootComponent)
+  }
 
-      if (componentDefinition.$$typeof === $$typeofReactElement) {
-        componentDefinition = { view: rootComponent }
-      }
-
-      return recycle.createComponent(rootComponent, props, false, componentDefinition).get('ReactComponent')
-    }
+  return {
+    ...recycle,
+    createComponent,
+    createReactComponent
   }
 }

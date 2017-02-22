@@ -216,6 +216,12 @@ export default function (streamAdapter) {
         }
       })
     }
+
+    const event$ = event + '$'
+    if (api[event$]) {
+      api[event$].next(payload)
+    }
+    
   }
 
   function use (driversArr) {
@@ -255,7 +261,9 @@ export default function (streamAdapter) {
     createComponent,
     use,
     emit,
-    getRootComponent: () => rootComponent
+    getRootComponent: () => rootComponent,
+    componentInit$: new Subject(),
+    action$: new Subject()
   }
 
   return api
