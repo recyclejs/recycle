@@ -15,7 +15,7 @@ npm install recyclejs@beta
 
 ## Todo
 Even though most of the code from v1 is the same in v2,
-in order to be released without `beta`, documentation and examples needs to be updated.
+in order to be released without `beta`, its documentation and examples needs to be updated.
 
 ## Difference From 1.0
 In version 2, Recycle has no dependencies.
