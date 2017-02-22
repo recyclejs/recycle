@@ -6,17 +6,18 @@ Recycle is a JavaScript library for creating modular applications using [Observa
 [![npm version](https://img.shields.io/npm/v/recyclejs.svg?style=flat-square)](https://www.npmjs.com/package/recyclejs)
 [![npm downloads](https://img.shields.io/npm/dm/recyclejs.svg?style=flat-square)](https://www.npmjs.com/package/recyclejs)
 
-## Why?
-Todo: use cases which are not only related to react
-
 ## Installation
-Recycle v2.0 is (while in rc stage) installed using npm tag `v2`
+Recycle v2.0 is installed using npm tag `beta`
 
 ```bash
-npm install recyclejs@v2
+npm install recyclejs@beta
 ```
 
-## Migrating From 1.0
+## Todo
+Even though most of the code from v1 is the same in v2,
+in order to be released without `beta` documentation and examples needs to be updated.
+
+## Difference From 1.0
 In version 2, Recycle has no dependencies.
 React or RxJS must be provided in `createRecycle` function.
 
@@ -52,10 +53,6 @@ recycle.createComponent(ComponentWithoutView)
 // rendering root react component
 ReactDOM.render(<WrapperReact />, document.getElementById('root'))
 ```
-
-## Todo
-This release will be released without `v2` tag when documentation and examples are adapted to `v2`
-and more non-react examples (node.js app) are provided
 
 ## How does it look like?
 Example of writing React component using Recycle:
