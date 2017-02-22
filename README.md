@@ -13,8 +13,8 @@ for designing your apps.
 
 ## Version 2.0 (beta)
 Version 2.0 is not yet ready,
-but if you are interested how to use Recycle in apps not only related to react (node.js mostly),
-you learn more about it [here](https://github.com/recyclejs/recycle/tree/v2.0)
+but if you are interested how to use Recycle in apps not only related to React (node.js mostly),
+you can learn more about it [here](https://github.com/recyclejs/recycle/tree/v2.0)
 
 ## Why?
 * Use [Observables](http://reactivex.io) for managing async behavior
