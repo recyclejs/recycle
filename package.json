@@ -52,8 +52,6 @@
     "uglify-js": "^2.7.5"
   },
   "dependencies": {
-    "react": "^15.4.1",
-    "rxjs": "^5.0.1",
     "objectpath": "1.2.1"
   }
 }
