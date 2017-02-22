@@ -17,7 +17,7 @@ npm install recyclejs@v2
 ```
 
 ## Migrating From 1.0
-Recycle has no dependencies in 2.0.
+In version 2, Recycle has no dependencies.
 React or RxJS must be provided in `createRecycle` function.
 
 Other than that, Recycle is the same as 1.0 but it has a different initialization process.
