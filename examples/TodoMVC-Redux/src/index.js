@@ -1,21 +1,16 @@
 import React from 'react'
+import Rx from 'rxjs/Rx'
+import createRecycle from 'recyclejs/react'
 import { render } from 'react-dom'
 import { createStore } from 'redux'
 import 'todomvc-app-css/index.css'
 import reduxDriver from 'recyclejs/drivers/redux'
 
-// RECYCLE DEFINED USING DEFAULT ADAPTER
-import Recycle from 'recyclejs'
-
-// RECYCLE DEFINED USING CUSTOM ADAPTER
-// import Rx from 'rxjs/Rx'
-// import createRecycle from 'recyclejs/react'
-// const Recycle = createRecycle(React, Rx)
-
 // 'REDUX-WAY' FOR DEFINING REDUCERS
-// import rootReducer from './reducers'
-// import App from './containers/App'
+import rootReducer from './reducers'
+import App from './containers/App'
 
+/*
 // ALTERNATIVE USING SPECIAL RECYCLE ACTIONS
 import App from './containers/App-Alternative'
 
@@ -27,7 +22,16 @@ function rootReducer (state, action) {
       return state
   }
 }
+*/
 
-const store = reduxDriver(createStore(rootReducer))
+// creating recycle instance
+const recycle = createRecycle(React, Rx)
 
-render(<Recycle root={App} drivers={store} />, document.getElementById('root'))
+// applying drivers
+recycle.use(reduxDriver(createStore(rootReducer)))
+
+// creating root react component
+const AppReact = recycle.createReactComponent(App)
+
+// rendering
+render(<AppReact />, document.getElementById('root'))

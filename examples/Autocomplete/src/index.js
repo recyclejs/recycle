@@ -1,25 +1,25 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Autocomplete from './components/Autocomplete'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import injectTapEventPlugin from 'react-tap-event-plugin'
+import Rx from 'rxjs/Rx'
+import createRecycle from 'recyclejs/react'
+import Autocomplete from './components/Autocomplete'
 import ajaxDriver from './drivers/ajax'
 
-// RECYCLE DEFINED USING DEFAULT ADAPTER
-import Recycle from 'recyclejs'
-import 'rxjs/add/observable/dom/ajax'
-import 'rxjs/add/operator/debounceTime'
-import 'rxjs/add/operator/switchMap'
+// creating recycle instance
+const recycle = createRecycle(React, Rx)
 
-// RECYCLE DEFINED USING CUSTOM ADAPTER
-// import Rx from 'rxjs/Rx'
-// import createRecycle from 'recyclejs/react'
-// const Recycle = createRecycle(React, Rx)
+// applying drivers
+recycle.use(ajaxDriver)
+
+// creating root react component
+const AutocompleteReact = recycle.createReactComponent(Autocomplete)
 
 injectTapEventPlugin()
 
 ReactDOM.render((
   <MuiThemeProvider>
-    <Recycle root={Autocomplete} drivers={ajaxDriver} />
+    <AutocompleteReact />
   </MuiThemeProvider>
 ), document.getElementById('root'))

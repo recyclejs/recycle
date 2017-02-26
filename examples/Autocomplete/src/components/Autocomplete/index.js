@@ -19,7 +19,7 @@ export default function Autocomplete () {
 
     reducers (sources) {
       return [
-        sources.suggestions
+        sources.suggestions$
           .reducer(function (state, items) {
             state.suggestions = items.slice(0, 10)
             return state
