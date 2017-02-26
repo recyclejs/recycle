@@ -254,6 +254,41 @@ export default function (streamAdapter) {
     recycleProps[prop] = val
   }
 
+  function feedMatchedComponents (config) {
+    if (typeof config !== 'object') {
+      throw new Error('Could not match components. Missing config object')
+    }
+
+    api.on('componentInit', function (c) {
+      Object.keys(config).forEach(sourceName => {
+        const sourceTypes = c.get('sourceTypes')
+        if (sourceTypes && sourceTypes[sourceName]) {
+          c.setSource(sourceName, config[sourceName])
+        }
+      })
+    })
+  }
+
+  function feedAllComponents (sourceName, feedWith) {
+    api.on('componentInit', function (c) {
+      c.setSource(sourceName, feedWith)
+    })
+  }
+
+  function getAllComponents () {
+    const children = []
+
+    function ch (c) {
+      children.push(...c.getChildren())
+      c.getChildren().forEach(function (child) {
+        ch(child)
+      })
+    }
+    ch(rootComponent)
+
+    return children
+  }
+
   const api = {
     on: addListener,
     get,
@@ -263,6 +298,9 @@ export default function (streamAdapter) {
     use,
     emit,
     getRootComponent: () => rootComponent,
+    feedMatchedComponents,
+    feedAllComponents,
+    getAllComponents,
     componentInit$: new Subject(),
     action$: new Subject()
   }
