@@ -176,13 +176,14 @@ export default function (streamAdapter) {
         Observable.merge(...forceArray(act))
           .filter(action => action)
           .subscribe(a => {
-            emit('action', [a, thisComponent])
+            emit('componentAction', [a, thisComponent])
+            emit('action', a)
             componentSources.actions.next(a)
           }, err => {
             emit('actionError', [err, thisComponent])
             componentSources.actions.error(err)
           }, () => {
-            emit('actionComplete')
+            emit('actionComplete', thisComponent)
             componentSources.actions.complete()
           })
       }
@@ -222,7 +223,6 @@ export default function (streamAdapter) {
     if (api[event$]) {
       api[event$].next(payload)
     }
-    
   }
 
   function use (driversArr) {
