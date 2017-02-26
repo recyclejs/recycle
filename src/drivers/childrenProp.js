@@ -1,7 +1,5 @@
 export default (recycle, Rx) => {
-  let timeout = null
   recycle.on('sourcesReady', (component) => {
-    clearTimeout(timeout)
     const children = component.get('children')
     if (children) {
       children.forEach(child => {
@@ -11,11 +9,7 @@ export default (recycle, Rx) => {
     component.updateChildrenActions()
   })
 
-  timeout = setTimeout(function () {
-    recycle.emit('componentsInitalized')
-  }, 0)
-
   return {
-    name: 'node'
+    name: 'childrenProp'
   }
 }

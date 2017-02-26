@@ -4,7 +4,7 @@ const ANY_EVENT = 'ANY_EVENT'
 
 export default React => (recycle, streamAdapter) => {
   const { Observable, Subject } = streamAdapter
-  const $$typeofReactElement = React.createElement(function() {}).$$typeof
+  const $$typeofReactElement = React.createElement(function () {}).$$typeof
   const createElement = React.createElement
 
   recycle.on('componentInit', component => {
