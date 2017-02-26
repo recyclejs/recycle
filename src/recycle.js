@@ -76,6 +76,7 @@ export default function (streamAdapter) {
         .map(({ reducer, action }) => {
           let newState = reducer(shallowClone(state), action)
           emit('newState', [thisComponent, newState, action])
+          replaceState(newState)
           return {
             state: newState,
             reducer,
