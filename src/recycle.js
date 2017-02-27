@@ -179,12 +179,6 @@ export default function (streamAdapter) {
             emit('componentAction', [a, thisComponent])
             emit('action', a)
             componentSources.actions.next(a)
-          }, err => {
-            emit('actionError', [err, thisComponent])
-            componentSources.actions.error(err)
-          }, () => {
-            emit('actionComplete', thisComponent)
-            componentSources.actions.complete()
           })
       }
     }
