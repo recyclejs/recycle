@@ -244,7 +244,10 @@ export default function (streamAdapter) {
     return recycleProps[prop]
   }
 
-  function set (prop, val) {
+  function set (prop, val, force) {
+    if (!force && recycleProps[prop] !== undefined) {
+      throw Error(`${prop} already exists`)
+    }
     recycleProps[prop] = val
   }
 
