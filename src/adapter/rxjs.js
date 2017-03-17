@@ -5,16 +5,5 @@ export default function ({ Observable, Subject }) {
     return this.map(action => ({ reducer: reducerFn, action }))
   }
 
-  Observable.prototype.filterByType = function filterByType (type) {
-    return this.filter(action => action.type === type)
-  }
-
-  Observable.prototype.mapToLatest = function mapToLatest (sourceFirst, sourceSecond) {
-    if (sourceSecond) {
-      return this.mapToLatest(sourceFirst).withLatestFrom(sourceSecond, (props, state) => ({props, state}))
-    }
-    return this.withLatestFrom(sourceFirst, (first, second) => second)
-  }
-
   return { Observable, Subject }
 }
