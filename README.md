@@ -30,7 +30,7 @@ this will not be Recycle's focus.
 Creating modular application using Observables can be applied to other React-like libraries, 
 but also to projects on the backend (node.js)
 
-This version will be published without "beta" tag as soon as documentation, and new examples are ready.
+This version will be published without "beta" tag as soon as documentation, new examples and tests are ready.
 
 ## Examples
 Current examples using Recycle v2:
