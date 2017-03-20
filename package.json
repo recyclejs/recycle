@@ -1,6 +1,6 @@
 {
   "name": "recyclejs",
-  "version": "2.0.0-rc.6",
+  "version": "2.0.0-rc.7",
   "description": "A functional and reactive library for React",
   "main": "index.js",
   "scripts": {
@@ -8,8 +8,8 @@
     "test:watch": "jest -c jest.json --watch",
     "test": "jest -c jest.json",
     "build": "babel src -d ./",
-    "build:umd": "browserify src/react.js -o dist/recycle.js -s createRecycle -t [ babelify --presets [ es2015 ] --plugins [ add-module-exports ] ]",
-    "build:umd:min": "uglifyjs --compress --mangle -o dist/recycle.min.js -- dist/recycle.js",
+    "build:umd": "browserify index.js -o dist/recycle.js -s createRecycle && echo \"createRecycle = createRecycle.default;\" >> dist/recycle.js && browserify drivers/react.js -o dist/react-driver.js -s reactDriver && echo \"reactDriver = reactDriver.default;\" >> dist/react-driver.js",
+    "build:umd:min": "uglifyjs --compress --mangle -o dist/recycle.min.js -- dist/recycle.js && uglifyjs --compress --mangle -o dist/react-driver.min.js -- dist/react-driver.js",
     "docs:prepare": "gitbook install",
     "docs:watch": "npm run docs:prepare && gitbook serve",
     "docs:build": "npm run docs:prepare && rm -rf _book && gitbook build",
@@ -50,8 +50,5 @@
     "redux": "^3.6.0",
     "style-loader": "^0.13.1",
     "uglify-js": "^2.7.5"
-  },
-  "dependencies": {
-    "objectpath": "1.2.1"
   }
 }
