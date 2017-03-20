@@ -12,9 +12,9 @@ for designing your apps.
 [![npm downloads](https://img.shields.io/npm/dm/recyclejs.svg?style=flat-square)](https://www.npmjs.com/package/recyclejs)
 
 ## Version 2.0 (beta)
-Version 2.0 is not yet ready,
-but if you are interested how to use Recycle in apps not only related to React (node.js mostly),
-you can learn more about it [here](https://github.com/recyclejs/recycle/tree/v2.0)
+Version 2.0 is not ready yet,
+but if you are interested how to use Recycle in apps not only related to React,
+you can read more about it [here](https://github.com/recyclejs/recycle/blob/v2.0/README.md)
 
 ## Why?
 * Use [Observables](http://reactivex.io) for managing async behavior
