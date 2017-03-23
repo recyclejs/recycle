@@ -290,6 +290,24 @@ export default React => (recycle, streamAdapter) => {
     return ReactClass
   }
 
+  function apiCreateReactComponent (reactComponent, props, rootComponent) {
+    let componentDefinition = reactComponent(props)
+
+    if (componentDefinition.$$typeof === $$typeofReactElement) {
+      componentDefinition = { view: reactComponent }
+    }
+
+    return recycle.createComponent(reactComponent, props, rootComponent, componentDefinition).get('ReactComponent')
+  }
+
+  function applyModule (module) {
+    const rootComponent = recycle.applyModule(module)
+    if (!rootComponent) {
+      throw new Error('Invalid root component.')
+    }
+    return apiCreateReactComponent(rootComponent)
+  }
+
   return {
     createReactComponent: apiCreateReactComponent,
     applyModule

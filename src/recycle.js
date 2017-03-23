@@ -236,32 +236,43 @@ export default function (streamAdapter) {
         }
       })
     }
-
-    const event$ = event + '$'
-    if (api[event$]) {
-      api[event$].next(payload)
-    }
   }
 
-  function use (driversArr) {
-    if (!Array.isArray(driversArr)) {
-      driversArr = []
-      if (arguments.length) {
-        for (let i = 0; i < arguments.length; i++) {
-          driversArr.push(arguments[i])
+  function applyDriver (driver) {
+    return driver(api, streamAdapter)
+  }
+
+  function applyModule (module) {
+    const rootComponent = module.root
+
+    if (module.view) {
+      module.view.forEach(c => {
+        if (c.sources) {
+          api.feedMatchedComponents(c.sources, c.component)
         }
-      }
+      })
     }
 
-    const drivers = {}
-    api.getDriver = name => drivers[name]
+    if (module.store) {
+      module.store.forEach(c => {
+        if (c.sources) {
+          api.feedMatchedComponents(c.sources, c.component)
+        }
+        api.createComponent(c.component, false, false, false, function (createdComponent) {
+          createdComponent.setPrivate('modifyStore', c.modify)
+        })
+      })
+    }
 
-    driversArr.map((m) => {
-      const instance = m(api, streamAdapter)
-      const name = (instance && instance.name) ? instance.name : 'driver-' + Math.random()
-      drivers[name] = instance
-      return false
-    })
+    if (module.effects) {
+      module.effects.forEach(c => {
+        if (c.sources) {
+          api.feedMatchedComponents(c.sources, c.component)
+        }
+        api.createComponent(c.component)
+      })
+    }
+    return rootComponent
   }
 
   function get (prop) {
@@ -310,20 +321,28 @@ export default function (streamAdapter) {
     return children
   }
 
+  function getType (test) {
+    if (test instanceof Observable) {
+      return 'observable'
+    }
+    if (Array.isArray(test)) {
+      return 'array'
+    }
+    return typeof test
+  }
+
   const api = {
     on: addListener,
     get,
     set,
     unbind: removeListener,
     createComponent,
-    use,
+    applyDriver,
+    applyModule,
     emit,
     getRootComponent: () => rootComponent,
     feedMatchedComponents,
-    feedAllComponents,
-    getAllComponents,
-    componentInit$: new Subject(),
-    action$: new Subject()
+    getAllComponents
   }
 
   return api
