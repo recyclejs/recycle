@@ -20,12 +20,19 @@ export default React => (recycle, streamAdapter) => {
 
     component.setPrivate('registeredNodeStreams', registeredNodeStreams)
 
-    if (component.get('initialState') !== undefined) {
-      component.replaceState(component.get('initialState'))
-    }
-
     if (!component.getPrivate('children')) {
       component.setPrivate('children', new Map())
+    }
+  })
+
+  recycle.on('sourcesReady', component => {
+    let initialState = component.get('initialState')
+    if (typeof initialState === 'function') {
+      initialState = initialState(component.getSources())
+    }
+
+    if (initialState !== undefined) {
+      component.replaceState(initialState)
     }
   })
 
