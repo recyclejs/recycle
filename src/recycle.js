@@ -286,24 +286,35 @@ export default function (streamAdapter) {
     recycleProps[prop] = val
   }
 
-  function feedMatchedComponents (config) {
-    if (typeof config !== 'object') {
-      throw new Error('Could not match components. Missing config object')
+  function feedMatchedComponents (feedSources, matchConstructor) {
+    if (typeof feedSources !== 'object') {
+      throw new Error('Could not match components. Missing feed source object')
     }
 
     api.on('componentInit', function (c) {
-      Object.keys(config).forEach(sourceName => {
-        const sourceTypes = c.get('sourceTypes')
-        if (sourceTypes && sourceTypes[sourceName]) {
-          c.setSource(sourceName, config[sourceName])
-        }
-      })
-    })
-  }
+      const cInterface = c.get('interface')
 
-  function feedAllComponents (sourceName, feedWith) {
-    api.on('componentInit', function (c) {
-      c.setSource(sourceName, feedWith)
+      if (!cInterface) {
+        return
+      }
+      if (matchConstructor && c.getConstructor() !== matchConstructor) {
+        return
+      }
+
+      Object.keys(cInterface).forEach(requiredSourceName => {
+        let expectedType = cInterface[requiredSourceName]
+        let source = feedSources[requiredSourceName]
+
+        if (source === undefined) {
+          throw new Error(`Source \`${requiredSourceName}\` is required in \`${c.getName()}\`, but its value is \`undefined\`.`)
+        }
+
+        if (expectedType !== getType(source)) {
+          throw new Error(`Invalid source \`${requiredSourceName}\` of type \`${getType(source)}\` supplied to \`${c.getName()}\`, expected \`${expectedType}\`.`)
+        }
+
+        c.setSource(requiredSourceName, source)
+      })
     })
   }
 

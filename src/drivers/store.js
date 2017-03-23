@@ -1,39 +1,39 @@
 export default function storeDriver (recycle, Rx) {
   const store$ = new Rx.Subject()
-  const state = {}
+  const store = {}
   const aggregators = []
 
-  recycle.on('componentInit', function (c) {
-    const aggregate = c.get('aggregate')
-    if (typeof aggregate !== 'object') {
+  recycle.on('sourcesReady', function (c) {
+    const modifyStore = c.getPrivate('modifyStore')
+    if (!modifyStore) {
       return
     }
-    Object.keys(aggregate).forEach(key => {
-      if (state[key] !== undefined) {
-        throw new Error(`${key} aggregate is already defined`)
+
+    let initialState = c.get('initialState')
+    if (typeof initialState === 'function') {
+      initialState = initialState(c.getSources())
+    }
+
+    Object.keys(modifyStore).forEach(key => {
+      if (store[key] !== undefined) {
+        throw new Error(`${key} is already modified by another store component`)
       }
-      state[key] = aggregate[key]
+      store[key] = modifyStore[key](initialState)
     })
-    c.replaceState(aggregate)
     aggregators.push(c)
   })
 
-  recycle.on('newState', function (c, state) {
-    const aggregate = c.get('aggregate')
-    if (typeof aggregate !== 'object') {
-      return
-    }
-    Object.keys(state).forEach(key => {
-      if (aggregate[key] === undefined) {
-        throw new Error(`Could not calculate state. ${key} is not defined in aggregate.`)
-      }
-    })
-  })
-
   recycle.on('componentsInitalized', function () {
-    Rx.Observable.merge(...aggregators.map(c => c.getStateStream()))
-      .map(res => res.state)
-      .startWith(state)
+    Rx.Observable.merge(...aggregators.map(c => c.getStateStream().map(res => [res, c])))
+      .map(([res, c]) => {
+        const modifyStore = c.getPrivate('modifyStore')
+        const calcState = {}
+        Object.keys(modifyStore).forEach(key => {
+          calcState[key] = modifyStore[key](res.state)
+        })
+        return calcState
+      })
+      .startWith(store)
       .scan((acc, curr) => {
         return Object.assign({}, acc, curr)
       })
