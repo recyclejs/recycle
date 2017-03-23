@@ -277,7 +277,8 @@ export default React => (recycle, streamAdapter) => {
   }
 
   return {
-    name: 'react'
+    createReactComponent: apiCreateReactComponent,
+    applyModule
   }
 }
 

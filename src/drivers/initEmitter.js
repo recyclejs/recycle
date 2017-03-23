@@ -11,8 +11,4 @@ export default (recycle, Rx) => {
     clearTimeout(timeout)
     emit()
   })
-
-  return {
-    name: 'initEmitter'
-  }
 }

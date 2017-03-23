@@ -8,8 +8,4 @@ export default (recycle, Rx) => {
     }
     component.updateChildrenActions()
   })
-
-  return {
-    name: 'childrenProp'
-  }
 }

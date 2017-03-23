@@ -40,8 +40,5 @@ export default function storeDriver (recycle, Rx) {
       .subscribe(store$)
   })
 
-  return {
-    name: 'store',
-    store$
-  }
+  return store$
 }
