@@ -75,7 +75,10 @@ export default function (streamAdapter) {
         })
         .map(({ reducer, action }) => {
           let newState = reducer(shallowClone(state), action)
-          emit('newState', [thisComponent, newState, action])
+          emit({
+            event: 'newState',
+            params: [thisComponent, newState, action]
+          })
           replaceState(newState)
           return {
             state: newState,
@@ -160,31 +163,49 @@ export default function (streamAdapter) {
     }
 
     if (!parent) {
-      if (rootComponent) throw new Error('rootComponent already set')
+      if (rootComponent) {
+        return createComponent(constructor, props, rootComponent, componentDefinition, beforeInit)
+      }
       rootComponent = thisComponent
-      emit('initialize')
+      emit({
+        event: 'initialize'
+      })
     } else {
       parent.addChild(thisComponent)
     }
 
-    emit('componentInit', thisComponent)
+    if (beforeInit && typeof beforeInit === 'function') {
+      beforeInit(thisComponent)
+    }
+
+    emit({
+      event: 'componentInit',
+      component: thisComponent
+    })
 
     if (componentDefinition.actions) {
-      // todo: error for unsupported actions
       let act = componentDefinition.actions(componentSources)
       if (act) {
         Observable.merge(...forceArray(act))
           .filter(action => action)
           .subscribe(a => {
-            emit('componentAction', [a, thisComponent])
-            emit('action', a)
+            emit({
+              event: 'action',
+              component: thisComponent,
+              params: a
+            })
             componentSources.actions.next(a)
           })
       }
     }
 
     stateStream = getInternalStateStream().merge(injectedState)
-    emit('sourcesReady', thisComponent)
+
+    emit({
+      event: 'sourcesReady',
+      component: thisComponent
+    })
+
     return thisComponent
   }
 
@@ -202,7 +223,10 @@ export default function (streamAdapter) {
     events[event].delete(cb)
   }
 
-  function emit (event, payload) {
+  function emit (data) {
+    let event = data.event
+    let payload = data.params || data.component
+
     if (events[event]) {
       events[event].forEach(function (cb) {
         if (Array.isArray(payload)) {

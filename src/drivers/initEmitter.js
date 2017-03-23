@@ -3,7 +3,7 @@ export default (recycle, Rx) => {
 
   function emit () {
     timeout = setTimeout(function () {
-      recycle.emit('componentsInitalized')
+      recycle.emit({ event: 'componentsInitalized' })
     }, 0)
   }
 

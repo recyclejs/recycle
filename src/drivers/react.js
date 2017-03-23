@@ -215,7 +215,10 @@ export default React => (recycle, streamAdapter) => {
           })
         })
 
-        recycle.emit('componentDidMount', component)
+        recycle.emit({
+          event: 'componentDidMount',
+          component
+        })
 
         if (component.get('componentDidMount')) {
           return component.get('componentDidMount')()
@@ -233,7 +236,10 @@ export default React => (recycle, streamAdapter) => {
         component.replaceProps(this.props)
         component.replaceState(this.state.recycleState)
 
-        recycle.emit('componentUpdate', component)
+        recycle.emit({
+          event: 'componentUpdate',
+          component
+        })
 
         if (component.get('componentDidUpdate')) {
           const params = {
@@ -248,7 +254,10 @@ export default React => (recycle, streamAdapter) => {
       }
 
       componentWillUnmount () {
-        recycle.emit('componentWillUnmount', component)
+        recycle.emit({
+          event: 'componentWillUnmount',
+          component
+        })
 
         if (this.stateSubsription) {
           this.stateSubsription.unsubscribe()
@@ -263,10 +272,18 @@ export default React => (recycle, streamAdapter) => {
       }
 
       render () {
-        recycle.emit('beforeRender', component)
+        recycle.emit({
+          event: 'beforeRender',
+          component
+        })
+
         if (!component.get('view')) return null
         let toReturn = component.get('view')(this.props, this.state.recycleState)
-        recycle.emit('afterRender', component)
+
+        recycle.emit({
+          event: 'afterRender',
+          component
+        })
         return toReturn
       }
     }
