@@ -7,16 +7,6 @@ export default React => (recycle, streamAdapter) => {
   const $$typeofReactElement = React.createElement(function () {}).$$typeof
   const createElement = React.createElement
 
-  recycle.set('createReactComponent', function (reactComponent, props, rootComponent) {
-    let componentDefinition = reactComponent(props)
-
-    if (componentDefinition.$$typeof === $$typeofReactElement) {
-      componentDefinition = { view: reactComponent }
-    }
-
-    return recycle.createComponent(reactComponent, props, rootComponent, componentDefinition).get('ReactComponent')
-  })
-
   recycle.on('componentInit', component => {
     let registeredNodeStreams = component.getPrivate('registeredNodeStreams') || []
 
