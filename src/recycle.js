@@ -5,7 +5,10 @@ export default function (streamAdapter) {
   const recycleProps = {}
   let rootComponent
 
-  function createComponent (constructor, props, parent, componentDefinition) {
+  // to many function params!
+  // todo: transform createComponent arguments in object
+  // before doing that: improve test coverage
+  function createComponent (constructor, props, parent, componentDefinition, beforeInit) {
     const key = (props) ? props.key : null
     const children = new Set()
     const childrenActions = new Subject()
