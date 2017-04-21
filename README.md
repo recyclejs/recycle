@@ -85,7 +85,8 @@ const Timer = recycle({
 
 ## Replacing Redux Connect
 If you are using Redux (and store object is defined in context),
-Recycle component can also be used as a container (an alternative to Redux `connect`).
+Recycle component can also be used as a container (an alternative to Redux `connect`)
+giving you full controll over component updates.
 
 ```javascript
 export default recycle({
