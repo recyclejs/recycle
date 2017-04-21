@@ -4,7 +4,7 @@
   "plugins": ["edit-link", "github"],
   "pluginsConfig": {
     "theme-default": {
-      "showLevel": true
+      "showLevel": false
     },
     "edit-link": {
       "base": "https://github.com/recyclejs/recycle/tree/master",
