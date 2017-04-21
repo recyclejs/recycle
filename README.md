@@ -10,6 +10,8 @@ npm install --save recycle
 Rather than defining state as an object which will later be overwritten (using `this.setState()`),
 you can define it more declaratively:
 
+[**Webpackbin example**](https://www.webpackbin.com/bins/-KiHSPOMjmY9tz4qYnbv)
+
 ```javascript
 const Timer = recycle({
   initialState: {
@@ -43,8 +45,6 @@ const Timer = recycle({
   }
 })
 ```
-
-[Webpackbin example](https://www.webpackbin.com/bins/-KiHSPOMjmY9tz4qYnbv)
 
 You can also use custom event handlers.
 Just make sure you specify what should be returned:
