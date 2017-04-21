@@ -1,106 +1,139 @@
 # Recycle
+Create React component using [RxJS](https://github.com/ReactiveX/rxjs).
 
-Recycle is a JavaScript library for creating modular applications using [Observable streams](http://reactivex.io/).
-
-With the official *React driver*, 
-it can be used as a [React](https://facebook.github.io/react) component,
-giving you the ability to leverage the power of [RxJS](https://github.com/ReactiveX/rxjs)
-for designing your apps.
-
-[![Join the chat at https://gitter.im/recyclejs](https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square)](https://gitter.im/recyclejs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![npm version](https://img.shields.io/npm/v/recyclejs.svg?style=flat-square)](https://www.npmjs.com/package/recyclejs)
-[![npm downloads](https://img.shields.io/npm/dm/recyclejs.svg?style=flat-square)](https://www.npmjs.com/package/recyclejs)
-
-## Version 2.0 (beta)
-Version 2.0 is not ready yet,
-but if you are interested how to use Recycle in apps not only related to React,
-you can read more about it [here](https://github.com/recyclejs/recycle/blob/v2.0/README.md)
-
-## Why?
-* Use [Observables](http://reactivex.io) for managing async behavior
-* Greater separation of concerns
-* Better component decoupling
-* Manage side effects outside a component definition
-* Use Observables for dispatching actions to [Redux](http://redux.js.org) store
-* No need for another framework - use it as any other React component
-
-## How does it look like?
-Example of writing React component using Recycle:
-<img src="https://cloud.githubusercontent.com/assets/1868852/22227336/192d20fe-e1cb-11e6-8c20-27218a6bc5e2.gif" style="border: 5px solid #1e1e1e" alt="Recycle example" width="600" />
-
-## Quick Start
-The easiest way to get started with Recycle is to use [Create React App](https://github.com/facebookincubator/create-react-app)
-
+## Installation
 ```bash
-npm install -g create-react-app
-
-create-react-app my-app
-cd my-app/
+npm install --save recycle
 ```
 
-When your application is initialized you can install Recycle:
-
-```bash
-npm install --save recyclejs
-```
-
-Create Recycle instance by defining its root component:
+## Example
+Rather than defining state as an object which will later be overwritten (using `this.setState()`),
+you can define it more declaratively:
 
 ```javascript
-import React from 'react'
-import ReactDOM from 'react-dom'
-import Recycle from 'recyclejs'
-import ClickCounter from './ClickCounter'
-
-ReactDOM.render(
-  <Recycle root={ClickCounter} />,
-  document.getElementById('root')
-)
-```
-
-Create a new file, `src/ClickCounter.js`:
-
-```javascript
-import React from 'react';
-
-function ClickCounter () {
-  return {
-    initialState: { 
-      timesClicked: 0 
-    },
-
-    reducers (sources) {
-      return [
-        sources.select('button')
-          .on('click')
-          .reducer(function (state) {
-            state.timesClicked++
-            return state
-          })
-      ]
-    },
-
-    view (props, state) {
-      return (
-        <div>
-          <span>Times clicked: {state.timesClicked}</span>
-          <button>Click me</button>
-        </div>
-      )
-    }
+const Timer = recycle({
+  initialState: {
+    secondsElapsed: 0,
+    counter: 0
+  },
+ 
+  update(sources) {
+    return [
+      sources.select('button')
+        .addListener('onClick')
+        .reducer(state => ({
+          counter: state.counter + 1
+        })),
+      
+      Rx.Observable.interval(1000)
+        .reducer(state => ({
+          secondsElapsed: state.secondsElapsed + 1
+        }))
+    ]
+  },
+ 
+  view(props, state) {
+    return (
+      <div>
+        <div>Seconds Elapsed: {state.secondsElapsed}</div>
+        <div>Times Clicked: {state.counter}</div>
+        <button>Click Me</button>
+      </div>
+    )
   }
-}
-
-export default ClickCounter;
+})
 ```
 
-### Starting Application
+[Webpackbin example](https://www.webpackbin.com/bins/-KiHSPOMjmY9tz4qYnbv)
 
-You can now run your app:
-```bash
-npm start
+You can also use custom event handlers.
+Just make sure you specify what should be returned:
+
+```javascript
+const Timer = recycle({
+  initialState: {
+    secondsElapsed: 0,
+    counter: 0
+  },
+ 
+  update(sources) {
+    return [
+      sources.select('button')
+        .addListener('onClick')
+        .reducer((state, returnedValue) => ({
+          counter: state.counter + returnedValue // returnedValue = 5
+        })),
+      
+      Rx.Observable.interval(1000)
+        .reducer(state => ({
+          secondsElapsed: state.secondsElapsed + 1
+        }))
+    ]
+  },
+ 
+  view(props, state) {
+    return (
+      <div>
+        <div>Seconds Elapsed: {state.secondsElapsed}</div>
+        <div>Times Clicked: {state.counter}</div>
+        <button onClick={e => 5}>Click Me</button>
+      </div>
+    )
+  }
+})
 ```
 
-## Documentation
+## Replacing Redux Connect
+If you are using Redux (and store object is defined in context),
+Recycle component can also be used as a container (an alternative to Redux `connect`).
 
-### [https://recycle.js.org](https://recycle.js.org)
+```javascript
+export default recycle({
+  dispatch (sources) {
+    return [
+      sources.select('div')
+        .addListener('onClick')
+        .mapTo({ type: 'ADD_TODO', text: 'hello from recycle' })
+    ]
+  },
+
+  update (sources) {
+    return [
+      sources.store
+        .reducer(function (state, store) {
+          return {
+            counter: store.todos.length
+          }
+        })
+    ]
+  },
+
+  view (props, state) {
+    return <div><br />Hello{state.counter}</div>
+  }
+})
+```
+
+## What is this? jQuery?
+No.
+
+Although it resembles [query selectors](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), Recycle uses React’s inline event handlers and doesn’t rely on the DOM. Since selection is isolated per component, no child nodes can ever be accessed.
+
+## How does it then find selected nodes?
+It works by monkeypatching `React.createElement`.
+Before component is rendered, for each element,
+if a select query is matched, recycle sets inline event listener.
+
+Each time event handler dispatches an event,
+it calls `selectedNode.rxSubject.next(e)`
+
+## Can I use it with React Native?
+Yes.
+
+Recycle creates classical React component which can be safely used in React Native.
+
+## Previous Version
+Recycle v2.0 is much smaller library from its predecessor.
+It is focussed only on making React components use RxJS for defining component state and handling events.
+
+If you are interested in previous version, check [here](https://github.com/recyclejs/recycle/tree/v1.0)

@@ -1,16 +1,8 @@
 # Generated code
 /index.js
-/recycle.js
-/testutils.js
-/react.js
-/node.js
-/adapter
-/drivers
-/plugins
-/dist
-_book
+/lib
 
 node_modules
 .DS_Store
 npm-debug.log
-/todo
+_book
