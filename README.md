@@ -9,9 +9,6 @@ npm install --save recycle
 ```
 
 ## Example
-Rather than defining state as an object which will later be overwritten (using `this.setState()`),
-you can define it more declaratively:
-
 [**Webpackbin example**](https://www.webpackbin.com/bins/-KiHSPOMjmY9tz4qYnbv)
 
 ```javascript
@@ -127,6 +124,14 @@ export default recycle({
   }
 })
 ```
+
+## Why would I use it?
+- Part of a component logic is seperated from its view presentation.
+- You don't need classes so each part of a component can be defined and tested separately
+- Component description is more consistent.
+  There is no custom `handleClick` events so you don't need to look for `this.setState` statements.
+- State is calculated the same way as for redux store: `state = reducer(state, action)`
+- Redux container looks like a normal component and it's more clear what it does.
 
 ## What is this? jQuery?
 No.
