@@ -110,7 +110,7 @@ export default recycle({
   },
 
   view (props, state) {
-    return <div><br />Hello{state.counter}</div>
+    return <div>Number of todos: {state.counter}</div>
   }
 })
 ```
