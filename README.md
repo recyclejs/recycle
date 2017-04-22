@@ -212,11 +212,11 @@ sources.selectId('node-id')
   There is no custom `handleClick` events or `this.setState` statements that you need to worry about.
 - State is calculated the same way as for redux store: `state = reducer(state, action)`.
 - Redux container looks like a normal component and it's more clear what it does.
-- Start using it in an existing React application (choose components which you wish to convert)
+- Start using it in an existing React application (choose components which you wish to convert).
 
 ### Why would I NOT use it?
 - Observables is not your thing.
-- You need more controll over component lifecycle
+- You need more controll over component lifecycle (`shouldComponentUpdate`, `componentDidMount`)
 
 ### What is this? jQuery?
 No.
