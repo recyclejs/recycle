@@ -1,7 +1,9 @@
 import Rx from 'rxjs'
+import { Subject } from 'rxjs/Subject'
 import ReactNpm from 'react'
 import PropTypes from 'prop-types'
 import forceArray from './forceArray'
+import shallowClone from './shallowClone'
 import registerListeners from './registerListeners'
 import customCreateElement from './customCreateElement'
 import updateNodeStreams from './updateNodeStreams'
@@ -21,9 +23,12 @@ function recycle (component, React) {
   const sources = {
     select: registerListeners(listeners, 'tag'),
     selectClass: registerListeners(listeners, 'class'),
-    selectId: registerListeners(listeners, 'id')
+    selectId: registerListeners(listeners, 'id'),
+    state: new Subject(),
+    props: new Subject()
   }
 
+  let componentState = component.initialState
   class RecycleComponent extends React.Component {
     componentWillMount () {
       // create redux store stream
@@ -44,14 +49,15 @@ function recycle (component, React) {
       }
 
       // handling component state with update() stream
-      this.state = component.initialState
+      this.state = componentState
       if (component.update) {
         const state$ = Rx.Observable.merge(...forceArray(component.update(sources)))
         this.__stateSubsription = state$.subscribe(newVal => {
           if (this.__componentMounted) {
-            this.setState(newVal.reducer(this.state, newVal.event))
+            componentState = shallowClone(newVal.reducer(componentState, newVal.event))
+            this.setState(componentState)
           } else {
-            this.state = newVal.reducer(this.state, newVal.event)
+            componentState = newVal.reducer(componentState, newVal.event)
           }
         })
       }
@@ -60,10 +66,14 @@ function recycle (component, React) {
     componentDidMount () {
       this.__componentMounted = true
       updateNodeStreams(listeners, nodeStreams)
+      sources.state.next(componentState)
+      sources.props.next(this.props)
     }
 
     componentDidUpdate () {
       updateNodeStreams(listeners, nodeStreams)
+      sources.state.next(componentState)
+      sources.props.next(this.props)
     }
 
     componentWillUnmount () {
@@ -78,7 +88,7 @@ function recycle (component, React) {
     render () {
       nodeStreams = []
       React.createElement = customCreateElement(listeners, nodeStreams, originalCreateElement)
-      const view = component.view(this.props, this.state)
+      const view = component.view(this.props, componentState)
       React.createElement = originalCreateElement
       return view
     }
