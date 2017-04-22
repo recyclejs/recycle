@@ -23,14 +23,16 @@ const Timer = recycle({
     return [
       sources.select('button')
         .addListener('onClick')
-        .reducer(state => ({
-          counter: state.counter + 1
-        })),
+        .reducer(function (state) {
+          state.counter = state.counter + 1
+          return state
+        }),
       
       Rx.Observable.interval(1000)
-        .reducer(state => ({
-          secondsElapsed: state.secondsElapsed + 1
-        }))
+        .reducer(function (state) {
+          state.secondsElapsed = state.secondsElapsed + 1
+          return state
+        })
     ]
   },
  
@@ -60,14 +62,17 @@ const Timer = recycle({
     return [
       sources.select('button')
         .addListener('onClick')
-        .reducer((state, returnedValue) => ({
-          counter: state.counter + returnedValue // returnedValue = 5
-        })),
+        .reducer(function (state) {
+          state.counter = state.counter + 1
+          return state
+        }),
       
       Rx.Observable.interval(1000)
-        .reducer(state => ({
-          secondsElapsed: state.secondsElapsed + 1
-        }))
+        .reducer(function (state, returnedValue) {
+          // returnedValue = 5
+          state.secondsElapsed = state.secondsElapsed + returnedValue
+          return state
+        })
     ]
   },
  
