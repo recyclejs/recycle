@@ -84,7 +84,8 @@ const Timer = recycle({
 If you are using Redux,
 Recycle component can also be used as a container (an alternative to Redux `connect`).
 
-Advantage of this approach is full controll over component rerendering (components will not be forceUpdated when state changes).
+Advantage of this approach is full controll over component rerendering (components will not be *forceUpdated* when state changes).
+
 Also, you can listen only a specific part of state and update only if it's changed.
 
 ```javascript
@@ -105,8 +106,8 @@ export default recycle({
         })
 
       /** 
-      * Example of Subscription on a specifing store propery
-      * unsing distinctUntilChanged() Component will be updated only when it's changed
+      * Example of Subscription on a specifing store property
+      * with distinctUntilChanged() Component will be updated only when property is changed
       *
       * sources.store
       *   .map(s => s.specificProperty)
@@ -124,21 +125,109 @@ export default recycle({
   }
 })
 ```
+## API
+Component description object accepts following properties:
 
-## Why would I use it?
+```javascript
+{
+  propTypes,
+  displayName,
+  initialState,
+  dispatch,
+  update,
+  view
+}
+```
+
+In `update` and `dispatch` functions, you can use the following sources:
+
+```javascript
+/**
+*   sources.select
+*
+*   select node by tag name or child component
+*/
+sources.select('tag')
+  .addListener('event')
+
+sources.select(ChildComponent)
+  .addListener('event')
+
+/**
+*   sources.selectClass
+*
+*   select node by class name
+*/
+sources.selectClass('classname')
+  .addListener('event')
+
+/**
+*   sources.selectId
+*
+*   select node by its id
+*/
+sources.selectId('node-id')
+  .addListener('event')
+
+/**
+*   sources.store
+*
+*   If you are using redux (component is inside Provider)
+*   sources.store will emit its state changes
+*/
+  sources.store
+
+/**
+*   sources.state
+*
+*   Stream of current local component state
+*/
+  sources.select('input')
+    .addListener('onKeyPress')
+    .filter(e => e.key === 'Enter')
+    .withLatestFrom(sources.state)
+    .map(([e, state]) => state.newItemInput)
+    .map(addRepoInputSubmitted)
+
+/**
+*   sources.props
+*
+*   Stream of current local component props
+*/
+  sources.select('input')
+    .addListener('onKeyPress')
+    .filter(e => e.key === 'Enter')
+    .withLatestFrom(sources.props)
+    .map(([e, props]) => props.newItemInput)
+    .map(addRepoInputSubmitted)
+```
+
+## FAQ
+
+### Why would I use it?
 - Part of a component logic is seperated from its view presentation.
-- You don't need classes so each part of a component can be defined and tested separately
+- You don't need classes so each part of a component can be defined and tested separately.
 - Component description is more consistent.
-  There is no custom `handleClick` events so you don't need to look for `this.setState` statements.
-- State is calculated the same way as for redux store: `state = reducer(state, action)`
+  There is no custom `handleClick` events or `this.setState` statements that you need to worry about.
+- State is calculated the same way as for redux store: `state = reducer(state, action)`.
 - Redux container looks like a normal component and it's more clear what it does.
+- Start using it in an existing React application (choose components which you wish to convert)
 
-## What is this? jQuery?
+### Why would I NOT use it?
+- Observables is not your thing.
+- You need more controll over component lifecycle
+
+### What is this? jQuery?
 No.
 
 Although it resembles [query selectors](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), Recycle uses React’s inline event handlers and doesn’t rely on the DOM. Since selection is isolated per component, no child nodes can ever be accessed.
 
-## How does it then find selected nodes?
+### Can I use CSS selectors?
+No.
+
+Since Recycle doesn't query over your nodes, selectors like `div .class` will not work.
+
+### How does it then find selected nodes?
 It works by monkeypatching `React.createElement`.
 Before component is rendered, for each element,
 if a select query is matched, recycle sets inline event listener.
@@ -146,7 +235,7 @@ if a select query is matched, recycle sets inline event listener.
 Each time event handler dispatches an event,
 it calls `selectedNode.rxSubject.next(e)`
 
-## Can I use it with React Native?
+### Can I use it with React Native?
 Yes.
 
 Recycle creates classical React component which can be safely used in React Native.
