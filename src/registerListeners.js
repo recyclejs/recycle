@@ -1,6 +1,4 @@
-import { Subject } from 'rxjs/Subject'
-
-const registerListeners = (listeners, selectorType) => selector => ({
+const registerListeners = Rx => (listeners, selectorType) => selector => ({
   addListener: event => {
     let ref = listeners
       .filter(ref => ref.selector === selector)
@@ -12,7 +10,7 @@ const registerListeners = (listeners, selectorType) => selector => ({
         selector,
         selectorType,
         event,
-        stream: new Subject()
+        stream: new Rx.Subject()
       }
       listeners.push(ref)
     }

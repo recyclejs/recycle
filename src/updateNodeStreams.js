@@ -1,6 +1,4 @@
-import { Observable } from 'rxjs/Observable'
-
-function updateNodeStreams (listeners, nodeStreams) {
+export default Rx => function updateNodeStreams (listeners, nodeStreams) {
   listeners.forEach(regRef => {
     const streams = nodeStreams
       .filter(ref => ref.selector === regRef.selector)
@@ -9,9 +7,7 @@ function updateNodeStreams (listeners, nodeStreams) {
       .map(ref => ref.stream)
 
     if (streams.length) {
-      regRef.stream.next((streams.length === 1) ? streams[0] : Observable.merge(...streams))
+      regRef.stream.next((streams.length === 1) ? streams[0] : Rx.Observable.merge(...streams))
     }
   })
 }
-
-export default updateNodeStreams
