@@ -85,8 +85,10 @@ const Timer = recycle({
 
 ## Replacing Redux Connect
 If you are using Redux (and store object is defined in context),
-Recycle component can also be used as a container (an alternative to Redux `connect`)
-giving you full controll over component updates.
+Recycle component can also be used as a container (an alternative to Redux `connect`).
+
+Advantage of this approach is full controll over component updates - components will not be forceUpdated when state is changed.
+Also, you can listen only a specific part of state and update only if it's changed.
 
 ```javascript
 export default recycle({
@@ -102,15 +104,26 @@ export default recycle({
     return [
       sources.store
         .reducer(function (state, store) {
-          return {
-            todosNum: store.todos.length
-          }
+          return store
         })
+
+      /** 
+      * Example of Subscription on a specifing store propery
+      * unsing distinctUntilChanged() Component will be updated only when it's changed
+      *
+      * sources.store
+      *   .map(s => s.specificProperty)
+      *   .distinctUntilChanged()
+      *   .reducer(function (state, specificProperty) {
+      *     state.something = specificProperty
+      *     return state
+      *   })
+      */
     ]
   },
 
   view (props, state) {
-    return <div>Number of todos: {state.todosNum}</div>
+    return <div>Number of todos: {store.todos.length}</div>
   }
 })
 ```
