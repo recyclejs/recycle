@@ -206,7 +206,7 @@ sources.selectId('node-id')
 ## FAQ
 
 ### Why would I use it?
-- Part of a component logic is seperated from its view presentation.
+- Greater separation of concerns between component presentation and component logic
 - You don't need classes so each part of a component can be defined and tested separately.
 - Component description is more consistent.
   There is no custom `handleClick` events or `this.setState` statements that you need to worry about.
