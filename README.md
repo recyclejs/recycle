@@ -103,14 +103,14 @@ export default recycle({
       sources.store
         .reducer(function (state, store) {
           return {
-            counter: store.todos.length
+            todosNum: store.todos.length
           }
         })
     ]
   },
 
   view (props, state) {
-    return <div>Number of todos: {state.counter}</div>
+    return <div>Number of todos: {state.todosNum}</div>
   }
 })
 ```
