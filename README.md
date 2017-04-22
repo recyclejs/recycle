@@ -137,4 +137,4 @@ Recycle creates classical React component which can be safely used in React Nati
 Recycle v2.0 is much smaller library from its predecessor.
 It is focussed only on making React components use RxJS for defining component state and handling events.
 
-If you are interested in previous version, check [here](https://github.com/recyclejs/recycle/tree/v1.0)
+If you are interested in previous version, check [here](https://github.com/recyclejs/recycle/tree/v1.2.1)
