@@ -1,5 +1,5 @@
 # Recycle
-Create React component using [RxJS](https://github.com/ReactiveX/rxjs).
+Write React components functional/reactive style using [RxJS](https://github.com/ReactiveX/rxjs).
 
 ## Installation
 ```bash
