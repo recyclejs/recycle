@@ -84,7 +84,7 @@ const Timer = recycle({
 ```
 
 ## Replacing Redux Connect
-If you are using Redux (and store object is defined in context),
+If you are using Redux,
 Recycle component can also be used as a container (an alternative to Redux `connect`).
 
 Advantage of this approach is full controll over component updates - components will not be forceUpdated when state is changed.
