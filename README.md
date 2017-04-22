@@ -130,12 +130,12 @@ Component description object accepts following properties:
 
 ```javascript
 {
-  propTypes,
-  displayName,
-  initialState,
-  dispatch,
-  update,
-  view
+  propTypes: { name: PropTypes.string },
+  displayName: 'ComponentName',
+  initialState: {},
+  dispatch: function(sources) { return Observable },
+  update: function(sources) { return Observable },
+  view: function(props, state) { return JSX }
 }
 ```
 
@@ -176,6 +176,7 @@ sources.selectId('node-id')
 *   sources.store will emit its state changes
 */
   sources.store
+    .reducer(...)
 
 /**
 *   sources.state
