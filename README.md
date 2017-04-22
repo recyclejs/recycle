@@ -50,29 +50,23 @@ const Timer = recycle({
 })
 ```
 
-You can also use custom event handlers.
+You can also listen other components or define custom event handlers.
 Just make sure you specify what should be returned:
 
 ```javascript
+import CustomButton from './CustomButton'
+
 const Timer = recycle({
   initialState: {
-    secondsElapsed: 0,
     counter: 0
   },
  
   update(sources) {
     return [
-      sources.select('button')
-        .addListener('onClick')
-        .reducer(function (state) {
-          state.counter = state.counter + 1
-          return state
-        }),
-      
-      Rx.Observable.interval(1000)
+      sources.select(CustomButton)
+        .addListener('customOnClick')
         .reducer(function (state, returnedValue) {
-          // returnedValue = 5
-          state.secondsElapsed = state.secondsElapsed + returnedValue
+          state.counter = state.counter + returnedValue
           return state
         })
     ]
@@ -81,9 +75,8 @@ const Timer = recycle({
   view(props, state) {
     return (
       <div>
-        <div>Seconds Elapsed: {state.secondsElapsed}</div>
         <div>Times Clicked: {state.counter}</div>
-        <button onClick={e => 5}>Click Me</button>
+        <CustomButton customOnClick={e => e.something}>Click Me</CustomButton>
       </div>
     )
   }
