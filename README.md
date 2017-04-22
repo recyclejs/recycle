@@ -1,5 +1,7 @@
 # Recycle
-Write React components functional/reactive style using [RxJS](https://github.com/ReactiveX/rxjs).
+Convert functional/reactive object description into React component.
+
+You don't need another UI framework if you want to use [RxJS](https://github.com/ReactiveX/rxjs).
 
 ## Installation
 ```bash
