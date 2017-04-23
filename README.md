@@ -88,7 +88,7 @@ const Timer = recycle({
 If you are using Redux,
 Recycle component can also be used as a container (an alternative to Redux `connect`).
 
-Advantage of this approach is full controll over component rerendering (components will not be *forceUpdated* when state changes).
+Advantage of this approach is that you have full controll over component rerendering (components will not be *forceUpdated* "from the outside" like in redux `connect`).
 
 Also, you can listen for a specific part of the state and update your component only if the state is changed.
 
