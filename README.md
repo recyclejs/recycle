@@ -51,7 +51,7 @@ const Timer = recycle({
 })
 ```
 
-You can also listen other components or define custom event handlers.
+You can also listen child components or define custom event handlers.
 Just make sure you specify what should be returned:
 
 ```javascript
