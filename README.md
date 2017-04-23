@@ -90,7 +90,7 @@ Recycle component can also be used as a container (an alternative to Redux `conn
 
 Advantage of this approach is full controll over component rerendering (components will not be *forceUpdated* when state changes).
 
-Also, you can listen for a specific part of the state and update component only when it changes.
+Also, you can listen for a specific part of the state and update your component only if the state is changed.
 
 ```javascript
 export default recycle({
