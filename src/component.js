@@ -20,6 +20,7 @@ export default (React, Rx) => function recycle (component) {
     select: registerListeners(listeners, 'tag'),
     selectClass: registerListeners(listeners, 'class'),
     selectId: registerListeners(listeners, 'id'),
+    lifecycle: new Rx.Subject(),
     state: new Rx.Subject(),
     props: new Rx.Subject()
   }
@@ -64,15 +65,18 @@ export default (React, Rx) => function recycle (component) {
       updateNodeStreams(listeners, nodeStreams)
       sources.state.next(componentState)
       sources.props.next(this.props)
+      sources.lifecycle.next('componentDidMount')
     }
 
     componentDidUpdate () {
       updateNodeStreams(listeners, nodeStreams)
       sources.state.next(componentState)
       sources.props.next(this.props)
+      sources.lifecycle.next('componentDidUpdate')
     }
 
     componentWillUnmount () {
+      sources.lifecycle.next('componentWillUnmount')
       if (this.__stateSubsription) {
         this.__stateSubsription.unsubscribe()
       }
