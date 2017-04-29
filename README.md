@@ -22,24 +22,24 @@ const Timer = recycle({
     counter: 0
   },
  
-  update(sources) {
+  update (sources) {
     return [
       sources.select('button')
         .addListener('onClick')
         .reducer(function (state) {
-          state.counter = state.counter + 1
+          state.counter++
           return state
         }),
       
       Rx.Observable.interval(1000)
         .reducer(function (state) {
-          state.secondsElapsed = state.secondsElapsed + 1
+          state.secondsElapsed++
           return state
         })
     ]
   },
  
-  view(props, state) {
+  view (props, state) {
     return (
       <div>
         <div>Seconds Elapsed: {state.secondsElapsed}</div>
@@ -62,7 +62,7 @@ const Timer = recycle({
     counter: 0
   },
  
-  update(sources) {
+  update (sources) {
     return [
       sources.select(CustomButton)
         .addListener('customOnClick')
@@ -73,7 +73,7 @@ const Timer = recycle({
     ]
   },
  
-  view(props, state) {
+  view (props, state) {
     return (
       <div>
         <div>Times Clicked: {state.counter}</div>
@@ -98,7 +98,7 @@ export default recycle({
     return [
       sources.select('div')
         .addListener('onClick')
-        .mapTo({ type: 'ADD_TODO', text: 'hello from recycle' })
+        .mapTo({ type: 'REDUX_ACTION_TYPE', text: 'hello from recycle' })
     ]
   },
 
@@ -110,8 +110,8 @@ export default recycle({
         })
 
       /** 
-      * Example of Subscription on a specifing store property
-      * with distinctUntilChanged() Component will be updated only when property is changed
+      * Example of a subscription on a specific store property
+      * with distinctUntilChanged() component will be updated only when that property is changed
       *
       * sources.store
       *   .map(s => s.specificProperty)
@@ -129,6 +129,36 @@ export default recycle({
   }
 })
 ```
+
+## Effects
+If you don't need to update a component local state or dispatch Redux action,
+but you still need to react on some kind of async operation, you can use `effects`.
+
+Recycle will subscribe to this stream but it will not use it.
+It is intended for making side effects (like calling callback functions passed from a parent component)
+
+```javascript
+const Timer = recycle({
+ 
+  effects (sources) {
+    return [
+      sources.select('input')
+        .addListener('onKeyPress')
+        .withLatestFrom(sources.props)
+        .map(([e, props]) => {
+          props.callParentFunction(e.target.value)
+        })
+    ]
+  },
+ 
+  view (props) {
+    return (
+      <input placeholder={props.defaultValue}></input>
+    )
+  }
+})
+```
+
 ## API
 Component description object accepts following properties:
 
@@ -139,6 +169,7 @@ Component description object accepts following properties:
   initialState: {},
   dispatch: function(sources) { return Observable },
   update: function(sources) { return Observable },
+  effects: function(sources) { return Observable },
   view: function(props, state) { return JSX }
 }
 ```
@@ -191,8 +222,8 @@ sources.selectId('node-id')
     .addListener('onKeyPress')
     .filter(e => e.key === 'Enter')
     .withLatestFrom(sources.state)
-    .map(([e, state]) => state.newItemInput)
-    .map(addRepoInputSubmitted)
+    .map(([e, state]) => state.someStateValue)
+    .map(someStateValue => using(someStateValue))
 
 /**
 *   sources.props
@@ -203,8 +234,17 @@ sources.selectId('node-id')
     .addListener('onKeyPress')
     .filter(e => e.key === 'Enter')
     .withLatestFrom(sources.props)
-    .map(([e, props]) => props.newItemInput)
-    .map(addRepoInputSubmitted)
+    .map(([e, props]) => props.somePropsValue)
+    .map(somePropsValue => using(somePropsValue))
+
+/**
+*   sources.lifecycle
+*
+*   Stream of component lifecycle events
+*/
+  sources.lifecycle
+    .filter(e => === 'componentDidMount')
+    .do(something)
 ```
 
 ## FAQ
@@ -244,9 +284,3 @@ it calls `selectedNode.rxSubject.next(e)`
 Yes.
 
 Recycle creates classical React component which can be safely used in React Native.
-
-## Previous Version
-Recycle v2.0 is much smaller library from its predecessor.
-It is focussed only on making React components use RxJS for defining component state and handling events.
-
-If you are interested in previous version, check [here](https://github.com/recyclejs/recycle/tree/v1.2.1)
