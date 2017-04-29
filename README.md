@@ -51,7 +51,7 @@ const Timer = recycle({
 })
 ```
 
-You can also listen other components or define custom event handlers.
+You can also listen on child component events and define custom event handlers.
 Just make sure you specify what should be returned:
 
 ```javascript
@@ -88,9 +88,9 @@ const Timer = recycle({
 If you are using Redux,
 Recycle component can also be used as a container (an alternative to Redux `connect`).
 
-Advantage of this approach is full controll over component rerendering (components will not be *forceUpdated* when state changes).
+Advantage of this approach is that you have full controll over component rerendering (components will not be *forceUpdated* "from the outside").
 
-Also, you can listen only a specific part of state and update only if it's changed.
+Also, you can listen for a specific part of the state and update your component only if the state is changed.
 
 ```javascript
 export default recycle({
@@ -256,7 +256,7 @@ sources.selectId('node-id')
   There is no custom `handleClick` events or `this.setState` statements that you need to worry about.
 - State is calculated the same way as for redux store: `state = reducer(state, action)`.
 - Redux container looks like a normal component and it's more clear what it does.
-- Start using it in an existing React application (choose components which you wish to convert).
+- Easy to use in an existing React application (choose components which you wish to convert).
 
 ### Why would I NOT use it?
 - Observables is not your thing.
