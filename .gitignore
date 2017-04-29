@@ -1,6 +1,7 @@
 # Generated code
 /index.js
 /lib
+/dist
 
 node_modules
 .DS_Store
