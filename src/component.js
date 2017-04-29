@@ -58,6 +58,13 @@ export default (React, Rx) => function recycle (component) {
           }
         })
       }
+
+      if (component.effects) {
+        const effects$ = Rx.Observable.merge(...forceArray(component.effects(sources)))
+        this.__effectsSubsription = effects$.subscribe(function () {
+          // intentionally empty
+        })
+      }
     }
 
     componentDidMount () {
@@ -82,6 +89,9 @@ export default (React, Rx) => function recycle (component) {
       }
       if (this.__eventsSubsription) {
         this.__eventsSubsription.unsubscribe()
+      }
+      if (this.__effectsSubsription) {
+        this.__effectsSubsription.unsubscribe()
       }
     }
 
