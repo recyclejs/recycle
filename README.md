@@ -88,9 +88,9 @@ const Timer = recycle({
 If you are using Redux,
 Recycle component can also be used as a container (an alternative to Redux `connect`).
 
-Advantage of this approach is that you have full controll over component rerendering (components will not be *forceUpdated* "from the outside").
+The advantage of this approach is that you have full control over component rerendering (components will not be forceUpdated "from the outside").
 
-Also, you can listen for a specific part of the state and update your component only if the state is changed.
+Also, you can listen to a specific part of the state and update your component only if the state is changed.
 
 ```javascript
 export default recycle({
@@ -132,7 +132,7 @@ export default recycle({
 
 ## Effects
 If you don't need to update a component local state or dispatch Redux action,
-but you still need to react on some kind of async operation, you can use `effects`.
+but you still need to react to some kind of async operation, you can use `effects`.
 
 Recycle will subscribe to this stream but it will not use it.
 It is intended for making side effects (like calling callback functions passed from a parent component)
@@ -254,13 +254,13 @@ sources.selectId('node-id')
 - You don't need classes so each part of a component can be defined and tested separately.
 - Component description is more consistent.
   There is no custom `handleClick` events or `this.setState` statements that you need to worry about.
-- State is calculated the same way as for redux store: `state = reducer(state, action)`.
+- The State is calculated the same way as for redux store: `state = reducer(state, action)`.
 - Redux container looks like a normal component and it's more clear what it does.
 - Easy to use in an existing React application (choose components which you wish to convert).
 
 ### Why would I NOT use it?
-- Observables is not your thing.
-- You need more controll over component lifecycle (`shouldComponentUpdate`, `componentDidMount`)
+- Observables are not your thing.
+- You need more control over component lifecycle (`shouldComponentUpdate`, `componentDidMount`)
 
 ### What is this? jQuery?
 No.
@@ -274,7 +274,7 @@ Since Recycle doesn't query over your nodes, selectors like `div .class` will no
 
 ### How does it then find selected nodes?
 It works by monkeypatching `React.createElement`.
-Before component is rendered, for each element,
+Before a component is rendered, for each element,
 if a select query is matched, recycle sets inline event listener.
 
 Each time event handler dispatches an event,
