@@ -243,7 +243,7 @@ sources.selectId('node-id')
 *   Stream of component lifecycle events
 */
   sources.lifecycle
-    .filter(e => === 'componentDidMount')
+    .filter(e => e === 'componentDidMount')
     .do(something)
 ```
 
