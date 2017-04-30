@@ -174,7 +174,7 @@ Component description object accepts following properties:
 }
 ```
 
-In `update` and `dispatch` functions, you can use the following sources:
+In `update`, `dispatch` and `effects` functions, you can use the following sources:
 
 ```javascript
 /**
