@@ -17,4 +17,5 @@ const Rx = {
 }
 
 const recycle = component(React, Rx)
+export { reducer } from './customRxOperators'
 export default recycle
