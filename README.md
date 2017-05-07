@@ -16,8 +16,6 @@ npm install --save recycle
 [**Webpackbin example**](https://www.webpackbin.com/bins/-KiHSPOMjmY9tz4qYnbv)
 
 ```javascript
-import { reducer } from 'recycle'
-
 const Timer = recycle({
   initialState: {
     secondsElapsed: 0,
@@ -28,16 +26,16 @@ const Timer = recycle({
     return [
       sources.select('button')
         .addListener('onClick')
-        .let(reducer(function (state) {
+        .reducer(function (state) {
           state.counter++
           return state
-        })),
+        }),
       
       Rx.Observable.interval(1000)
-        .let(reducer(function (state) {
+        .reducer(function (state) {
           state.secondsElapsed++
           return state
-        }))
+        })
     ]
   },
  
@@ -68,10 +66,10 @@ const Timer = recycle({
     return [
       sources.select(CustomButton)
         .addListener('customOnClick')
-        .let(reducer(function (state, returnedValue) {
+        .reducer(function (state, returnedValue) {
           state.counter = state.counter + returnedValue
           return state
-        }))
+        })
     ]
   },
  
@@ -107,9 +105,9 @@ export default recycle({
   update (sources) {
     return [
       sources.store
-        .let(reducer(function (state, store) {
+        .reducer(function (state, store) {
           return store
-        }))
+        })
 
       /** 
       * Example of a subscription on a specific store property
@@ -118,10 +116,10 @@ export default recycle({
       * sources.store
       *   .map(s => s.specificProperty)
       *   .distinctUntilChanged()
-      *   .let(reducer(function (state, specificProperty) {
+      *   .reducer(function (state, specificProperty) {
       *     state.something = specificProperty
       *     return state
-      *   }))
+      *   })
       */
     ]
   },
@@ -213,7 +211,7 @@ sources.selectId('node-id')
 *   sources.store will emit its state changes
 */
   sources.store
-    .let(reducer(...))
+    .reducer(...)
 
 /**
 *   sources.state

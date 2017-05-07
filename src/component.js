@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import forceArray from './forceArray'
 import shallowClone from './shallowClone'
+import customRxOperators from './customRxOperators'
 import _makeUpdateNodeStreams from './updateNodeStreams'
 import _makeRegisterListeners from './registerListeners'
 import _makeCustomCreateElement from './customCreateElement'
@@ -9,6 +10,7 @@ export default (React, Rx) => function recycle (component) {
   const customCreateElement = _makeCustomCreateElement(Rx)
   const registerListeners = _makeRegisterListeners(Rx)
   const updateNodeStreams = _makeUpdateNodeStreams(Rx)
+  customRxOperators(Rx)
 
   const originalCreateElement = React.createElement
   const listeners = []
