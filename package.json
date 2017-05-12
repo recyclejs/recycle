@@ -4,6 +4,8 @@
   "description": "A functional and reactive library for React",
   "main": "lib/index.js",
   "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
     "prepublish": "npm run build && npm run build:umd && npm run build:umd:min",
     "build:umd": "browserify lib/index.js -o dist/recycle.js -s recycle && echo \"recycle = recycle.default;\" >> dist/recycle.js",
     "build:umd:min": "NODE_ENV=production uglifyjs --compress --mangle -o dist/recycle.min.js -- dist/recycle.js",
@@ -35,6 +37,7 @@
     "browserify": "^13.3.0",
     "classnames": "^2.2.5",
     "css-loader": "^0.25.0",
+    "enzyme": "^2.8.2",
     "eslint": "^3.9.1",
     "eslint-config-standard": "^6.2.1",
     "eslint-config-standard-react": "^4.2.0",
@@ -43,8 +46,9 @@
     "eslint-plugin-standard": "^2.0.1",
     "gitbook-cli": "^2.3.0",
     "jest": "^17.0.3",
+    "react-dom": "^15.5.4",
     "react-router": "^3.0.0",
-    "react-test-renderer": "^15.4.1",
+    "react-test-renderer": "^15.5.4",
     "redux": "^3.6.0",
     "style-loader": "^0.13.1",
     "uglify-js": "^2.7.5"
