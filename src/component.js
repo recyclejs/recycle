@@ -10,57 +10,58 @@ export default (React, Rx) => function recycle (component) {
   const customCreateElement = _makeCustomCreateElement(Rx)
   const registerListeners = _makeRegisterListeners(Rx)
   const updateNodeStreams = _makeUpdateNodeStreams(Rx)
+  const originalCreateElement = React.createElement
   customRxOperators(Rx)
 
-  const originalCreateElement = React.createElement
-  const listeners = []
-  let nodeStreams = []
-
-  const sources = {
-    select: registerListeners(listeners, 'tag'),
-    selectClass: registerListeners(listeners, 'class'),
-    selectId: registerListeners(listeners, 'id'),
-    lifecycle: new Rx.Subject(),
-    state: new Rx.Subject(),
-    props: new Rx.Subject()
-  }
-
-  let componentState = component.initialState
   class RecycleComponent extends React.Component {
     componentWillMount () {
+      this.listeners = []
+      this.nodeStreams = []
+
+      this.sources = {
+        select: registerListeners(this.listeners, 'tag'),
+        selectClass: registerListeners(this.listeners, 'class'),
+        selectId: registerListeners(this.listeners, 'id'),
+        lifecycle: new Rx.Subject(),
+        state: new Rx.Subject(),
+        props: new Rx.Subject()
+      }
+
+      this.componentState = component.initialState
+
       // create redux store stream
       if (this.context && this.context.store) {
         const store = this.context.store
-        sources.store = new Rx.BehaviorSubject(store.getState())
-        store.subscribe(function () {
-          sources.store.next(store.getState())
+        this.sources.store = new Rx.BehaviorSubject(store.getState())
+        store.subscribe(() => {
+          this.sources.store.next(store.getState())
         })
       }
 
       // dispatch events to redux store
       if (component.dispatch && this.context && this.context.store) {
-        const events$ = Rx.Observable.merge(...forceArray(component.dispatch(sources)))
+        const events$ = Rx.Observable.merge(...forceArray(component.dispatch(this.sources)))
         this.__eventsSubsription = events$.subscribe((a) => {
           this.context.store.dispatch(a)
         })
       }
 
       // handling component state with update() stream
-      this.state = componentState
+      this.state = this.componentState
       if (component.update) {
-        const state$ = Rx.Observable.merge(...forceArray(component.update(sources)))
+        const state$ = Rx.Observable.merge(...forceArray(component.update(this.sources)))
         this.__stateSubsription = state$.subscribe(newVal => {
           if (this.__componentMounted) {
-            componentState = shallowClone(newVal.reducer(componentState, newVal.event))
-            this.setState(componentState)
+            this.componentState = shallowClone(newVal.reducer(this.componentState, newVal.event))
           } else {
-            componentState = newVal.reducer(componentState, newVal.event)
+            this.componentState = newVal.reducer(this.componentState, newVal.event)
           }
+          this.setState(this.componentState)
         })
       }
 
       if (component.effects) {
-        const effects$ = Rx.Observable.merge(...forceArray(component.effects(sources)))
+        const effects$ = Rx.Observable.merge(...forceArray(component.effects(this.sources)))
         this.__effectsSubsription = effects$.subscribe(function () {
           // intentionally empty
         })
@@ -69,21 +70,18 @@ export default (React, Rx) => function recycle (component) {
 
     componentDidMount () {
       this.__componentMounted = true
-      updateNodeStreams(listeners, nodeStreams)
-      sources.state.next(componentState)
-      sources.props.next(this.props)
-      sources.lifecycle.next('componentDidMount')
+      this.sources.lifecycle.next('componentDidMount')
     }
 
     componentDidUpdate () {
-      updateNodeStreams(listeners, nodeStreams)
-      sources.state.next(componentState)
-      sources.props.next(this.props)
-      sources.lifecycle.next('componentDidUpdate')
+      updateNodeStreams(this.listeners, this.nodeStreams)
+      this.sources.state.next(this.componentState)
+      this.sources.props.next(this.props)
+      this.sources.lifecycle.next('componentDidUpdate')
     }
 
     componentWillUnmount () {
-      sources.lifecycle.next('componentWillUnmount')
+      this.sources.lifecycle.next('componentWillUnmount')
       if (this.__stateSubsription) {
         this.__stateSubsription.unsubscribe()
       }
@@ -96,10 +94,15 @@ export default (React, Rx) => function recycle (component) {
     }
 
     render () {
-      nodeStreams = []
-      React.createElement = customCreateElement(listeners, nodeStreams, originalCreateElement)
-      const view = component.view(this.props, componentState)
+      this.nodeStreams = []
+      React.createElement = customCreateElement(this.listeners, this.nodeStreams, originalCreateElement)
+      const view = component.view(this.props, this.componentState)
       React.createElement = originalCreateElement
+
+      updateNodeStreams(this.listeners, this.nodeStreams)
+      this.sources.state.next(this.componentState)
+      this.sources.props.next(this.props)
+
       return view
     }
   }
