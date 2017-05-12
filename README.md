@@ -88,9 +88,9 @@ const Timer = recycle({
 If you are using Redux,
 Recycle component can also be used as a container (an alternative to Redux `connect`).
 
-The advantage of this approach is that you have full control over component rerendering (components will not be forceUpdated "from the outside").
+The advantage of this approach is that you have full control over component rerendering (components will not be "forceUpdated" magically).
 
-Also, you can listen to a specific part of the state and update your component only if the state is changed.
+Also, you can listen to a specific part of the state and update your component only if that property is changed.
 
 ```javascript
 export default recycle({
@@ -174,7 +174,7 @@ Component description object accepts following properties:
 }
 ```
 
-In `update` and `dispatch` functions, you can use the following sources:
+In `update`, `dispatch` and `effects` functions, you can use the following sources:
 
 ```javascript
 /**
@@ -260,7 +260,7 @@ sources.selectId('node-id')
 
 ### Why would I NOT use it?
 - Observables are not your thing.
-- You need more control over component lifecycle (`shouldComponentUpdate`, `componentDidMount`)
+- You need more control over component lifecycle (like `shouldComponentUpdate`)
 
 ### What is this? jQuery?
 No.
