@@ -1,8 +1,8 @@
 import React from 'react'
-import recycle from 'recycle/component'
+import recycle from 'recycle'
 import Rx from 'rxjs'
 
-const Timer = recycle(React, Rx)({
+const Timer = recycle({
   initialState: {
     secondsElapsed: 0,
     counter: 0

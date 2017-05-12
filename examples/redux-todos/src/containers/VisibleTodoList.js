@@ -1,6 +1,5 @@
 import React from 'react'
-import recycle from 'recycle/component'
-import Rx from 'rxjs'
+import recycle from 'recycle'
 import { toggleTodo } from '../actions'
 import TodoList from '../components/TodoList'
 
@@ -17,7 +16,7 @@ const getVisibleTodos = (todos, filter) => {
   }
 }
 
-const VisibleTodoList = recycle(React, Rx)({
+const VisibleTodoList = recycle({
   dispatch (sources) {
     return sources.select(TodoList)
       .addListener('onTodoClick')

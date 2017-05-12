@@ -1,9 +1,8 @@
 import React from 'react'
-import recycle from 'recycle/component'
-import Rx from 'rxjs'
+import recycle from 'recycle'
 import { setVisibilityFilter } from '../actions'
 
-const FilterLink = recycle(React, Rx)({
+const FilterLink = recycle({
   dispatch (sources) {
     return [
       sources.select('a')
