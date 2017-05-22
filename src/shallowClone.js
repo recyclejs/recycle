@@ -1,6 +1,6 @@
 function shallowClone (data) {
   if (Array.isArray(data)) {
-    return data.map(i => i)
+    return [...data]
   } else if (typeof data === 'object') {
     return {...data}
   }
