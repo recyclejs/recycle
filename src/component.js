@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import forceArray from './forceArray'
 import shallowClone from './shallowClone'
-import customRxOperators from './customRxOperators'
 import _makeUpdateNodeStreams from './updateNodeStreams'
 import _makeRegisterListeners from './registerListeners'
 import _makeCustomCreateElement from './customCreateElement'
@@ -11,7 +10,6 @@ export default (React, Rx) => function recycle (component) {
   const registerListeners = _makeRegisterListeners(Rx)
   const updateNodeStreams = _makeUpdateNodeStreams(Rx)
   const originalCreateElement = React.createElement
-  customRxOperators(Rx)
 
   class RecycleComponent extends React.Component {
     componentWillMount () {
@@ -50,11 +48,11 @@ export default (React, Rx) => function recycle (component) {
       this.state = this.componentState
       if (component.update) {
         const state$ = Rx.Observable.merge(...forceArray(component.update(this.sources)))
-        this.__stateSubsription = state$.subscribe(newVal => {
+        this.__stateSubsription = state$.subscribe(({reducer, event}) => {
           if (this.__componentMounted) {
-            this.componentState = shallowClone(newVal.reducer(this.componentState, newVal.event))
+            this.componentState = shallowClone(reducer(this.componentState, event))
           } else {
-            this.componentState = newVal.reducer(this.componentState, newVal.event)
+            this.componentState = reducer(this.componentState, event)
           }
           this.setState(this.componentState)
         })

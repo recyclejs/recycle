@@ -1,6 +1,6 @@
 // functional tests
 /* global expect, it */
-import recycle from '../src'
+import recycle, {registerReducer} from '../src'
 import React from 'react'
 import {shallow} from 'enzyme'
 
@@ -12,10 +12,10 @@ it('should change label', () => {
       return [
         sources.select('input')
           .addListener('onChange')
-          .reducer(function (state) {
+          .let(registerReducer((state) => {
             state.isChecked = !state.isChecked
             return state
-          })
+          }))
       ]
     },
 
