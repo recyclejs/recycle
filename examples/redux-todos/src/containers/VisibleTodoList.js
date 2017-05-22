@@ -1,5 +1,5 @@
 import React from 'react'
-import recycle from 'recycle'
+import recycle, { registerReducer } from 'recycle'
 import { toggleTodo } from '../actions'
 import TodoList from '../components/TodoList'
 
@@ -25,7 +25,7 @@ const VisibleTodoList = recycle({
 
   update (sources) {
     return sources.store
-      .reducer((state, store) => store)
+      .let(registerReducer((state, store) => store))
   },
 
   view (props, state) {

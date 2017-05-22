@@ -1,8 +1,8 @@
 // functional tests
 /* global expect, it */
-import recycle, {registerReducer} from '../src'
+import recycle, { registerReducer } from '../src'
 import React from 'react'
-import {shallow} from 'enzyme'
+import { shallow } from 'enzyme'
 
 it('should change label', () => {
   const CheckboxWithLabel = recycle({
