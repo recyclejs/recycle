@@ -17,7 +17,7 @@
     "docs:publish": "npm run docs:build && cd _book && git init && git commit --allow-empty -m 'Update docs' && git checkout -b gh-pages && git add . && git commit -am 'Update docs' && git push https://github.com/recyclejs/recycle gh-pages --force && git checkout master"
   },
   "jest": {
-    "testMatch": [ 
+    "testMatch": [
       "**/tests/**/*.js?(x)",
       "**/src/?(*.)(spec|test).js?(x)"
     ]
@@ -53,16 +53,19 @@
     "eslint-plugin-standard": "^2.0.1",
     "gitbook-cli": "^2.3.0",
     "jest": "^20.0.1",
+    "prop-types": "^15.0.0",
+    "react": "^15.0.0",
     "react-dom": "^15.5.4",
     "react-router": "^3.0.0",
     "react-test-renderer": "^15.5.4",
     "redux": "^3.6.0",
+    "rxjs": "^5.0.0",
     "style-loader": "^0.13.1",
     "uglify-js": "^2.7.5"
   },
-  "dependencies": {
-    "prop-types": "^15.5.8",
-    "react": "^15.5.4",
-    "rxjs": "^5.3.0"
+  "peerDependencies": {
+    "prop-types": "15.x",
+    "react": "15.x",
+    "rxjs": "5.x"
   }
 }
