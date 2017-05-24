@@ -1,5 +1,5 @@
 import React from 'react'
-import recycle from 'recycle'
+import recycle, { registerReducer } from 'recycle'
 import { setVisibilityFilter } from '../actions'
 
 const FilterLink = recycle({
@@ -16,7 +16,7 @@ const FilterLink = recycle({
   update (sources) {
     return [
       sources.store
-        .reducer((state, store) => store)
+        .let(registerReducer((state, store) => store))
     ]
   },
 

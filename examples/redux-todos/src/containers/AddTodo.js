@@ -1,5 +1,5 @@
 import React from 'react'
-import recycle from 'recycle'
+import recycle, { registerReducer } from 'recycle'
 import { addTodo } from '../actions'
 
 const AddTodo = recycle({
@@ -20,18 +20,18 @@ const AddTodo = recycle({
     return [
       sources.select('input')
         .addListener('onChange')
-        .reducer(function (state, e) {
+        .let(registerReducer((state, e) => {
           state.inputVal = e.target.value
           return state
-        }),
+        })),
 
       sources.select('form')
         .addListener('onSubmit')
-        .reducer(function (state, e) {
+        .let(registerReducer((state, e) => {
           e.preventDefault()
           state.inputVal = ''
           return state
-        })
+        }))
     ]
   },
 
