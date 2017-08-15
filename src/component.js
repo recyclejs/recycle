@@ -27,7 +27,7 @@ export default (React, Rx) => function recycle (component) {
         props: new Rx.Subject()
       }
 
-      this.componentState = component.initialState
+      this.componentState = {...component.initialState}
 
       // create redux store stream
       if (this.context && this.context.store) {
