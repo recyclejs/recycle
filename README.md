@@ -26,15 +26,15 @@ const Timer = recycle({
     return [
       sources.select('button')
         .addListener('onClick')
-        .reducer(function (state) {
-          state.counter++
-          return state
+        .reducer(state => {
+          ...state,
+          counter: state.counter + 1
         }),
       
       Rx.Observable.interval(1000)
-        .reducer(function (state) {
-          state.secondsElapsed++
-          return state
+        .reducer(state => {
+          ...state,
+          secondsElapsed: state.secondsElapsed + 1
         })
     ]
   },
@@ -66,9 +66,8 @@ const Timer = recycle({
     return [
       sources.select(CustomButton)
         .addListener('customOnClick')
-        .reducer(function (state, returnedValue) {
-          state.counter = state.counter + returnedValue
-          return state
+        .reducer((state, returnedValue) => {
+          counter: state.counter + returnedValue
         })
     ]
   },
