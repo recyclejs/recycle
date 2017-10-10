@@ -15,7 +15,7 @@ function getNodeSelectors (nodeName, attrs) {
   }
 
   if (className) {
-    let classes = className.split(' ').map(classNcame => ({ selector: className, selectorType: 'class' }))
+    let classes = className.split(' ').map(className => ({ selector: className, selectorType: 'class' }))
     selectors = selectors.concat(classes)
   }
 
