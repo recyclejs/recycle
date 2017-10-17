@@ -1,7 +1,3 @@
-/**
- * TODO: Insert JSDoc
- */
-
 import {Observable} from 'rxjs'
 import * as React from 'react'
 import {Action} from 'redux'
@@ -185,12 +181,88 @@ declare namespace recycle {
     }
 
     interface Params<S, R> {
+        /**
+         * React props passed by JSX
+         */
         propTypes?: any
+
+        /**
+         * Determines the html tag name
+         */
         displayName?: string
+
+        /**
+         * Component's local initial state
+         */
         initialState?: S
-        dispatch?: (sources: recycle.Sources<S, R>) => Observable<Action>
+
+        /**
+         *
+         *
+         * @param sources
+         * @returns {Observable<Action>[]} Array of Redux action streams
+         */
+        dispatch?: (sources: recycle.Sources<S, R>) => Observable<Action>[]
+
+        /**
+         * Acts like a Redux reducer for the component local state
+         *
+         * @param sources
+         * @template S Interface representing the component local state
+         * @template R Interface representing the Redux state (If using Redux)
+         * @returns {Observable<ReducerObservableFn<S, R>>[]}
+         * @example
+         *
+         * update: (sources) => {
+         *     return [
+         *       sources.store
+         *         .reducer(function (state, store) {
+         *           return state
+         *         })
+         *     ]
+         * },
+         *
+         */
         update?: (sources: recycle.Sources<S, R>) => ReducerObservableFn<S, R>[]
+
+        /**
+         * If you don't need to update a component local state or dispatch Redux action, but you still need to react
+         * to some kind of async operation, you can use effects.
+         *
+         * @param sources
+         * @returns Observable<any>[]
+         * @example
+         *
+         * effects: (sources) => {
+         *     return [
+         *         sources.select('input')
+         *           .addListener('onKeyPress')
+         *           .withLatestFrom(sources.props)
+         *           .map(([e, props]) => {
+         *               props.callParentFunction(e.target.value)
+         *           })
+         *    ]
+         * }
+         *
+         */
         effects?: (sources: recycle.Sources<S, R>) => Observable<any>[]
+
+        /**
+         * Returns the JSX to be rendered for the component
+         *
+         * @param props
+         * @param state
+         * @returns {JSX.Element}
+         * @example
+         *
+         * view: (props, state) =>
+         *     <div>
+         *         <div>Seconds Elapsed: {state.secondsElapsed}</div>
+         *         <div>Times Clicked: {state.counter}</div>
+         *         <button>Click Me</button>
+         *     </div>
+         *
+         */
         view?: (props: any, state: S) => JSX.Element
     }
 
