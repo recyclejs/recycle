@@ -1,6 +1,6 @@
 import {Observable} from 'rxjs'
 import * as React from 'react'
-import {Action} from 'redux'
+import {AnyAction} from 'redux'
 
 
 export = recycle
@@ -200,9 +200,9 @@ declare namespace recycle {
          *
          *
          * @param sources
-         * @returns {Observable<Action>[]} Array of Redux action streams
+         * @returns {Observable<AnyAction>[]} Array of Redux action streams
          */
-        dispatch?: (sources: recycle.Sources<S, R>) => Observable<Action>[]
+        dispatch?: (sources: recycle.Sources<S, R>) => Observable<AnyAction>[]
 
         /**
          * Acts like a Redux reducer for the component local state
