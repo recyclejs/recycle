@@ -16,6 +16,6 @@ const Rx = {
   BehaviorSubject
 }
 
-const recycle = component(React, Rx)
+export const recycle = component(React, Rx)
 export { reducer } from './customRxOperators'
 export default recycle
