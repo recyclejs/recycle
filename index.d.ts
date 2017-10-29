@@ -3,8 +3,8 @@ import * as React from 'react'
 import {AnyAction} from 'redux'
 
 
-export = recycle
-declare const recycle: recycle.Recycle
+export declare const recycle: recycle.Recycle
+export default recycle
 export as namespace recycle
 
 
