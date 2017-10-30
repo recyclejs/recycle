@@ -62,7 +62,7 @@ declare module 'rxjs/Observable' {
 
 declare namespace recycle {
 
-    interface Listeners {
+    interface Listeners<T> {
 
         /**
          * Register a new DOM listener and returns a stream of DOM events
@@ -79,7 +79,7 @@ declare namespace recycle {
          *     }),
          *
          */
-        addListener: (event: DomEvent) => Observable<Event>
+        addListener: (event: T) => Observable<Event>
     }
 
     type ReactLifeCycle =
@@ -109,7 +109,7 @@ declare namespace recycle {
          * sources.select(ChildComponent)
          *
          */
-        select: <P = {}, S = {}>(param: string | React.Component<P, S> | React.StatelessComponent<P>) => recycle.Listeners
+        select: <CP={}, CS={}>(param: string | React.Component<CP, CS> | React.StatelessComponent<CP>) => recycle.Listeners<DomEvent | keyof CP>;
 
         /**
          * This method selects a element by a CSS class and returns a recycle.Listeners
@@ -122,7 +122,7 @@ declare namespace recycle {
          * sources.select('cssClass')
          *
          */
-        selectClass: (className: string) => recycle.Listeners
+        selectClass: <CP={}>(className: string) => recycle.Listeners<DomEvent | keyof CP>;
 
         /**
          * This method selects a element by id and returns a recycle.Listeners
@@ -135,7 +135,7 @@ declare namespace recycle {
          * sources.select('elementId')
          *
          */
-        selectId: (id: string) => recycle.Listeners
+        selectId: <CP={}>(id: string) => recycle.Listeners<DomEvent | keyof CP>
 
         /**
          * If you are using Redux (component is inside Provider) this will return a stream of your redux state
