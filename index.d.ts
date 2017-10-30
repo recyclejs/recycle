@@ -109,7 +109,7 @@ declare namespace recycle {
          * sources.select(ChildComponent)
          *
          */
-        select: (param: string) => recycle.Listeners
+        select: <P = {}, S = {}>(param: string | React.Component<P, S> | React.StatelessComponent<P>) => recycle.Listeners
 
         /**
          * This method selects a element by a CSS class and returns a recycle.Listeners
