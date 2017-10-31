@@ -1,6 +1,7 @@
-import {Observable} from 'rxjs'
+import { Observable } from 'rxjs'
 import * as React from 'react'
-import {AnyAction} from 'redux'
+import * as PropTypes from 'prop-types'
+import { AnyAction } from 'redux'
 
 
 export declare const recycle: recycle.Recycle
@@ -180,11 +181,11 @@ declare namespace recycle {
         lifecycle: Observable<ReactLifeCycle>
     }
 
-    interface Params<S, R> {
+    interface Params<P, S, R> {
         /**
          * React props passed by JSX
          */
-        propTypes?: any
+        propTypes?: PropTypes.ValidationMap<P>
 
         /**
          * Determines the html tag name
@@ -263,10 +264,10 @@ declare namespace recycle {
          *     </div>
          *
          */
-        view?: (props: any, state: S) => JSX.Element
+        view?: (props: P, state: S) => JSX.Element
     }
 
     interface Recycle {
-        <S, R=any>(params: recycle.Params<S, R>): React.Component
+        <P, S, R=any>(params: recycle.Params<P, S, R>): React.ComponentClass<P>
     }
 }
