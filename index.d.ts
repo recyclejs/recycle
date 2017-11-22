@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs'
-import * as React from 'react'
+import React from 'react'
 import * as PropTypes from 'prop-types'
 import { AnyAction } from 'redux'
 
