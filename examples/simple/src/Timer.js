@@ -1,5 +1,6 @@
 import React from 'react'
 import recycle from 'recycle'
+import { reducer } from 'recycle/lib/customRxOperators' // optional
 import Rx from 'rxjs'
 
 const Timer = recycle({
@@ -13,15 +14,21 @@ const Timer = recycle({
       sources.select('button')
         .addListener('onClick')
         .reducer(function (state) {
-          state.counter += 1
-          return state
+          return {
+            ...state,
+            counter: state.counter + 1
+          }
         }),
 
       Rx.Observable.interval(1000)
-        .reducer(function (state) {
-          state.secondsElapsed += 1
-          return state
-        })
+        // if you don't want to use custom Rx operator
+        // you can use "let"
+        .let(reducer(function (state) {
+          return {
+            ...state,
+            secondsElapsed: state.secondsElapsed + 1
+          }
+        }))
     ]
   },
 
