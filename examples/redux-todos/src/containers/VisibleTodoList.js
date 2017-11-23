@@ -25,6 +25,7 @@ const VisibleTodoList = recycle({
 
   update (sources) {
     return sources.store
+      // maping store to the component state
       .reducer((state, store) => store)
   },
 
