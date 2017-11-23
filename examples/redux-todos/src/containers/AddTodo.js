@@ -21,16 +21,20 @@ const AddTodo = recycle({
       sources.select('input')
         .addListener('onChange')
         .reducer(function (state, e) {
-          state.inputVal = e.target.value
-          return state
+          return {
+            ...state,
+            inputVal: e.target.value
+          }
         }),
 
       sources.select('form')
         .addListener('onSubmit')
         .reducer(function (state, e) {
           e.preventDefault()
-          state.inputVal = ''
-          return state
+          return {
+            ...state,
+            inputVal: ''
+          }
         })
     ]
   },
