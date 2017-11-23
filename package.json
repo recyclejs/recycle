@@ -1,6 +1,6 @@
 {
   "name": "recycle",
-  "version": "2.3.1",
+  "version": "3.0.0",
   "description": "A functional and reactive library for React",
   "main": "lib/index.js",
   "scripts": {
@@ -67,8 +67,8 @@
     "uglify-js": "^2.7.5"
   },
   "peerDependencies": {
-    "prop-types": "15.x",
-    "react": "15.x",
+    "prop-types": "15.x || 16.x",
+    "react": "15.x || 16.x",
     "rxjs": "5.x"
   }
 }
