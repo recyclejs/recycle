@@ -47,7 +47,7 @@ export default (React, Rx) => function recycle (component) {
       }
 
       // handling component state with update() stream
-      this.state = this.componentState
+      this.setState(this.componentState)
       if (component.update) {
         const state$ = Rx.Observable.merge(...forceArray(component.update(this.sources)))
         this.__stateSubsription = state$.subscribe(newVal => {
