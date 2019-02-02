@@ -2,6 +2,9 @@
 [![npm version](https://img.shields.io/npm/v/recycle.svg?style=flat-square)](https://www.npmjs.com/package/recycle)
 [![npm downloads](https://img.shields.io/npm/dm/recycle.svg?style=flat-square)](https://www.npmjs.com/package/recycle)
 
+# DEPRECATED
+Please note that this library hasn't been updated for more than two years. It's very rarely used and I consider it deprecated.
+
 # Recycle
 Convert functional/reactive object description into React component.
 
